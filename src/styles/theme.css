@@ -1,0 +1,15 @@
+:root {
+  --bg-page: #f3f5f7;
+  --bg-card: #ffffff;
+  --line: #e5e7eb;
+  --text-main: #1f2937;
+  --text-secondary: #6b7280;
+  --brand: #77b980;
+  --brand-dark: #5a9864;
+}
+
+body {
+  font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+  color: var(--text-main);
+  background: radial-gradient(circle at 5% 10%, #eff8f0 0%, #f5f7f9 45%, #eef2f6 100%);
+}
