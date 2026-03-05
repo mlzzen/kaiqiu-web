@@ -30,6 +30,70 @@
           <div class="html" v-html="safeDescription"></div>
         </template>
 
+        <template v-if="scoreTrend.length">
+          <div class="section-title">最近40场比赛积分趋势</div>
+          <div class="trend-wrap">
+            <svg viewBox="0 0 1000 300" preserveAspectRatio="none" class="trend-svg">
+              <line :x1="chartBox.left" :y1="chartBox.top" :x2="chartBox.left" :y2="chartBox.bottom" stroke="#9ca3af" stroke-width="1.5" />
+              <line :x1="chartBox.left" :y1="chartBox.bottom" :x2="chartBox.right" :y2="chartBox.bottom" stroke="#9ca3af" stroke-width="1.5" />
+              <g v-for="tick in yTicks" :key="`y-${tick.value}`">
+                <line :x1="chartBox.left - 6" :y1="tick.y" :x2="chartBox.right" :y2="tick.y" stroke="#e5e7eb" stroke-width="1" />
+                <text :x="chartBox.left - 10" :y="tick.y + 4" text-anchor="end" font-size="16" fill="#6b7280">{{ tick.label }}</text>
+              </g>
+              <g v-for="tick in xTicks" :key="`x-${tick.index}`">
+                <line :x1="tick.x" :y1="chartBox.bottom" :x2="tick.x" :y2="chartBox.bottom + 5" stroke="#9ca3af" stroke-width="1" />
+                <text :x="tick.x" :y="chartBox.bottom + 22" text-anchor="middle" font-size="14" fill="#6b7280">{{ tick.label }}</text>
+              </g>
+              <polyline
+                fill="none"
+                stroke="#248dff"
+                stroke-width="3"
+                :points="trendPoints"
+              />
+              <g v-for="point in trendDots" :key="point.index">
+                <circle :cx="point.x" :cy="point.y" r="3.5" fill="#248dff" />
+              </g>
+            </svg>
+          </div>
+        </template>
+
+        <template v-if="showTags.length">
+          <div class="section-title">收到最多评价</div>
+          <div class="tag-list">
+            <el-tag
+              v-for="tag in showTags"
+              :key="`${tag.ename}-${tag.etype}`"
+              :type="tag.selected == 1 ? 'success' : 'info'"
+              effect="plain"
+              class="tag-item"
+            >
+              {{ tag.ename }} ({{ tag.count }})
+            </el-tag>
+          </div>
+        </template>
+
+        <div class="section-title">基础信息</div>
+        <el-descriptions :column="2" border>
+          <el-descriptions-item label="性别年龄">
+            {{ profile.sex || '-' }}{{ profile.age ? ` ${profile.age}岁` : '' }}
+          </el-descriptions-item>
+          <el-descriptions-item label="所在">{{ profile.resideprovince || '-' }}</el-descriptions-item>
+          <el-descriptions-item label="专业背景">{{ profile.bg || '-' }}</el-descriptions-item>
+          <el-descriptions-item label="底板型号">{{ `${profile.qiupai || ''} ${profile.qiupaitype || ''}`.trim() || '-' }}</el-descriptions-item>
+          <el-descriptions-item label="正手套胶">{{ `${profile.zhengshou || ''} ${profile.zhengshoutype || ''}`.trim() || '-' }}</el-descriptions-item>
+          <el-descriptions-item label="反手套胶">{{ `${profile.fanshou || ''} ${profile.fanshoutype || ''}`.trim() || '-' }}</el-descriptions-item>
+        </el-descriptions>
+
+        <template v-if="profile.honors?.length">
+          <div class="section-title">近期荣耀</div>
+          <div class="honor-list">
+            <div class="honor-item" v-for="(item, index) in profile.honors" :key="index">
+              <img class="honor-icon" :src="item.honor" alt="honor" />
+              <span>{{ item.subject }}</span>
+            </div>
+          </div>
+        </template>
+
         <div class="section-title">近期战绩</div>
         <el-table :data="games" stripe v-loading="gamesLoading">
           <el-table-column label="日期" width="130">
@@ -76,7 +140,7 @@
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessageBox } from 'element-plus'
-import { getAdvProfile, getPageGamesByUid, goCancelFolloweeByUid, goFolloweeByUid } from '../api/user'
+import { getAdvProfile, getPageGamesByUid, getUserScores, getUserTags, goCancelFolloweeByUid, goFolloweeByUid } from '../api/user'
 import { useUserStore } from '../stores/user'
 
 const route = useRoute()
@@ -91,6 +155,8 @@ const total = ref(0)
 const firstPageGames = ref([])
 const hasNext = ref(false)
 const effectivePageSize = ref(20)
+const showTags = ref([])
+const scoreTrend = ref([])
 
 const uid = computed(() => route.params.uid || userStore.userInfo?.user_id || userStore.userInfo?.id)
 const showFollowButton = computed(() => Number(profile.value.hasFollowed) !== -1)
@@ -100,6 +166,76 @@ const safeDescription = computed(() => {
   } catch {
     return profile.value.description || ''
   }
+})
+
+const trendPoints = computed(() => {
+  if (scoreTrend.value.length <= 1) {
+    return ''
+  }
+  return trendDots.value.map((p) => `${p.x},${p.y}`).join(' ')
+})
+
+const chartBox = {
+  left: 80,
+  right: 970,
+  top: 18,
+  bottom: 250
+}
+
+const scoreRange = computed(() => {
+  const values = scoreTrend.value.map((v) => Number(v.postscore || 0))
+  const max = Math.max(...values)
+  const min = Math.min(...values)
+  const range = Math.max(1, max - min)
+  return { min, max, range }
+})
+
+const trendDots = computed(() => {
+  if (!scoreTrend.value.length) {
+    return []
+  }
+  const { min, range } = scoreRange.value
+  const width = chartBox.right - chartBox.left
+  const height = chartBox.bottom - chartBox.top
+  return scoreTrend.value
+    .map((item, index) => {
+      const ratio = scoreTrend.value.length === 1 ? 0 : index / (scoreTrend.value.length - 1)
+      const x = chartBox.left + ratio * width
+      const y = chartBox.bottom - ((Number(item.postscore || 0) - min) / range) * height
+      return { index, x, y, date: item.dateline }
+    })
+})
+
+const yTicks = computed(() => {
+  if (!scoreTrend.value.length) {
+    return []
+  }
+  const count = 4
+  const { min, max } = scoreRange.value
+  const step = (max - min) / count
+  return Array.from({ length: count + 1 }).map((_, i) => {
+    const value = max - step * i
+    const y = chartBox.top + ((chartBox.bottom - chartBox.top) * i) / count
+    return { value, y, label: Math.round(value) }
+  })
+})
+
+const xTicks = computed(() => {
+  if (!trendDots.value.length) {
+    return []
+  }
+  const indexes = Array.from(new Set([
+    0,
+    Math.floor((trendDots.value.length - 1) * 0.33),
+    Math.floor((trendDots.value.length - 1) * 0.66),
+    trendDots.value.length - 1
+  ])).filter((i) => i >= 0)
+  return indexes.map((i) => {
+    const dot = trendDots.value[i]
+    const raw = dot.date || ''
+    const label = raw.length >= 10 ? raw.slice(5, 10) : raw
+    return { index: i, x: dot.x, label }
+  })
 })
 
 async function loadData() {
@@ -118,7 +254,27 @@ async function loadData() {
   )
   // 原版是无限加载：未知总数时先允许继续翻页，直到某页返回空/不足再收口
   hasNext.value = total.value > 0 ? effectivePageSize.value < total.value : firstPageGames.value.length > 0
+  await Promise.all([
+    loadUserTags(),
+    loadUserScores()
+  ])
   await loadGames(1)
+}
+
+async function loadUserTags() {
+  if (!uid.value) {
+    return
+  }
+  const res = await getUserTags({ uid: uid.value, limitByCount: 6, getNegative: false })
+  showTags.value = (res.data || []).filter((v) => Number(v.count || 0) > 0)
+}
+
+async function loadUserScores() {
+  if (!uid.value) {
+    return
+  }
+  const res = await getUserScores(uid.value)
+  scoreTrend.value = (res.data || []).slice(-40)
 }
 
 async function loadGames(nextPage = 1) {
@@ -229,6 +385,47 @@ function nextPage() {
 .section-title {
   margin: 16px 0 10px;
   font-weight: 700;
+}
+
+.trend-wrap {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fafafa;
+  padding: 10px;
+}
+
+.trend-svg {
+  width: 100%;
+  height: 280px;
+  display: block;
+}
+
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tag-item {
+  margin: 0;
+}
+
+.honor-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
+.honor-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.honor-icon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
 }
 
 .html {

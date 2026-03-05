@@ -39,3 +39,11 @@ export function goCancelFolloweeByUid(uid) {
 export function goFolloweeByUid(uid) {
   return get('/User/followee', { uid })
 }
+
+export function getUserTags(params) {
+  return get('/User/get_tags', params)
+}
+
+export function getUserScores(uid) {
+  return get('/User/getUserScores', { uid })
+}
