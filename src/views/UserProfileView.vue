@@ -84,6 +84,78 @@
           <el-descriptions-item label="反手套胶">{{ `${profile.fanshou || ''} ${profile.fanshoutype || ''}`.trim() || '-' }}</el-descriptions-item>
         </el-descriptions>
 
+        <template v-if="top3BeatList.length">
+          <div class="section-title">击败分数最高前三名</div>
+          <div class="stat-list">
+            <div class="stat-item" v-for="(item, index) in top3BeatList" :key="`top3-beat-${index}`">
+              <el-button link type="primary" class="clickable-text" @click="goTopListUser('Top3OfBeat', index)">{{ item }}</el-button>
+            </div>
+          </div>
+        </template>
+
+        <template v-if="top3PlayerList.length">
+          <div class="section-title">交手分数最高前三名</div>
+          <div class="stat-list">
+            <div class="stat-item" v-for="(item, index) in top3PlayerList" :key="`top3-player-${index}`">
+              <el-button link type="primary" class="clickable-text" @click="goTopListUser('TopPlayer', index)">{{ item }}</el-button>
+            </div>
+          </div>
+        </template>
+
+        <template v-if="top3BeatManList.length">
+          <div class="section-title">击败男子最高前三名</div>
+          <div class="stat-list">
+            <div class="stat-item" v-for="(item, index) in top3BeatManList" :key="`top3-man-${index}`">
+              <el-button link type="primary" class="clickable-text" @click="goTopListUser('Top3ManOfBeat', index)">{{ item }}</el-button>
+            </div>
+          </div>
+        </template>
+
+        <template v-if="top3BeatWomanList.length">
+          <div class="section-title">击败女子最高前三名</div>
+          <div class="stat-list">
+            <div class="stat-item" v-for="(item, index) in top3BeatWomanList" :key="`top3-woman-${index}`">
+              <el-button link type="primary" class="clickable-text" @click="goTopListUser('Top3WomanOfBeat', index)">{{ item }}</el-button>
+            </div>
+          </div>
+        </template>
+
+        <template v-if="kuZhuList.length">
+          <div class="section-title">苦主</div>
+          <div class="stat-list">
+            <div class="stat-item" v-for="(item, index) in kuZhuList" :key="`kuzhu-${index}`">
+              <el-button v-if="item.uid" link type="primary" class="clickable-text" @click="goUser(item.uid)">{{ item.name }}({{ item.score || '-' }})</el-button>
+              <span v-else>{{ item.name }}({{ item.score || '-' }})</span>
+              <span class="sub">{{ item.detail }}</span>
+            </div>
+          </div>
+        </template>
+
+        <template v-if="fuXingList.length">
+          <div class="section-title">福星</div>
+          <div class="stat-list">
+            <div class="stat-item" v-for="(item, index) in fuXingList" :key="`fuxing-${index}`">
+              <el-button v-if="item.uid" link type="primary" class="clickable-text" @click="goUser(item.uid)">{{ item.name }}({{ item.score || '-' }})</el-button>
+              <span v-else>{{ item.name }}({{ item.score || '-' }})</span>
+              <span class="sub">{{ item.detail }}</span>
+            </div>
+          </div>
+        </template>
+
+        <template v-if="oftenPlayerList.length">
+          <div class="section-title">经常交手</div>
+          <div class="tag-list">
+            <el-tag v-for="(item, index) in oftenPlayerList" :key="`often-${index}`" effect="plain">{{ item }}</el-tag>
+          </div>
+        </template>
+
+        <template v-if="allCitiesList.length">
+          <div class="section-title">曾参加比赛城市</div>
+          <div class="tag-list">
+            <el-tag v-for="(city, index) in allCitiesList" :key="`city-${index}`" type="info" effect="plain">{{ city }}</el-tag>
+          </div>
+        </template>
+
         <template v-if="profile.honors?.length">
           <div class="section-title">近期荣耀</div>
           <div class="honor-list">
@@ -167,6 +239,14 @@ const safeDescription = computed(() => {
     return profile.value.description || ''
   }
 })
+const oftenPlayerList = computed(() => splitValue(profile.value.OftenPlayer))
+const top3BeatList = computed(() => splitValue(profile.value.Top3OfBeatUsernameScore))
+const top3PlayerList = computed(() => splitValue(profile.value.TopPlayerUsernameScore))
+const top3BeatManList = computed(() => splitValue(profile.value.Top3ManOfBeatUsernameScore))
+const top3BeatWomanList = computed(() => splitValue(profile.value.Top3WomanOfBeatUsernameScore))
+const allCitiesList = computed(() => splitValue(profile.value.allCities))
+const kuZhuList = computed(() => parseSpecialRival(profile.value.kuzhu))
+const fuXingList = computed(() => parseSpecialRival(profile.value.fuxing))
 
 const trendPoints = computed(() => {
   if (scoreTrend.value.length <= 1) {
@@ -358,6 +438,41 @@ function nextPage() {
   }
   loadGames(page.value + 1)
 }
+
+function splitValue(raw, delimiter = ',') {
+  if (Array.isArray(raw)) {
+    return raw.map((v) => String(v || '').trim()).filter(Boolean)
+  }
+  return String(raw || '')
+    .split(delimiter)
+    .map((v) => v.trim())
+    .filter(Boolean)
+}
+
+function parseSpecialRival(raw) {
+  return String(raw || '')
+    .split(';')
+    .map((item) => item.trim())
+    .filter(Boolean)
+    .map((item) => {
+      const parts = item.split(',')
+      return {
+        name: parts[1] || '',
+        score: parts[2] || '',
+        uid: parts[3] || '',
+        detail: parts[5] || ''
+      }
+    })
+    .filter((item) => item.name)
+}
+
+function goTopListUser(type, index) {
+  const ids = splitValue(profile.value[type])
+  const target = ids[2 - index]
+  if (target) {
+    goUser(target)
+  }
+}
 </script>
 
 <style scoped>
@@ -448,5 +563,20 @@ function nextPage() {
   min-width: 72px;
   text-align: center;
   color: #6b7280;
+}
+
+.stat-list {
+  display: grid;
+  gap: 8px;
+}
+
+.stat-item {
+  display: flex;
+  gap: 8px;
+  color: #374151;
+}
+
+.clickable-text {
+  cursor: pointer;
 }
 </style>
