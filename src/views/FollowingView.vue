@@ -7,12 +7,16 @@
     <el-table :data="rows" stripe v-loading="loading">
       <el-table-column label="头像" width="90">
         <template #default="scope">
-          <el-avatar :src="scope.row.face_url" :size="46" />
+          <el-button link class="avatar-btn" @click="goUser(scope.row.fuid)">
+            <el-avatar :src="scope.row.face_url" :size="46" />
+          </el-button>
         </template>
       </el-table-column>
       <el-table-column label="姓名" min-width="200">
         <template #default="scope">
-          {{ scope.row.realname }} ({{ scope.row.nickname }})
+          <el-button link type="primary" @click="goUser(scope.row.fuid)">
+            {{ scope.row.realname }} ({{ scope.row.nickname }})
+          </el-button>
         </template>
       </el-table-column>
       <el-table-column label="操作" width="260">
@@ -111,5 +115,9 @@ loadRows()
 
 .inner {
   margin-top: 14px;
+}
+
+.avatar-btn {
+  padding: 0;
 }
 </style>

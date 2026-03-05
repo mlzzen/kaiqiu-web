@@ -24,7 +24,19 @@
           <div class="header">参赛记录</div>
         </template>
         <el-table :data="eventRows" stripe v-loading="loading">
-          <el-table-column prop="title" label="赛事名称" min-width="260" />
+          <el-table-column label="赛事名称" min-width="260">
+            <template #default="scope">
+              <el-button
+                v-if="getEventId(scope.row)"
+                link
+                type="primary"
+                @click="goEvent(scope.row)"
+              >
+                {{ scope.row.title }}
+              </el-button>
+              <span v-else>{{ scope.row.title }}</span>
+            </template>
+          </el-table-column>
           <el-table-column prop="city" label="城市" width="120" />
           <el-table-column prop="starttime" label="开始时间" width="180" />
           <el-table-column prop="status" label="状态" width="110" />
@@ -87,6 +99,18 @@ function goMyProfile() {
 
 function goFollowing() {
   router.push('/following')
+}
+
+function getEventId(row) {
+  return row?.eventid || row?.id || row?.match_id || null
+}
+
+function goEvent(row) {
+  const eventId = getEventId(row)
+  if (!eventId) {
+    return
+  }
+  router.push(`/event/${eventId}`)
 }
 
 Promise.all([loadUser(), loadEvents(1)])
