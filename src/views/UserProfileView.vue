@@ -1,35 +1,66 @@
 <template>
   <el-row :gutter="16">
     <el-col :span="8">
-      <el-card>
-        <div class="profile">
-          <el-avatar :size="90" :src="profile.realpic || profile.image" />
-          <div class="name">{{ profile.realname || '-' }}</div>
-          <div class="sub">{{ profile.username || '-' }}</div>
-          <div class="meta">{{ profile.scope || '全国' }}排名: {{ profile.rank ?? '-' }}</div>
-          <el-button type="success" plain @click="toggleFollow" v-if="showFollowButton">
-            {{ Number(profile.hasFollowed) === 1 ? '取消关注' : '关注Ta' }}
-          </el-button>
-        </div>
-      </el-card>
+      <div class="left-stack">
+        <el-card>
+          <div class="profile">
+            <el-avatar :size="90" :src="profile.realpic || profile.image" />
+            <div class="name">{{ profile.realname || '-' }}</div>
+            <div class="sub">{{ profile.username || '-' }}</div>
+            <div class="meta">{{ profile.scope || '全国' }}排名: {{ profile.rank ?? '-' }}</div>
+            <el-button type="success" plain @click="toggleFollow" v-if="showFollowButton">
+              {{ Number(profile.hasFollowed) === 1 ? '取消关注' : '关注Ta' }}
+            </el-button>
+          </div>
+        </el-card>
+
+        <el-card>
+          <template #header>
+            <div class="header">积分信息</div>
+          </template>
+          <el-descriptions :column="1" border>
+            <el-descriptions-item label="当前积分">{{ profile.score ?? '-' }}</el-descriptions-item>
+            <el-descriptions-item label="年度积分">{{ profile.maxScoreTheYear ?? '-' }}</el-descriptions-item>
+            <el-descriptions-item label="最高积分">{{ profile.maxscore ?? '-' }}</el-descriptions-item>
+          </el-descriptions>
+
+          <template v-if="profile.description">
+            <div class="section-title">比赛信息</div>
+            <div class="html" v-html="safeDescription"></div>
+          </template>
+
+          <template v-if="showTags.length">
+            <div class="section-title">收到最多评价</div>
+            <div class="tag-list">
+              <el-tag
+                v-for="tag in showTags"
+                :key="`${tag.ename}-${tag.etype}`"
+                :type="tag.selected == 1 ? 'success' : 'info'"
+                effect="plain"
+                class="tag-item"
+              >
+                {{ tag.ename }} ({{ tag.count }})
+              </el-tag>
+            </div>
+          </template>
+
+          <div class="section-title">基础信息</div>
+          <el-descriptions :column="1" border>
+            <el-descriptions-item label="性别年龄">
+              {{ profile.sex || '-' }}{{ profile.age ? ` ${profile.age}岁` : '' }}
+            </el-descriptions-item>
+            <el-descriptions-item label="所在">{{ profile.resideprovince || '-' }}</el-descriptions-item>
+            <el-descriptions-item label="专业背景">{{ profile.bg || '-' }}</el-descriptions-item>
+            <el-descriptions-item label="底板型号">{{ `${profile.qiupai || ''} ${profile.qiupaitype || ''}`.trim() || '-' }}</el-descriptions-item>
+            <el-descriptions-item label="正手套胶">{{ `${profile.zhengshou || ''} ${profile.zhengshoutype || ''}`.trim() || '-' }}</el-descriptions-item>
+            <el-descriptions-item label="反手套胶">{{ `${profile.fanshou || ''} ${profile.fanshoutype || ''}`.trim() || '-' }}</el-descriptions-item>
+          </el-descriptions>
+        </el-card>
+      </div>
     </el-col>
 
     <el-col :span="16">
       <el-card>
-        <template #header>
-          <div class="header">积分信息</div>
-        </template>
-        <el-descriptions :column="3" border>
-          <el-descriptions-item label="当前积分">{{ profile.score ?? '-' }}</el-descriptions-item>
-          <el-descriptions-item label="年度积分">{{ profile.maxScoreTheYear ?? '-' }}</el-descriptions-item>
-          <el-descriptions-item label="最高积分">{{ profile.maxscore ?? '-' }}</el-descriptions-item>
-        </el-descriptions>
-
-        <template v-if="profile.description">
-          <div class="section-title">比赛信息</div>
-          <div class="html" v-html="safeDescription"></div>
-        </template>
-
         <template v-if="scoreTrend.length">
           <div class="section-title">最近40场比赛积分趋势</div>
           <div class="trend-wrap">
@@ -56,33 +87,6 @@
             </svg>
           </div>
         </template>
-
-        <template v-if="showTags.length">
-          <div class="section-title">收到最多评价</div>
-          <div class="tag-list">
-            <el-tag
-              v-for="tag in showTags"
-              :key="`${tag.ename}-${tag.etype}`"
-              :type="tag.selected == 1 ? 'success' : 'info'"
-              effect="plain"
-              class="tag-item"
-            >
-              {{ tag.ename }} ({{ tag.count }})
-            </el-tag>
-          </div>
-        </template>
-
-        <div class="section-title">基础信息</div>
-        <el-descriptions :column="2" border>
-          <el-descriptions-item label="性别年龄">
-            {{ profile.sex || '-' }}{{ profile.age ? ` ${profile.age}岁` : '' }}
-          </el-descriptions-item>
-          <el-descriptions-item label="所在">{{ profile.resideprovince || '-' }}</el-descriptions-item>
-          <el-descriptions-item label="专业背景">{{ profile.bg || '-' }}</el-descriptions-item>
-          <el-descriptions-item label="底板型号">{{ `${profile.qiupai || ''} ${profile.qiupaitype || ''}`.trim() || '-' }}</el-descriptions-item>
-          <el-descriptions-item label="正手套胶">{{ `${profile.zhengshou || ''} ${profile.zhengshoutype || ''}`.trim() || '-' }}</el-descriptions-item>
-          <el-descriptions-item label="反手套胶">{{ `${profile.fanshou || ''} ${profile.fanshoutype || ''}`.trim() || '-' }}</el-descriptions-item>
-        </el-descriptions>
 
         <template v-if="top3BeatList.length">
           <div class="section-title">击败分数最高前三名</div>
@@ -476,6 +480,11 @@ function goTopListUser(type, index) {
 </script>
 
 <style scoped>
+.left-stack {
+  display: grid;
+  gap: 16px;
+}
+
 .profile {
   display: flex;
   flex-direction: column;

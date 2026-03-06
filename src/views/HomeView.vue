@@ -2,9 +2,9 @@
   <div>
     <el-card shadow="never" class="toolbar">
       <div class="toolbar-inner">
-        <el-input v-model="keyword" placeholder="输入赛事关键词" clearable style="max-width: 300px" @keyup.enter="loadList(1)">
+        <el-input v-model="keyword" placeholder="输入赛事关键词" clearable style="max-width: 300px" @keyup.enter="loadList(1, false)">
           <template #append>
-            <el-button :icon="Search" @click="loadList(1)" />
+            <el-button :icon="Search" @click="loadList(1, false)" />
           </template>
         </el-input>
         <el-button type="success" @click="syncBrowserLocation">使用浏览器定位</el-button>
@@ -21,20 +21,14 @@
     <el-empty v-if="!loading && !rows.length" description="暂无赛事" />
 
     <div class="pager">
-      <el-pagination
-        background
-        layout="prev, pager, next"
-        :current-page="query.page"
-        :page-size="10"
-        :total="total"
-        @current-change="loadList"
-      />
+      <el-button v-if="hasMore" :loading="loading" @click="loadMore">加载更多</el-button>
+      <span v-else class="pager-end">没有更多数据了</span>
     </div>
   </div>
 </template>
 
 <script setup>
-import { reactive, ref, watch } from 'vue'
+import { ref, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Search } from '@element-plus/icons-vue'
 import EventCard from '../components/EventCard.vue'
@@ -45,12 +39,16 @@ import { toList } from '../utils/format'
 const userStore = useUserStore()
 const loading = ref(false)
 const rows = ref([])
-const total = ref(0)
 const keyword = ref('')
-const query = reactive({ page: 1 })
+const page = ref(1)
+const hasMore = ref(false)
+const PAGE_SIZE = 10
 
-async function loadList(page = 1) {
-  query.page = page
+async function loadList(nextPage = 1, append = false) {
+  if (loading.value) {
+    return
+  }
+  page.value = nextPage
   loading.value = true
   try {
     const { lng, lat } = userStore.location
@@ -61,13 +59,21 @@ async function loadList(page = 1) {
       eventTitle: keyword.value,
       sort: 4,
       search: keyword.value ? 1 : 0,
-      page
+      page: nextPage
     })
-    rows.value = toList(res.data)
-    total.value = Number(res.data?.total || rows.value.length)
+    const incoming = toList(res.data)
+    rows.value = append ? rows.value.concat(incoming) : incoming
+    hasMore.value = incoming.length >= PAGE_SIZE
   } finally {
     loading.value = false
   }
+}
+
+function loadMore() {
+  if (!hasMore.value || loading.value) {
+    return
+  }
+  loadList(page.value + 1, true)
 }
 
 function syncBrowserLocation() {
@@ -82,7 +88,7 @@ function syncBrowserLocation() {
         lat: String(pos.coords.latitude)
       })
       ElMessage.success('定位成功，已刷新赛事')
-      loadList(1)
+      loadList(1, false)
     },
     () => ElMessage.warning('定位失败，继续使用默认位置')
   )
@@ -90,10 +96,10 @@ function syncBrowserLocation() {
 
 watch(
   () => userStore.city.name,
-  () => loadList(1)
+  () => loadList(1, false)
 )
 
-loadList(1)
+loadList(1, false)
 </script>
 
 <style scoped>
@@ -116,5 +122,11 @@ loadList(1)
   margin-top: 18px;
   display: flex;
   justify-content: center;
+  align-items: center;
+}
+
+.pager-end {
+  font-size: 13px;
+  color: #909399;
 }
 </style>

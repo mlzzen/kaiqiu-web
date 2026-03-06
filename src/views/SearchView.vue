@@ -100,21 +100,19 @@
     </el-table>
 
     <div class="pager">
-      <el-pagination
-        background
-        layout="prev, pager, next"
-        :current-page="page"
-        :page-size="10"
-        :total="total"
-        @current-change="search"
-      />
+      <el-button v-if="hasMore" :loading="loading" @click="loadMore">
+        加载更多
+      </el-button>
+      <span v-else class="pager-end">
+        没有更多数据了
+      </span>
     </div>
   </el-card>
 </template>
 
 <script setup>
 import { computed, ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { getArenaListPageByKey } from '../api/arena'
 import { getMatchListPageByKey } from '../api/match'
 import { getCities } from '../api/publicc'
@@ -124,13 +122,16 @@ import { toList } from '../utils/format'
 
 const userStore = useUserStore()
 const router = useRouter()
+const route = useRoute()
 const tab = ref('match')
 const loading = ref(false)
 const keyword = ref('')
 const rows = ref([])
-const total = ref(0)
 const page = ref(1)
 const distance = ref('')
+const bootstrapped = ref(false)
+const hasMore = ref(false)
+const PAGE_SIZE = 10
 
 function formatYmd(date) {
   const y = date.getFullYear()
@@ -152,8 +153,55 @@ const placeholder = computed(() => {
   return '请输入比赛名称'
 })
 
-async function search(nextPage = 1) {
+function buildQuery() {
+  const query = {
+    tab: tab.value || 'match',
+    keyword: keyword.value || undefined
+  }
+  if (tab.value === 'match') {
+    const [startDate, endDate] = dateRange.value || []
+    if (startDate && endDate) {
+      query.start = startDate
+      query.end = endDate
+    }
+    query.city = matchCity.value || undefined
+    query.distance = distance.value || undefined
+    query.tags = matchTags.value.length ? matchTags.value.join(',') : undefined
+  }
+  return query
+}
+
+function syncQuery() {
+  router.replace({ query: buildQuery() })
+}
+
+function applyQuery() {
+  const q = route.query || {}
+  tab.value = q.tab === 'arena' || q.tab === 'player' ? q.tab : 'match'
+  keyword.value = typeof q.keyword === 'string' ? q.keyword : ''
+  page.value = 1
+
+  if (tab.value === 'match') {
+    const start = typeof q.start === 'string' ? q.start : today
+    const end = typeof q.end === 'string' ? q.end : today
+    dateRange.value = [start, end]
+    matchCity.value = typeof q.city === 'string' ? q.city : ''
+    distance.value = typeof q.distance === 'string' ? q.distance : ''
+    matchTags.value = typeof q.tags === 'string' && q.tags.length ? q.tags.split(',') : []
+  } else {
+    dateRange.value = [today, today]
+    matchCity.value = ''
+    distance.value = ''
+    matchTags.value = []
+  }
+}
+
+async function search(nextPage = 1, append = false) {
+  if (loading.value) {
+    return
+  }
   page.value = nextPage
+  syncQuery()
   loading.value = true
   try {
     const { lng, lat } = userStore.location
@@ -190,20 +238,32 @@ async function search(nextPage = 1) {
         sort: 2
       })
     }
-    rows.value = toList(res.data)
-    total.value = Number(res.data?.total || rows.value.length)
+    const incoming = toList(res.data)
+    rows.value = append ? rows.value.concat(incoming) : incoming
+    hasMore.value = incoming.length >= PAGE_SIZE
   } finally {
     loading.value = false
   }
 }
 
+function loadMore() {
+  if (!hasMore.value || loading.value) {
+    return
+  }
+  search(page.value + 1, true)
+}
+
 watch(tab, () => {
+  if (!bootstrapped.value) {
+    return
+  }
   page.value = 1
   rows.value = []
+  hasMore.value = false
   if (tab.value === 'match' && (!dateRange.value || dateRange.value.length !== 2)) {
     dateRange.value = [today, today]
   }
-  search(1)
+  search(1, false)
 })
 
 async function loadCities() {
@@ -214,7 +274,9 @@ async function loadCities() {
   }
 }
 
-search(1)
+applyQuery()
+bootstrapped.value = true
+search(page.value || 1, false)
 loadCities()
 
 function goUser(uid) {
@@ -263,5 +325,11 @@ function formatDateRange(row) {
   margin-top: 14px;
   display: flex;
   justify-content: center;
+  align-items: center;
+}
+
+.pager-end {
+  font-size: 13px;
+  color: #909399;
 }
 </style>
