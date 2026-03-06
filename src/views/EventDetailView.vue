@@ -287,11 +287,11 @@
             <span v-else>{{ scope.row.name }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="score" label="报名积分" width="120" />
-        <el-table-column label="确认" width="120">
+        <el-table-column prop="score" label="报名积分" width="120" sortable :sort-method="sortMemberScore" />
+        <el-table-column label="确认" width="120" :filters="paidFilters" :filter-method="filterMemberPaid" column-key="paid">
           <template #default="scope">{{ paidMap[scope.row.paid] || scope.row.paid }}</template>
         </el-table-column>
-        <el-table-column label="性别" width="80">
+        <el-table-column label="性别" width="80" :filters="sexFilters" :filter-method="filterMemberSex" column-key="sex">
           <template #default="scope">{{ sexMap[scope.row.sex] || '-' }}</template>
         </el-table-column>
       </el-table>
@@ -333,6 +333,8 @@ const memberRows = ref([])
 
 const paidMap = { 0: '交费处理中', 1: '已交付', 2: '已报名' }
 const sexMap = { 1: '男', 2: '女' }
+const paidFilters = Object.keys(paidMap).map((key) => ({ text: paidMap[key], value: String(key) }))
+const sexFilters = Object.keys(sexMap).map((key) => ({ text: sexMap[key], value: String(key) }))
 
 const eventId = computed(() => route.params.id)
 const currentItem = computed(() => subEventList.value.find((v) => String(v.id) === String(activeItemId.value)) || null)
@@ -597,6 +599,23 @@ async function openMembers() {
   } finally {
     memberLoading.value = false
   }
+}
+
+function sortMemberScore(a, b) {
+  const left = Number(a?.score ?? 0)
+  const right = Number(b?.score ?? 0)
+  if (Number.isNaN(left) || Number.isNaN(right)) {
+    return String(a?.score ?? '').localeCompare(String(b?.score ?? ''))
+  }
+  return left - right
+}
+
+function filterMemberPaid(value, row) {
+  return String(row?.paid ?? '') === String(value)
+}
+
+function filterMemberSex(value, row) {
+  return String(row?.sex ?? '') === String(value)
 }
 
 function setChange(change) {
