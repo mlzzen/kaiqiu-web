@@ -48,7 +48,7 @@
             <span class="schedule-name">{{ currentItem?.name || '-' }}</span>
             <span v-if="currentItem?.qualNum > 0" class="schedule-qual">(小组出线{{ currentItem.qualNum }}人)</span>
           </div>
-          <el-button class="schedule-btn" type="success" plain :disabled="!groupSections.length">
+          <el-button class="schedule-btn" type="success" plain :disabled="!groupSections.length" @click="goSetScore">
             {{ groupSections.length ? '录入成绩' : '设定中...' }}
           </el-button>
         </div>
@@ -330,6 +330,7 @@ const scoreRows = ref([])
 
 const memberVisible = ref(false)
 const memberRows = ref([])
+const scoreTypeVisible = ref(false)
 
 const paidMap = { 0: '交费处理中', 1: '已交付', 2: '已报名' }
 const sexMap = { 1: '男', 2: '女' }
@@ -628,6 +629,15 @@ function goUser(uid) {
     return
   }
   router.push(`/user/${uid}`)
+}
+
+function goSetScore() {
+  if (!activeItemId.value) {
+    return
+  }
+  // 简单处理：默认先显示小组赛录入，后续可以根据是否有淘汰赛数据来选择
+  // 这里可以先让用户选择是小组赛还是淘汰赛
+  router.push(`/set-score/group/${eventId.value}/${activeItemId.value}`)
 }
 
 watch(eventId, async () => {
