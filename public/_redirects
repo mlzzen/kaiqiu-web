@@ -3,3 +3,6 @@
 # :splat 会捕获并传递剩余的路径部分
 
 /devApi/* https://kaiqiuwang.cc/xcx/public/index.php/api/:splat 200
+
+# SPA 回退规则 - 所有页面都返回 index.html 由 Vue Router 处理
+/*    /index.html   200
