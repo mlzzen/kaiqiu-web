@@ -1,0 +1,12 @@
+# Netlify 配置文件
+# https://docs.netlify.com/configure-builds/file-based-configuration/
+
+[build]
+  publish = "dist"
+  command = "npm run build"
+
+# CORS 支持
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"

@@ -1,0 +1,5 @@
+# Netlify 重定向规则
+# 将 /devApi/* 代理到后端 API
+# :splat 会捕获并传递剩余的路径部分
+
+/devApi/* https://kaiqiuwang.cc/xcx/public/index.php/api/:splat 200
