@@ -72,7 +72,9 @@
                   align="center"
                 >
                   <template #default="scope">
-                    <el-button v-if="scope.row.uid" link type="primary" @click="goUser(scope.row.uid)">{{ scope.row.newUsername }}</el-button>
+                    <router-link v-if="scope.row.uid" :to="`/user/${scope.row.uid}`" class="link-primary">
+                      {{ scope.row.newUsername }}
+                    </router-link>
                     <span v-else>{{ scope.row.newUsername }}</span>
                   </template>
                 </el-table-column>
@@ -95,10 +97,10 @@
       <div v-else-if="activeTab === 'results'" class="results" v-loading="tabLoading">
         <div v-if="resultHonors.length" class="results-honors">
           <div class="results-honors-title">名次列表</div>
-          <div v-for="(item, index) in resultHonors" :key="index" class="results-honor-row" @click="goUser(item.uid)">
+          <router-link v-for="(item, index) in resultHonors" :key="index" :to="`/user/${item.uid}`" class="results-honor-row link-primary">
             <div class="results-honor-rank">{{ item.honor }}</div>
             <div class="results-honor-name" :class="{ 'is-first': index === 0 }">{{ item.name }}</div>
-          </div>
+          </router-link>
         </div>
 
         <template v-if="resultGroups.length">
@@ -120,7 +122,9 @@
                   align="center"
                 >
                   <template #default="scope">
-                    <el-button v-if="scope.row.uid" link type="primary" @click="goUser(scope.row.uid)">{{ scope.row.newUsername }}</el-button>
+                    <router-link v-if="scope.row.uid" :to="`/user/${scope.row.uid}`" class="link-primary">
+                      {{ scope.row.newUsername }}
+                    </router-link>
                     <span v-else>{{ scope.row.newUsername }}</span>
                   </template>
                 </el-table-column>
@@ -251,7 +255,9 @@
         <el-table-column prop="honor" label="名次" width="120" />
         <el-table-column label="选手" min-width="220">
           <template #default="scope">
-            <el-button v-if="scope.row.uid" link type="primary" @click="goUser(scope.row.uid)">{{ scope.row.name }}</el-button>
+            <router-link v-if="scope.row.uid" :to="`/user/${scope.row.uid}`" class="link-primary">
+              {{ scope.row.name }}
+            </router-link>
             <span v-else>{{ scope.row.name }}</span>
           </template>
         </el-table-column>
@@ -261,7 +267,9 @@
       <el-table v-else :data="scoreRows" stripe v-loading="tabLoading">
         <el-table-column label="姓名" min-width="160">
           <template #default="scope">
-            <el-button v-if="scope.row.uid" link type="primary" @click="goUser(scope.row.uid)">{{ scope.row.realname }}</el-button>
+            <router-link v-if="scope.row.uid" :to="`/user/${scope.row.uid}`" class="link-primary">
+              {{ scope.row.realname }}
+            </router-link>
             <span v-else>{{ scope.row.realname }}</span>
           </template>
         </el-table-column>
@@ -283,7 +291,9 @@
         <el-table-column prop="number" label="#" width="60" />
         <el-table-column label="名称" min-width="180">
           <template #default="scope">
-            <el-button v-if="scope.row.uid" link type="primary" @click="goUser(scope.row.uid)">{{ scope.row.name }}</el-button>
+            <router-link v-if="scope.row.uid" :to="`/user/${scope.row.uid}`" class="link-primary">
+              {{ scope.row.name }}
+            </router-link>
             <span v-else>{{ scope.row.name }}</span>
           </template>
         </el-table-column>
@@ -622,13 +632,6 @@ function filterMemberSex(value, row) {
 function setChange(change) {
   const num = Number(change || 0)
   return num > 0 ? `+${num}` : String(num)
-}
-
-function goUser(uid) {
-  if (!uid) {
-    return
-  }
-  router.push(`/user/${uid}`)
 }
 
 function goSetScore() {
@@ -982,5 +985,14 @@ watch(activeItemId, () => {
   align-items: center;
   justify-content: center;
   color: #6b7280;
+}
+
+.link-primary {
+  color: #409eff;
+  text-decoration: none;
+}
+
+.link-primary:hover {
+  text-decoration: underline;
 }
 </style>

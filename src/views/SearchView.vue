@@ -37,14 +37,9 @@
     <el-table :data="rows" stripe v-loading="loading">
       <el-table-column v-if="tab === 'match'" label="比赛名称" min-width="240">
         <template #default="scope">
-          <el-button
-            v-if="getEventId(scope.row)"
-            link
-            type="primary"
-            @click="goEvent(scope.row)"
-          >
+          <router-link v-if="getEventId(scope.row)" :to="`/event/${getEventId(scope.row)}`" class="link-primary">
             {{ scope.row.title }}
-          </el-button>
+          </router-link>
           <span v-else>{{ scope.row.title }}</span>
         </template>
       </el-table-column>
@@ -78,14 +73,9 @@
 
       <el-table-column v-if="tab === 'player'" label="昵称(username2)" min-width="220">
         <template #default="scope">
-          <el-button
-            v-if="scope.row.uid || scope.row.id"
-            link
-            type="primary"
-            @click="goUser(scope.row.uid || scope.row.id)"
-          >
+          <router-link v-if="scope.row.uid || scope.row.id" :to="`/user/${scope.row.uid || scope.row.id}`" class="link-primary">
             {{ scope.row.username2 || scope.row.username || '-' }}
-          </el-button>
+          </router-link>
           <span v-else>{{ scope.row.username2 || scope.row.username || '-' }}</span>
         </template>
       </el-table-column>
@@ -279,23 +269,8 @@ bootstrapped.value = true
 search(page.value || 1, false)
 loadCities()
 
-function goUser(uid) {
-  if (!uid) {
-    return
-  }
-  router.push(`/user/${uid}`)
-}
-
 function getEventId(row) {
   return row?.eventid || row?.id || row?.match_id || null
-}
-
-function goEvent(row) {
-  const eventId = getEventId(row)
-  if (!eventId) {
-    return
-  }
-  router.push(`/event/${eventId}`)
 }
 
 function formatDistance(juli) {
@@ -331,5 +306,14 @@ function formatDateRange(row) {
 .pager-end {
   font-size: 13px;
   color: #909399;
+}
+
+.link-primary {
+  color: #409eff;
+  text-decoration: none;
+}
+
+.link-primary:hover {
+  text-decoration: underline;
 }
 </style>

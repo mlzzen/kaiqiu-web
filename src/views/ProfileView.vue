@@ -26,14 +26,9 @@
         <el-table :data="eventRows" stripe v-loading="loading">
           <el-table-column label="赛事名称" min-width="260">
             <template #default="scope">
-              <el-button
-                v-if="getEventId(scope.row)"
-                link
-                type="primary"
-                @click="goEvent(scope.row)"
-              >
+              <router-link v-if="getEventId(scope.row)" :to="`/event/${getEventId(scope.row)}`" class="link-primary">
                 {{ scope.row.title }}
-              </el-button>
+              </router-link>
               <span v-else>{{ scope.row.title }}</span>
             </template>
           </el-table-column>
@@ -105,14 +100,6 @@ function getEventId(row) {
   return row?.eventid || row?.id || row?.match_id || null
 }
 
-function goEvent(row) {
-  const eventId = getEventId(row)
-  if (!eventId) {
-    return
-  }
-  router.push(`/event/${eventId}`)
-}
-
 Promise.all([loadUser(), loadEvents(1)])
 </script>
 
@@ -147,5 +134,14 @@ Promise.all([loadUser(), loadEvents(1)])
   margin-top: 14px;
   display: flex;
   justify-content: center;
+}
+
+.link-primary {
+  color: #409eff;
+  text-decoration: none;
+}
+
+.link-primary:hover {
+  text-decoration: underline;
 }
 </style>

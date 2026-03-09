@@ -21,7 +21,9 @@
           <el-table-column label="排名" type="index" width="70" />
           <el-table-column label="昵称" min-width="180">
             <template #default="scope">
-              <el-button v-if="scope.row.uid || scope.row.id" link type="primary" @click="goUser(scope.row.uid || scope.row.id)">{{ scope.row.username }}</el-button>
+              <router-link v-if="scope.row.uid || scope.row.id" :to="`/user/${scope.row.uid || scope.row.id}`" class="link-primary">
+                {{ scope.row.username }}
+              </router-link>
               <span v-else>{{ scope.row.username }}</span>
             </template>
           </el-table-column>
@@ -36,13 +38,11 @@
 
 <script setup>
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
 import { getTop100Data, getTopView } from '../api/top'
 import { useUserStore } from '../stores/user'
 import { toList } from '../utils/format'
 
 const userStore = useUserStore()
-const router = useRouter()
 const loading = ref(false)
 const topList = ref([])
 const tableRows = ref([])
@@ -73,18 +73,20 @@ function selectTid(tid) {
 }
 
 loadTopView()
-
-function goUser(uid) {
-  if (!uid) {
-    return
-  }
-  router.push(`/user/${uid}`)
-}
 </script>
 
 <style scoped>
 .header {
   font-weight: 700;
   color: #2f4d32;
+}
+
+.link-primary {
+  color: #409eff;
+  text-decoration: none;
+}
+
+.link-primary:hover {
+  text-decoration: underline;
 }
 </style>
