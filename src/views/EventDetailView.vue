@@ -16,7 +16,8 @@
       <el-descriptions :column="2" border>
         <el-descriptions-item label="联系人">{{ detail.contact || '-' }}</el-descriptions-item>
         <el-descriptions-item label="电话">{{ detail.mobile || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="比赛时间">{{ detail.starttime || '-' }} 至 {{ detail.endtime || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="比赛时间">{{ detail.starttime || '-' }} 至 {{ detail.endtime || '-'
+          }}</el-descriptions-item>
         <el-descriptions-item label="比赛球馆">{{ detail.arena_name || '-' }}</el-descriptions-item>
         <el-descriptions-item label="比赛地点" :span="2">{{ detail.location || '-' }}</el-descriptions-item>
       </el-descriptions>
@@ -27,7 +28,8 @@
           <el-descriptions-item label="报名人数">{{ currentItem.curr_count || 0 }}/{{ allCount }}</el-descriptions-item>
           <el-descriptions-item label="比赛类型">{{ currentItem.match_type || '-' }}</el-descriptions-item>
           <el-descriptions-item label="报名限制">{{ currentItem.condition || '-' }}</el-descriptions-item>
-          <el-descriptions-item label="报名费">{{ currentItem.cost || 0 }} 元 {{ currentItem.postfee || '' }}</el-descriptions-item>
+          <el-descriptions-item label="报名费">{{ currentItem.cost || 0 }} 元 {{ currentItem.postfee || ''
+            }}</el-descriptions-item>
           <el-descriptions-item label="报名状态">{{ currentItem.is_enter ? '已报名' : '未报名' }}</el-descriptions-item>
         </el-descriptions>
       </div>
@@ -58,31 +60,23 @@
             <div class="schedule-group-title">第{{ groupIndex + 1 }}台</div>
             <div class="schedule-table-wrap">
               <el-table
-                :data="buildGroupRows(group)"
-                border
-                class="schedule-table"
-                :cell-style="setGroupCellStyle"
-                :header-cell-style="setGroupHeaderStyle"
-              >
+                        :data="buildGroupRows(group)"
+                        border
+                        class="schedule-table"
+                        :cell-style="setGroupCellStyle"
+                        :header-cell-style="setGroupHeaderStyle">
                 <el-table-column
-                  prop="newUsername"
-                  :label="`第${groupIndex + 1}组`"
-                  width="120"
-                  fixed="left"
-                  align="center"
-                >
+                                 prop="newUsername"
+                                 :label="`第${groupIndex + 1}组`"
+                                 width="120"
+                                 fixed="left"
+                                 align="center">
                   <template #default="scope">
                     <UserLink :uid="scope.row.uid" :name="scope.row.newUsername" />
                   </template>
                 </el-table-column>
-                <el-table-column
-                  v-for="col in getGroupColumns(group)"
-                  :key="col.key"
-                  :prop="col.key"
-                  :label="col.label"
-                  :width="col.width"
-                  align="center"
-                >
+                <el-table-column v-for="col in getGroupColumns(group)" :key="col.key" :prop="col.key" :label="col.label"
+                                 :width="col.width" align="center">
                   <template #default="scope">{{ scope.row[col.key] ?? '' }}</template>
                 </el-table-column>
               </el-table>
@@ -95,7 +89,8 @@
         <div v-if="resultHonors.length" class="results-honors">
           <div class="results-honors-title">名次列表</div>
           <div v-for="(item, index) in resultHonors" :key="index" class="results-honor-row">
-            <UserLink :uid="item.uid" :name="item.name" class="results-honor-name" :class="{ 'is-first': index === 0 }" />
+            <UserLink :uid="item.uid" :name="item.name" class="results-honor-name"
+                      :class="{ 'is-first': index === 0 }" />
             <div class="results-honor-rank">{{ item.honor }}</div>
           </div>
         </div>
@@ -105,31 +100,24 @@
             <div class="results-group-title">第{{ groupIndex + 1 }}台</div>
             <div class="results-table-wrap">
               <el-table
-                :data="buildResultRows(group)"
-                border
-                class="results-table"
-                :cell-style="setResultCellStyle"
-                :header-cell-style="setResultHeaderStyle"
-              >
+                        :data="buildResultRows(group)"
+                        border
+                        class="results-table"
+                        :cell-style="setResultCellStyle"
+                        :header-cell-style="setResultHeaderStyle">
                 <el-table-column
-                  prop="newUsername"
-                  :label="`第${groupIndex + 1}组`"
-                  width="120"
-                  fixed="left"
-                  align="center"
-                >
+                                 prop="newUsername"
+                                 :label="`第${groupIndex + 1}组`"
+                                 width="120"
+                                 fixed="left"
+                                 align="center">
                   <template #default="scope">
                     <UserLink :uid="scope.row.uid" :name="scope.row.newUsername" />
                   </template>
                 </el-table-column>
-                <el-table-column
-                  v-for="col in getResultColumns(group)"
-                  :key="col.key"
-                  :prop="col.key"
-                  :label="col.label"
-                  :width="col.width"
-                  align="center"
-                >
+                <el-table-column v-for="col in getResultColumns(group)" :key="col.key" :prop="col.key"
+                                 :label="col.label"
+                                 :width="col.width" align="center">
                   <template #default="scope">{{ scope.row[col.key] ?? '' }}</template>
                 </el-table-column>
                 <el-table-column prop="score" label="积分" width="70" align="center" />
@@ -152,16 +140,19 @@
                 <div v-for="info in group[0].detail_games" :key="info.tgameid" class="results-detail-round">
                   <div class="results-detail-round-name">{{ info.roundname }}</div>
                   <div class="results-detail-table-wrap">
-                    <el-table :data="info.games || []" border class="results-detail-table" :cell-style="setDetailCellStyle" :header-cell-style="setResultHeaderStyle">
+                    <el-table :data="info.games || []" border class="results-detail-table"
+                              :cell-style="setDetailCellStyle" :header-cell-style="setResultHeaderStyle">
                       <el-table-column type="index" label="序号" width="70" align="center" />
                       <el-table-column prop="username1" label="选手1" width="200" align="center">
                         <template #default="scope">
-                          <div class="results-detail-name" :class="{ 'is-win': scope.row.result1 > scope.row.result2 }">{{ scope.row.username1 }}</div>
+                          <div class="results-detail-name" :class="{ 'is-win': scope.row.result1 > scope.row.result2 }">
+                            {{ scope.row.username1 }}</div>
                         </template>
                       </el-table-column>
                       <el-table-column prop="username2" label="选手2" width="200" align="center">
                         <template #default="scope">
-                          <div class="results-detail-name" :class="{ 'is-win': scope.row.result2 > scope.row.result1 }">{{ scope.row.username2 }}</div>
+                          <div class="results-detail-name" :class="{ 'is-win': scope.row.result2 > scope.row.result1 }">
+                            {{ scope.row.username2 }}</div>
                         </template>
                       </el-table-column>
                       <el-table-column label="比分" width="90" align="center">
@@ -169,7 +160,9 @@
                       </el-table-column>
                       <el-table-column label="详情" width="70" align="center">
                         <template #default="scope">
-                          <el-icon v-if="String(scope.row.flag) === '0'"><ArrowRight /></el-icon>
+                          <el-icon v-if="String(scope.row.flag) === '0'">
+                            <ArrowRight />
+                          </el-icon>
                         </template>
                       </el-table-column>
                     </el-table>
@@ -186,12 +179,8 @@
             <div v-for="(round, roundIndex) in resultTtRounds" :key="roundIndex" class="results-tt-column">
               <div class="results-tt-round-name">{{ round.roundname }}</div>
               <div class="results-tt-round-body">
-                <div
-                  v-for="(game, gameIndex) in round.games"
-                  :key="gameIndex"
-                  class="results-tt-game"
-                  :style="getTtGameStyle(roundIndex, gameIndex, round.games.length)"
-                >
+                <div v-for="(game, gameIndex) in round.games" :key="gameIndex" class="results-tt-game"
+                     :style="getTtGameStyle(roundIndex, gameIndex, round.games.length)">
                   <div class="results-tt-player" :class="{ winner: game.winner1 }">
                     <span class="results-tt-name">{{ game.username1 }}</span>
                     <span class="results-tt-score">{{ game.result1 }}</span>
@@ -216,16 +205,19 @@
             <div v-for="info in resultTtDetailGames" :key="info.tgameid" class="results-detail-round">
               <div class="results-detail-round-name">{{ info.roundname }}</div>
               <div class="results-detail-table-wrap">
-                <el-table v-if="info.games?.length" :data="info.games" border class="results-detail-table" :cell-style="setDetailCellStyle" :header-cell-style="setResultHeaderStyle">
+                <el-table v-if="info.games?.length" :data="info.games" border class="results-detail-table"
+                          :cell-style="setDetailCellStyle" :header-cell-style="setResultHeaderStyle">
                   <el-table-column type="index" label="序号" width="70" align="center" />
                   <el-table-column prop="username1" label="选手1" width="200" align="center">
                     <template #default="scope">
-                      <div class="results-detail-name" :class="{ 'is-win': scope.row.result1 > scope.row.result2 }">{{ scope.row.username1 }}</div>
+                      <div class="results-detail-name" :class="{ 'is-win': scope.row.result1 > scope.row.result2 }">{{
+                        scope.row.username1 }}</div>
                     </template>
                   </el-table-column>
                   <el-table-column prop="username2" label="选手2" width="200" align="center">
                     <template #default="scope">
-                      <div class="results-detail-name" :class="{ 'is-win': scope.row.result2 > scope.row.result1 }">{{ scope.row.username2 }}</div>
+                      <div class="results-detail-name" :class="{ 'is-win': scope.row.result2 > scope.row.result1 }">{{
+                        scope.row.username2 }}</div>
                     </template>
                   </el-table-column>
                   <el-table-column label="比分" width="90" align="center">
@@ -233,7 +225,9 @@
                   </el-table-column>
                   <el-table-column label="详情" width="70" align="center">
                     <template #default="scope">
-                      <el-icon v-if="String(scope.row.flag) === '0'"><ArrowRight /></el-icon>
+                      <el-icon v-if="String(scope.row.flag) === '0'">
+                        <ArrowRight />
+                      </el-icon>
                     </template>
                   </el-table-column>
                 </el-table>
@@ -279,11 +273,12 @@
         <el-table-column prop="number" label="#" width="60" />
         <el-table-column label="名称" min-width="180">
           <template #default="scope">
-            <UserLink :uid="scope.row.uid" :name="scope.row.name" />
+            <UserLink :uid="scope.row.uid" :name="scope.row.username" :sub-name="scope.row.realname" />
           </template>
         </el-table-column>
         <el-table-column prop="score" label="报名积分" width="120" sortable :sort-method="sortMemberScore" />
-        <el-table-column label="确认" width="120" :filters="paidFilters" :filter-method="filterMemberPaid" column-key="paid">
+        <el-table-column label="确认" width="120" :filters="paidFilters" :filter-method="filterMemberPaid"
+                         column-key="paid">
           <template #default="scope">{{ paidMap[scope.row.paid] || scope.row.paid }}</template>
         </el-table-column>
         <el-table-column label="性别" width="80" :filters="sexFilters" :filter-method="filterMemberSex" column-key="sex">

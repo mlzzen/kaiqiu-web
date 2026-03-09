@@ -14,7 +14,7 @@
       </el-table-column>
       <el-table-column label="姓名" min-width="200">
         <template #default="scope">
-          <UserLink :uid="scope.row.fuid" :name="`${scope.row.realname} (${scope.row.nickname})`" />
+          <UserLink :uid="scope.row.fuid" :name="scope.row.nickname" :sub-name="scope.row.realname" />
         </template>
       </el-table-column>
       <el-table-column label="操作" width="260">

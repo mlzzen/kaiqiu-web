@@ -410,13 +410,6 @@ async function toggleFollow() {
 
 watch(uid, () => loadData(), { immediate: true })
 
-function goUser(playerUid) {
-  if (!playerUid) {
-    return
-  }
-  router.push(`/user/${playerUid}`)
-}
-
 function getEventId(row) {
   return row?.eventid || row?.match_id || row?.id || null
 }

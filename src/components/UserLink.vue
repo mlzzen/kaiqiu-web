@@ -1,6 +1,7 @@
 <template>
   <router-link v-if="uid" :to="`/user/${uid}`" class="user-link" :class="{ 'is-following': isFollowing }">
     <slot>{{ name }}</slot>
+    <span v-if="subName" class="sub-name">({{ subName }})</span>
   </router-link>
   <slot v-else>{{ name }}</slot>
 </template>
@@ -16,7 +17,11 @@ const props = defineProps({
   name: {
     type: String,
     default: ''
-  }
+  },
+  subName: {
+    type: String,
+    default: ''
+  },
 })
 
 const isFollowing = computed(() => {
