@@ -24,7 +24,11 @@
               <UserLink :uid="scope.row.uid || scope.row.id" :name="scope.row.username" />
             </template>
           </el-table-column>
-          <el-table-column prop="realname" label="真实姓名" min-width="130" />
+          <el-table-column prop="realname" label="真实姓名" min-width="130">
+            <template #default="scope">
+              <UserLink :uid="scope.row.uid || scope.row.id" :name="scope.row.realname" />
+            </template>
+          </el-table-column>
           <el-table-column prop="score" label="积分" width="100" />
           <el-table-column prop="city" label="城市" width="120" />
         </el-table>
@@ -58,8 +62,8 @@ async function loadTopView() {
 async function loadTop100(tid) {
   loading.value = true
   try {
-    const res = await getTop100Data({ city: userStore.city.name, tabIndex: 1, tid })
-    tableRows.value = toList(res.data)
+    const { data } = await getTop100Data({ city: userStore.city.name, tabIndex: 1, tid })
+    tableRows.value = toList(data.list)
   } finally {
     loading.value = false
   }
