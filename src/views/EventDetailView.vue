@@ -72,10 +72,7 @@
                   align="center"
                 >
                   <template #default="scope">
-                    <router-link v-if="scope.row.uid" :to="`/user/${scope.row.uid}`" class="link-primary">
-                      {{ scope.row.newUsername }}
-                    </router-link>
-                    <span v-else>{{ scope.row.newUsername }}</span>
+                    <UserLink :uid="scope.row.uid" :name="scope.row.newUsername" />
                   </template>
                 </el-table-column>
                 <el-table-column
@@ -97,10 +94,10 @@
       <div v-else-if="activeTab === 'results'" class="results" v-loading="tabLoading">
         <div v-if="resultHonors.length" class="results-honors">
           <div class="results-honors-title">名次列表</div>
-          <router-link v-for="(item, index) in resultHonors" :key="index" :to="`/user/${item.uid}`" class="results-honor-row link-primary">
+          <div v-for="(item, index) in resultHonors" :key="index" class="results-honor-row">
+            <UserLink :uid="item.uid" :name="item.name" class="results-honor-name" :class="{ 'is-first': index === 0 }" />
             <div class="results-honor-rank">{{ item.honor }}</div>
-            <div class="results-honor-name" :class="{ 'is-first': index === 0 }">{{ item.name }}</div>
-          </router-link>
+          </div>
         </div>
 
         <template v-if="resultGroups.length">
@@ -122,10 +119,7 @@
                   align="center"
                 >
                   <template #default="scope">
-                    <router-link v-if="scope.row.uid" :to="`/user/${scope.row.uid}`" class="link-primary">
-                      {{ scope.row.newUsername }}
-                    </router-link>
-                    <span v-else>{{ scope.row.newUsername }}</span>
+                    <UserLink :uid="scope.row.uid" :name="scope.row.newUsername" />
                   </template>
                 </el-table-column>
                 <el-table-column
@@ -255,10 +249,7 @@
         <el-table-column prop="honor" label="名次" width="120" />
         <el-table-column label="选手" min-width="220">
           <template #default="scope">
-            <router-link v-if="scope.row.uid" :to="`/user/${scope.row.uid}`" class="link-primary">
-              {{ scope.row.name }}
-            </router-link>
-            <span v-else>{{ scope.row.name }}</span>
+            <UserLink :uid="scope.row.uid" :name="scope.row.name" />
           </template>
         </el-table-column>
         <el-table-column prop="score" label="积分" width="100" />
@@ -267,10 +258,7 @@
       <el-table v-else :data="scoreRows" stripe v-loading="tabLoading">
         <el-table-column label="姓名" min-width="160">
           <template #default="scope">
-            <router-link v-if="scope.row.uid" :to="`/user/${scope.row.uid}`" class="link-primary">
-              {{ scope.row.realname }}
-            </router-link>
-            <span v-else>{{ scope.row.realname }}</span>
+            <UserLink :uid="scope.row.uid" :name="scope.row.realname" />
           </template>
         </el-table-column>
         <el-table-column prop="prescore" label="赛前积分" width="120" />
@@ -291,10 +279,7 @@
         <el-table-column prop="number" label="#" width="60" />
         <el-table-column label="名称" min-width="180">
           <template #default="scope">
-            <router-link v-if="scope.row.uid" :to="`/user/${scope.row.uid}`" class="link-primary">
-              {{ scope.row.name }}
-            </router-link>
-            <span v-else>{{ scope.row.name }}</span>
+            <UserLink :uid="scope.row.uid" :name="scope.row.name" />
           </template>
         </el-table-column>
         <el-table-column prop="score" label="报名积分" width="120" sortable :sort-method="sortMemberScore" />
@@ -313,6 +298,7 @@
 import { computed, ref, watch } from 'vue'
 import { ArrowRight } from '@element-plus/icons-vue'
 import { useRoute, useRouter } from 'vue-router'
+import UserLink from '../components/UserLink.vue'
 import { getAllHonors, getAllResult, getEventDetaiByIdAndLocation, getGroups, getMemberDetail, getScoreChangeByEventid } from '../api/event'
 import { useUserStore } from '../stores/user'
 
@@ -985,14 +971,5 @@ watch(activeItemId, () => {
   align-items: center;
   justify-content: center;
   color: #6b7280;
-}
-
-.link-primary {
-  color: #409eff;
-  text-decoration: none;
-}
-
-.link-primary:hover {
-  text-decoration: underline;
 }
 </style>

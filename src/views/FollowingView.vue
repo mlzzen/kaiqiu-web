@@ -14,14 +14,12 @@
       </el-table-column>
       <el-table-column label="姓名" min-width="200">
         <template #default="scope">
-          <router-link :to="`/user/${scope.row.fuid}`" class="link-primary">
-            {{ scope.row.realname }} ({{ scope.row.nickname }})
-          </router-link>
+          <UserLink :uid="scope.row.fuid" :name="`${scope.row.realname} (${scope.row.nickname})`" />
         </template>
       </el-table-column>
       <el-table-column label="操作" width="260">
         <template #default="scope">
-          <router-link :to="`/user/${scope.row.fuid}`" class="link-primary">进入主页</router-link>
+          <UserLink :uid="scope.row.fuid" name="进入主页" />
           <el-button link type="success" @click="toggleMatches(scope.row)">
             {{ expandedUid === scope.row.fuid ? '收起近期赛事' : '查看近期赛事' }}
           </el-button>
@@ -53,6 +51,7 @@
 <script setup>
 import { ref } from 'vue'
 import { ElMessageBox } from 'element-plus'
+import UserLink from '../components/UserLink.vue'
 import { getFolloweeEnrolledMatch, getUserFolloweesList, goCancelFolloweeByUid } from '../api/user'
 
 const loading = ref(false)

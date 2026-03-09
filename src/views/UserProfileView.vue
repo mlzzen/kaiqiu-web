@@ -33,12 +33,11 @@
             <div class="section-title">收到最多评价</div>
             <div class="tag-list">
               <el-tag
-                v-for="tag in showTags"
-                :key="`${tag.ename}-${tag.etype}`"
-                :type="tag.selected == 1 ? 'success' : 'info'"
-                effect="plain"
-                class="tag-item"
-              >
+                      v-for="tag in showTags"
+                      :key="`${tag.ename}-${tag.etype}`"
+                      :type="tag.selected == 1 ? 'success' : 'info'"
+                      effect="plain"
+                      class="tag-item">
                 {{ tag.ename }} ({{ tag.count }})
               </el-tag>
             </div>
@@ -51,9 +50,13 @@
             </el-descriptions-item>
             <el-descriptions-item label="所在">{{ profile.resideprovince || '-' }}</el-descriptions-item>
             <el-descriptions-item label="专业背景">{{ profile.bg || '-' }}</el-descriptions-item>
-            <el-descriptions-item label="底板型号">{{ `${profile.qiupai || ''} ${profile.qiupaitype || ''}`.trim() || '-' }}</el-descriptions-item>
-            <el-descriptions-item label="正手套胶">{{ `${profile.zhengshou || ''} ${profile.zhengshoutype || ''}`.trim() || '-' }}</el-descriptions-item>
-            <el-descriptions-item label="反手套胶">{{ `${profile.fanshou || ''} ${profile.fanshoutype || ''}`.trim() || '-' }}</el-descriptions-item>
+            <el-descriptions-item label="底板型号">{{ `${profile.qiupai || ''} ${profile.qiupaitype || ''}`.trim() || '-'
+              }}</el-descriptions-item>
+            <el-descriptions-item label="正手套胶">{{ `${profile.zhengshou || ''} ${profile.zhengshoutype || ''}`.trim() ||
+              '-'
+              }}</el-descriptions-item>
+            <el-descriptions-item label="反手套胶">{{ `${profile.fanshou || ''} ${profile.fanshoutype || ''}`.trim() || '-'
+              }}</el-descriptions-item>
           </el-descriptions>
         </el-card>
       </div>
@@ -65,22 +68,27 @@
           <div class="section-title">最近40场比赛积分趋势</div>
           <div class="trend-wrap">
             <svg viewBox="0 0 1000 300" preserveAspectRatio="none" class="trend-svg">
-              <line :x1="chartBox.left" :y1="chartBox.top" :x2="chartBox.left" :y2="chartBox.bottom" stroke="#9ca3af" stroke-width="1.5" />
-              <line :x1="chartBox.left" :y1="chartBox.bottom" :x2="chartBox.right" :y2="chartBox.bottom" stroke="#9ca3af" stroke-width="1.5" />
+              <line :x1="chartBox.left" :y1="chartBox.top" :x2="chartBox.left" :y2="chartBox.bottom" stroke="#9ca3af"
+                    stroke-width="1.5" />
+              <line :x1="chartBox.left" :y1="chartBox.bottom" :x2="chartBox.right" :y2="chartBox.bottom"
+                    stroke="#9ca3af" stroke-width="1.5" />
               <g v-for="tick in yTicks" :key="`y-${tick.value}`">
-                <line :x1="chartBox.left - 6" :y1="tick.y" :x2="chartBox.right" :y2="tick.y" stroke="#e5e7eb" stroke-width="1" />
-                <text :x="chartBox.left - 10" :y="tick.y + 4" text-anchor="end" font-size="16" fill="#6b7280">{{ tick.label }}</text>
+                <line :x1="chartBox.left - 6" :y1="tick.y" :x2="chartBox.right" :y2="tick.y" stroke="#e5e7eb"
+                      stroke-width="1" />
+                <text :x="chartBox.left - 10" :y="tick.y + 4" text-anchor="end" font-size="16" fill="#6b7280">{{
+                  tick.label }}</text>
               </g>
               <g v-for="tick in xTicks" :key="`x-${tick.index}`">
-                <line :x1="tick.x" :y1="chartBox.bottom" :x2="tick.x" :y2="chartBox.bottom + 5" stroke="#9ca3af" stroke-width="1" />
-                <text :x="tick.x" :y="chartBox.bottom + 22" text-anchor="middle" font-size="14" fill="#6b7280">{{ tick.label }}</text>
+                <line :x1="tick.x" :y1="chartBox.bottom" :x2="tick.x" :y2="chartBox.bottom + 5" stroke="#9ca3af"
+                      stroke-width="1" />
+                <text :x="tick.x" :y="chartBox.bottom + 22" text-anchor="middle" font-size="14" fill="#6b7280">{{
+                  tick.label }}</text>
               </g>
               <polyline
-                fill="none"
-                stroke="#248dff"
-                stroke-width="3"
-                :points="trendPoints"
-              />
+                        fill="none"
+                        stroke="#248dff"
+                        stroke-width="3"
+                        :points="trendPoints" />
               <g v-for="point in trendDots" :key="point.index">
                 <circle :cx="point.x" :cy="point.y" r="3.5" fill="#248dff" />
               </g>
@@ -92,7 +100,7 @@
           <div class="section-title">击败分数最高前三名</div>
           <div class="stat-list">
             <div class="stat-item" v-for="(item, index) in top3BeatList" :key="`top3-beat-${index}`">
-              <el-button link type="primary" class="clickable-text" @click="goTopListUser('Top3OfBeat', index)">{{ item }}</el-button>
+              <UserLink :uid="item.uid" :name="item.name" />
             </div>
           </div>
         </template>
@@ -101,7 +109,7 @@
           <div class="section-title">交手分数最高前三名</div>
           <div class="stat-list">
             <div class="stat-item" v-for="(item, index) in top3PlayerList" :key="`top3-player-${index}`">
-              <el-button link type="primary" class="clickable-text" @click="goTopListUser('TopPlayer', index)">{{ item }}</el-button>
+              <UserLink :uid="item.uid" :name="item.name" />
             </div>
           </div>
         </template>
@@ -110,7 +118,7 @@
           <div class="section-title">击败男子最高前三名</div>
           <div class="stat-list">
             <div class="stat-item" v-for="(item, index) in top3BeatManList" :key="`top3-man-${index}`">
-              <el-button link type="primary" class="clickable-text" @click="goTopListUser('Top3ManOfBeat', index)">{{ item }}</el-button>
+              <UserLink :uid="item.uid" :name="item.name" />
             </div>
           </div>
         </template>
@@ -119,7 +127,7 @@
           <div class="section-title">击败女子最高前三名</div>
           <div class="stat-list">
             <div class="stat-item" v-for="(item, index) in top3BeatWomanList" :key="`top3-woman-${index}`">
-              <el-button link type="primary" class="clickable-text" @click="goTopListUser('Top3WomanOfBeat', index)">{{ item }}</el-button>
+              <UserLink :uid="item.uid" :name="item.name" />
             </div>
           </div>
         </template>
@@ -128,8 +136,7 @@
           <div class="section-title">苦主</div>
           <div class="stat-list">
             <div class="stat-item" v-for="(item, index) in kuZhuList" :key="`kuzhu-${index}`">
-              <el-button v-if="item.uid" link type="primary" class="clickable-text" @click="goUser(item.uid)">{{ item.name }}({{ item.score || '-' }})</el-button>
-              <span v-else>{{ item.name }}({{ item.score || '-' }})</span>
+              <UserLink :uid="item.uid" :name="`${item.name}(${item.score || '-'})`" />
               <span class="sub">{{ item.detail }}</span>
             </div>
           </div>
@@ -139,8 +146,7 @@
           <div class="section-title">福星</div>
           <div class="stat-list">
             <div class="stat-item" v-for="(item, index) in fuXingList" :key="`fuxing-${index}`">
-              <el-button v-if="item.uid" link type="primary" class="clickable-text" @click="goUser(item.uid)">{{ item.name }}({{ item.score || '-' }})</el-button>
-              <span v-else>{{ item.name }}({{ item.score || '-' }})</span>
+              <UserLink :uid="item.uid" :name="`${item.name}(${item.score || '-'})`" />
               <span class="sub">{{ item.detail }}</span>
             </div>
           </div>
@@ -156,7 +162,8 @@
         <template v-if="allCitiesList.length">
           <div class="section-title">曾参加比赛城市</div>
           <div class="tag-list">
-            <el-tag v-for="(city, index) in allCitiesList" :key="`city-${index}`" type="info" effect="plain">{{ city }}</el-tag>
+            <el-tag v-for="(city, index) in allCitiesList" :key="`city-${index}`" type="info" effect="plain">{{ city
+              }}</el-tag>
           </div>
         </template>
 
@@ -175,11 +182,10 @@
           <el-table-column label="日期" width="130">
             <template #default="scope">
               <el-button
-                v-if="getEventId(scope.row)"
-                link
-                type="primary"
-                @click="goEvent(scope.row)"
-              >
+                         v-if="getEventId(scope.row)"
+                         link
+                         type="primary"
+                         @click="goEvent(scope.row)">
                 {{ scope.row.dateline }}
               </el-button>
               <span v-else>{{ scope.row.dateline }}</span>
@@ -187,14 +193,12 @@
           </el-table-column>
           <el-table-column label="选手1" min-width="140">
             <template #default="scope">
-              <el-button v-if="scope.row.uid1" link type="primary" @click="goUser(scope.row.uid1)">{{ scope.row.username1 }}</el-button>
-              <span v-else>{{ scope.row.username1 }}</span>
+              <UserLink :uid="scope.row.uid1" :name="scope.row.username1" />
             </template>
           </el-table-column>
           <el-table-column label="选手2" min-width="140">
             <template #default="scope">
-              <el-button v-if="scope.row.uid2" link type="primary" @click="goUser(scope.row.uid2)">{{ scope.row.username2 }}</el-button>
-              <span v-else>{{ scope.row.username2 }}</span>
+              <UserLink :uid="scope.row.uid2" :name="scope.row.username2" />
             </template>
           </el-table-column>
           <el-table-column label="比分" min-width="90">
@@ -216,6 +220,7 @@
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessageBox } from 'element-plus'
+import UserLink from '../components/UserLink.vue'
 import { getAdvProfile, getPageGamesByUid, getUserScores, getUserTags, goCancelFolloweeByUid, goFolloweeByUid } from '../api/user'
 import { useUserStore } from '../stores/user'
 
@@ -244,10 +249,10 @@ const safeDescription = computed(() => {
   }
 })
 const oftenPlayerList = computed(() => splitValue(profile.value.OftenPlayer))
-const top3BeatList = computed(() => splitValue(profile.value.Top3OfBeatUsernameScore))
-const top3PlayerList = computed(() => splitValue(profile.value.TopPlayerUsernameScore))
-const top3BeatManList = computed(() => splitValue(profile.value.Top3ManOfBeatUsernameScore))
-const top3BeatWomanList = computed(() => splitValue(profile.value.Top3WomanOfBeatUsernameScore))
+const top3BeatList = computed(() => parseTopList(profile.value.Top3OfBeat, profile.value.Top3OfBeatUsernameScore))
+const top3PlayerList = computed(() => parseTopList(profile.value.TopPlayer, profile.value.TopPlayerUsernameScore))
+const top3BeatManList = computed(() => parseTopList(profile.value.Top3ManOfBeat, profile.value.Top3ManOfBeatUsernameScore))
+const top3BeatWomanList = computed(() => parseTopList(profile.value.Top3WomanOfBeat, profile.value.Top3WomanOfBeatUsernameScore))
 const allCitiesList = computed(() => splitValue(profile.value.allCities))
 const kuZhuList = computed(() => parseSpecialRival(profile.value.kuzhu))
 const fuXingList = computed(() => parseSpecialRival(profile.value.fuxing))
@@ -453,6 +458,15 @@ function splitValue(raw, delimiter = ',') {
     .filter(Boolean)
 }
 
+function parseTopList(uids, names) {
+  const uidList = splitValue(uids).reverse()
+  const nameList = splitValue(names)
+  return nameList.map((name, index) => ({
+    uid: uidList[index] || '',
+    name: name || ''
+  })).filter(item => item.name)
+}
+
 function parseSpecialRival(raw) {
   return String(raw || '')
     .split(';')
@@ -471,7 +485,10 @@ function parseSpecialRival(raw) {
 }
 
 function goTopListUser(type, index) {
+  console.log('type', type);
+  console.log('profile.value', profile.value);
   const ids = splitValue(profile.value[type])
+  console.log('ids', ids);
   const target = ids[2 - index]
   if (target) {
     goUser(target)

@@ -73,10 +73,7 @@
 
       <el-table-column v-if="tab === 'player'" label="昵称(username2)" min-width="220">
         <template #default="scope">
-          <router-link v-if="scope.row.uid || scope.row.id" :to="`/user/${scope.row.uid || scope.row.id}`" class="link-primary">
-            {{ scope.row.username2 || scope.row.username || '-' }}
-          </router-link>
-          <span v-else>{{ scope.row.username2 || scope.row.username || '-' }}</span>
+          <UserLink :uid="scope.row.uid || scope.row.id" :name="scope.row.username2 || scope.row.username || '-'" />
         </template>
       </el-table-column>
       <el-table-column v-if="tab === 'player'" label="省份(resideprovince)" prop="resideprovince" min-width="140" />
@@ -103,6 +100,7 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import UserLink from '../components/UserLink.vue'
 import { getArenaListPageByKey } from '../api/arena'
 import { getMatchListPageByKey } from '../api/match'
 import { getCities } from '../api/publicc'

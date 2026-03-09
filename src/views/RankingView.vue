@@ -21,10 +21,7 @@
           <el-table-column label="排名" type="index" width="70" />
           <el-table-column label="昵称" min-width="180">
             <template #default="scope">
-              <router-link v-if="scope.row.uid || scope.row.id" :to="`/user/${scope.row.uid || scope.row.id}`" class="link-primary">
-                {{ scope.row.username }}
-              </router-link>
-              <span v-else>{{ scope.row.username }}</span>
+              <UserLink :uid="scope.row.uid || scope.row.id" :name="scope.row.username" />
             </template>
           </el-table-column>
           <el-table-column prop="realname" label="真实姓名" min-width="130" />
@@ -38,6 +35,7 @@
 
 <script setup>
 import { ref } from 'vue'
+import UserLink from '../components/UserLink.vue'
 import { getTop100Data, getTopView } from '../api/top'
 import { useUserStore } from '../stores/user'
 import { toList } from '../utils/format'
@@ -79,14 +77,5 @@ loadTopView()
 .header {
   font-weight: 700;
   color: #2f4d32;
-}
-
-.link-primary {
-  color: #409eff;
-  text-decoration: none;
-}
-
-.link-primary:hover {
-  text-decoration: underline;
 }
 </style>
