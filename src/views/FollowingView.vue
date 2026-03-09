@@ -40,7 +40,7 @@
         </el-table-column>
         <el-table-column label="详情" width="120">
           <template #default="scope">
-            <router-link :to="`/event/${scope.row.eventid}`" class="link-primary">进入赛事</router-link>
+            <EventLink :event-id="scope.row.eventid" name="进入赛事" />
           </template>
         </el-table-column>
       </el-table>
@@ -52,6 +52,7 @@
 import { ref } from 'vue'
 import { ElMessageBox } from 'element-plus'
 import UserLink from '../components/UserLink.vue'
+import EventLink from '../components/EventLink.vue'
 import { getFolloweeEnrolledMatch, getUserFolloweesList, goCancelFolloweeByUid } from '../api/user'
 
 const loading = ref(false)

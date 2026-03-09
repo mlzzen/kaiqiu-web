@@ -51,12 +51,12 @@
             <el-descriptions-item label="所在">{{ profile.resideprovince || '-' }}</el-descriptions-item>
             <el-descriptions-item label="专业背景">{{ profile.bg || '-' }}</el-descriptions-item>
             <el-descriptions-item label="底板型号">{{ `${profile.qiupai || ''} ${profile.qiupaitype || ''}`.trim() || '-'
-              }}</el-descriptions-item>
+            }}</el-descriptions-item>
             <el-descriptions-item label="正手套胶">{{ `${profile.zhengshou || ''} ${profile.zhengshoutype || ''}`.trim() ||
               '-'
-              }}</el-descriptions-item>
+            }}</el-descriptions-item>
             <el-descriptions-item label="反手套胶">{{ `${profile.fanshou || ''} ${profile.fanshoutype || ''}`.trim() || '-'
-              }}</el-descriptions-item>
+            }}</el-descriptions-item>
           </el-descriptions>
         </el-card>
       </div>
@@ -163,7 +163,7 @@
           <div class="section-title">曾参加比赛城市</div>
           <div class="tag-list">
             <el-tag v-for="(city, index) in allCitiesList" :key="`city-${index}`" type="info" effect="plain">{{ city
-              }}</el-tag>
+            }}</el-tag>
           </div>
         </template>
 
@@ -172,7 +172,7 @@
           <div class="honor-list">
             <div class="honor-item" v-for="(item, index) in profile.honors" :key="index">
               <img class="honor-icon" :src="item.honor" alt="honor" />
-              <span>{{ item.subject }}</span>
+              <EventLink :event-id="item.eventid" :name="item.subject" />
             </div>
           </div>
         </template>
@@ -221,6 +221,7 @@ import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessageBox } from 'element-plus'
 import UserLink from '../components/UserLink.vue'
+import EventLink from '../components/EventLink.vue'
 import { getAdvProfile, getPageGamesByUid, getUserScores, getUserTags, goCancelFolloweeByUid, goFolloweeByUid } from '../api/user'
 import { useUserStore } from '../stores/user'
 
@@ -482,17 +483,6 @@ function parseSpecialRival(raw) {
       }
     })
     .filter((item) => item.name)
-}
-
-function goTopListUser(type, index) {
-  console.log('type', type);
-  console.log('profile.value', profile.value);
-  const ids = splitValue(profile.value[type])
-  console.log('ids', ids);
-  const target = ids[2 - index]
-  if (target) {
-    goUser(target)
-  }
 }
 </script>
 

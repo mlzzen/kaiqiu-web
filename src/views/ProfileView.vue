@@ -26,10 +26,7 @@
         <el-table :data="eventRows" stripe v-loading="loading">
           <el-table-column label="赛事名称" min-width="260">
             <template #default="scope">
-              <router-link v-if="getEventId(scope.row)" :to="`/event/${getEventId(scope.row)}`" class="link-primary">
-                {{ scope.row.title }}
-              </router-link>
-              <span v-else>{{ scope.row.title }}</span>
+              <EventLink :event-id="getEventId(scope.row)" :name="scope.row.title" />
             </template>
           </el-table-column>
           <el-table-column prop="city" label="城市" width="120" />
@@ -55,6 +52,7 @@
 import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import { useRouter } from 'vue-router'
+import EventLink from '../components/EventLink.vue'
 import { getDaySign, getMatchListHisByPage, getUserInfo } from '../api/user'
 import { toList } from '../utils/format'
 

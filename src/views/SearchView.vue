@@ -37,10 +37,7 @@
     <el-table :data="rows" stripe v-loading="loading">
       <el-table-column v-if="tab === 'match'" label="比赛名称" min-width="240">
         <template #default="scope">
-          <router-link v-if="getEventId(scope.row)" :to="`/event/${getEventId(scope.row)}`" class="link-primary">
-            {{ scope.row.title }}
-          </router-link>
-          <span v-else>{{ scope.row.title }}</span>
+          <EventLink :event-id="getEventId(scope.row)" :name="scope.row.title" />
         </template>
       </el-table-column>
       <el-table-column v-if="tab === 'match'" label="状态" width="100">
@@ -101,6 +98,7 @@
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import UserLink from '../components/UserLink.vue'
+import EventLink from '../components/EventLink.vue'
 import { getArenaListPageByKey } from '../api/arena'
 import { getMatchListPageByKey } from '../api/match'
 import { getCities } from '../api/publicc'
