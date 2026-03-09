@@ -1,12 +1,14 @@
 <template>
-  <router-link v-if="uid" :to="`/user/${uid}`" class="user-link">
+  <router-link v-if="uid" :to="`/user/${uid}`" class="user-link" :class="{ 'is-following': isFollowing }">
     <slot>{{ name }}</slot>
   </router-link>
   <slot v-else>{{ name }}</slot>
 </template>
 
 <script setup>
-defineProps({
+import { computed } from 'vue'
+
+const props = defineProps({
   uid: {
     type: [String, Number],
     default: ''
@@ -14,6 +16,15 @@ defineProps({
   name: {
     type: String,
     default: ''
+  }
+})
+
+const isFollowing = computed(() => {
+  try {
+    const followees = JSON.parse(localStorage.getItem('userFollowees') || '[]')
+    return followees.includes(String(props.uid))
+  } catch {
+    return false
   }
 })
 </script>
@@ -26,5 +37,9 @@ defineProps({
 
 .user-link:hover {
   text-decoration: underline;
+}
+
+.user-link.is-following {
+  color: #67c23a;
 }
 </style>

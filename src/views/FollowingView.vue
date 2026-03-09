@@ -65,6 +65,9 @@ async function loadRows() {
   try {
     const res = await getUserFolloweesList()
     rows.value = res.data?.followeesList || []
+    // 存储到 localstorage
+    const followees = rows.value.map(item => item.fuid)
+    localStorage.setItem('userFollowees', JSON.stringify(followees))
   } finally {
     loading.value = false
   }
@@ -89,6 +92,9 @@ async function cancelFollow(row) {
   }
   await goCancelFolloweeByUid(row.fuid)
   rows.value = rows.value.filter((v) => v.fuid !== row.fuid)
+  // 更新 localstorage
+  const followees = rows.value.map(item => item.fuid)
+  localStorage.setItem('userFollowees', JSON.stringify(followees))
   if (expandedUid.value === row.fuid) {
     expandedUid.value = ''
     expandedMatches.value = []

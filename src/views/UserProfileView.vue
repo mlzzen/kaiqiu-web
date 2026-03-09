@@ -51,12 +51,12 @@
             <el-descriptions-item label="所在">{{ profile.resideprovince || '-' }}</el-descriptions-item>
             <el-descriptions-item label="专业背景">{{ profile.bg || '-' }}</el-descriptions-item>
             <el-descriptions-item label="底板型号">{{ `${profile.qiupai || ''} ${profile.qiupaitype || ''}`.trim() || '-'
-            }}</el-descriptions-item>
+              }}</el-descriptions-item>
             <el-descriptions-item label="正手套胶">{{ `${profile.zhengshou || ''} ${profile.zhengshoutype || ''}`.trim() ||
               '-'
-            }}</el-descriptions-item>
+              }}</el-descriptions-item>
             <el-descriptions-item label="反手套胶">{{ `${profile.fanshou || ''} ${profile.fanshoutype || ''}`.trim() || '-'
-            }}</el-descriptions-item>
+              }}</el-descriptions-item>
           </el-descriptions>
         </el-card>
       </div>
@@ -163,7 +163,7 @@
           <div class="section-title">曾参加比赛城市</div>
           <div class="tag-list">
             <el-tag v-for="(city, index) in allCitiesList" :key="`city-${index}`" type="info" effect="plain">{{ city
-            }}</el-tag>
+              }}</el-tag>
           </div>
         </template>
 
@@ -181,13 +181,7 @@
         <el-table :data="games" stripe v-loading="gamesLoading">
           <el-table-column label="日期" width="130">
             <template #default="scope">
-              <el-button
-                         v-if="getEventId(scope.row)"
-                         link
-                         type="primary"
-                         @click="goEvent(scope.row)">
-                {{ scope.row.dateline }}
-              </el-button>
+              <EventLink v-if="getEventId(scope.row)" :event-id="getEventId(scope.row)" :name="scope.row.dateline" />
               <span v-else>{{ scope.row.dateline }}</span>
             </template>
           </el-table-column>
