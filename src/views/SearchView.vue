@@ -7,17 +7,17 @@
     </el-tabs>
 
     <div class="filters">
-      <el-input v-model="keyword" :placeholder="placeholder" clearable style="max-width: 320px" @keyup.enter="search(1)" />
+      <el-input v-model="keyword" :placeholder="placeholder" clearable style="max-width: 320px"
+                @keyup.enter="search(1)" />
       <template v-if="tab === 'match'">
         <el-date-picker
-          v-model="dateRange"
-          type="daterange"
-          range-separator="至"
-          start-placeholder="开始日期"
-          end-placeholder="结束日期"
-          value-format="YYYY-MM-DD"
-          style="width: 280px"
-        />
+                        v-model="dateRange"
+                        type="daterange"
+                        range-separator="至"
+                        start-placeholder="开始日期"
+                        end-placeholder="结束日期"
+                        value-format="YYYY-MM-DD"
+                        style="width: 280px" />
         <el-select v-model="matchCity" filterable clearable placeholder="举办城市" style="width: 160px">
           <el-option v-for="item in cityOptions" :key="item.id" :label="item.name" :value="item.name" />
         </el-select>
@@ -27,7 +27,8 @@
           <el-option label="50公里内" value="lt50" />
           <el-option label="100公里内" value="lt100" />
         </el-select>
-        <el-select v-model="matchTags" multiple collapse-tags collapse-tags-tooltip placeholder="赛事标签" style="width: 220px">
+        <el-select v-model="matchTags" multiple collapse-tags collapse-tags-tooltip placeholder="赛事标签"
+                   style="width: 220px">
           <el-option v-for="item in tagOptions" :key="item" :label="item" :value="item" />
         </el-select>
       </template>
@@ -35,6 +36,8 @@
     </div>
 
     <el-table :data="rows" stripe v-loading="loading">
+      <el-table-column type="index" label="#" width="60">
+      </el-table-column>
       <el-table-column v-if="tab === 'match'" label="比赛名称" min-width="240">
         <template #default="scope">
           <EventLink :event-id="getEventId(scope.row)" :name="scope.row.title" />
