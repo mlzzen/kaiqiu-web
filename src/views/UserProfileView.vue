@@ -248,6 +248,7 @@
 
         <div class="section-title">近期战绩</div>
         <el-table :data="games" stripe v-loading="gamesLoading">
+          <el-table-column label="#" type="index" />
           <el-table-column label="日期" width="130">
             <template #default="scope">
               <EventLink
@@ -271,7 +272,7 @@
           <el-table-column label="比分" min-width="90">
             <template #default="scope">{{ scope.row.result1 }}:{{ scope.row.result2 }}</template>
           </el-table-column>
-          <el-table-column label="赛事" prop="title" min-width="220" />
+          <el-table-column label="变化" prop="score1" />
         </el-table>
         <div class="pager">
           <el-button :disabled="page <= 1 || gamesLoading" @click="prevPage">上一页</el-button>
