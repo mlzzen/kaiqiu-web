@@ -70,6 +70,12 @@ const router = createRouter({
           component: () => import('../views/FollowingView.vue'),
           meta: { title: '我的关注' },
         },
+        {
+          path: 'match/:gameid',
+          name: 'match-detail',
+          component: () => import('../views/MatchDetailView.vue'),
+          meta: { title: '对战详情' },
+        },
       ],
     },
     { path: '/:pathMatch(.*)*', redirect: '/home' },

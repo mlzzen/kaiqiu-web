@@ -1,5 +1,6 @@
 <template>
   <div>
+    <!-- 赛事详情 -->
     <el-card v-loading="loading">
       <template #header>
         <div class="head">
@@ -169,7 +170,10 @@
                   :width="col.width"
                   align="center"
                 >
-                  <template #default="scope">{{ scope.row[col.key] ?? '' }}</template>
+                  <template #default="scope">
+                    {{ scope.row.gameid }}
+                    {{ scope.row[col.key] ?? '' }}</template
+                  >
                 </el-table-column>
                 <el-table-column prop="score" label="积分" width="70" align="center" />
                 <el-table-column prop="process" label="计算" width="90" align="center">
@@ -228,15 +232,27 @@
                         </template>
                       </el-table-column>
                       <el-table-column label="比分" width="90" align="center">
-                        <template #default="scope">{{
-                          `${scope.row.result1}:${scope.row.result2}`
-                        }}</template>
+                        <template #default="scope">
+                          <router-link
+                            v-if="scope.row.gameid"
+                            :to="`/match/${scope.row.gameid}`"
+                            class="score-link"
+                          >
+                            {{ `${scope.row.result1}:${scope.row.result2}` }}
+                          </router-link>
+                          <span v-else>{{ `${scope.row.result1}:${scope.row.result2}` }}</span>
+                        </template>
                       </el-table-column>
                       <el-table-column label="详情" width="70" align="center">
                         <template #default="scope">
-                          <el-icon v-if="String(scope.row.flag) === '0'">
-                            <ArrowRight />
-                          </el-icon>
+                          <router-link
+                            v-if="String(scope.row.flag) === '0' && scope.row.gameid"
+                            :to="`/match/${scope.row.gameid}`"
+                          >
+                            <el-icon>
+                              <ArrowRight />
+                            </el-icon>
+                          </router-link>
                         </template>
                       </el-table-column>
                     </el-table>
@@ -265,12 +281,26 @@
                 >
                   <div class="results-tt-player" :class="{ winner: game.winner1 }">
                     <span class="results-tt-name">{{ game.username1 }}</span>
-                    <span class="results-tt-score">{{ game.result1 }}</span>
+                    <router-link
+                      v-if="game.gameid"
+                      :to="`/match/${game.gameid}`"
+                      class="results-tt-score"
+                    >
+                      {{ game.result1 }}
+                    </router-link>
+                    <span v-else class="results-tt-score">{{ game.result1 }}</span>
                   </div>
                   <div class="results-tt-divider"></div>
                   <div class="results-tt-player" :class="{ winner: game.winner2 }">
                     <span class="results-tt-name">{{ game.username2 }}</span>
-                    <span class="results-tt-score">{{ game.result2 }}</span>
+                    <router-link
+                      v-if="game.gameid"
+                      :to="`/match/${game.gameid}`"
+                      class="results-tt-score"
+                    >
+                      {{ game.result2 }}
+                    </router-link>
+                    <span v-else class="results-tt-score">{{ game.result2 }}</span>
                   </div>
                   <div
                     class="results-tt-connector"
@@ -324,15 +354,27 @@
                     </template>
                   </el-table-column>
                   <el-table-column label="比分" width="90" align="center">
-                    <template #default="scope">{{
-                      `${scope.row.result1}:${scope.row.result2}`
-                    }}</template>
+                    <template #default="scope">
+                      <router-link
+                        v-if="scope.row.gameid"
+                        :to="`/match/${scope.row.gameid}`"
+                        class="score-link"
+                      >
+                        {{ `${scope.row.result1}:${scope.row.result2}` }}
+                      </router-link>
+                      <span v-else>{{ `${scope.row.result1}:${scope.row.result2}` }}</span>
+                    </template>
                   </el-table-column>
                   <el-table-column label="详情" width="70" align="center">
                     <template #default="scope">
-                      <el-icon v-if="String(scope.row.flag) === '0'">
-                        <ArrowRight />
-                      </el-icon>
+                      <router-link
+                        v-if="String(scope.row.flag) === '0' && scope.row.gameid"
+                        :to="`/match/${scope.row.gameid}`"
+                      >
+                        <el-icon>
+                          <ArrowRight />
+                        </el-icon>
+                      </router-link>
                     </template>
                   </el-table-column>
                 </el-table>
@@ -544,6 +586,7 @@ function buildResultRows(group = []) {
 }
 
 function getResultColumns(group = []) {
+  console.log('group', group);
   const count = Array.isArray(group) ? group.length : 0;
   const width = count ? Math.max(50, Math.floor(360 / count)) : 60;
   return Array.from({ length: count }, (_, index) => ({
@@ -1035,6 +1078,16 @@ watch(activeItemId, () => {
 .results-detail-name.is-win {
   color: #f89703;
   font-weight: 600;
+}
+
+.score-link {
+  color: #409eff;
+  text-decoration: none;
+  font-weight: 500;
+
+  &:hover {
+    text-decoration: underline;
+  }
 }
 
 .results-tt {

@@ -270,7 +270,16 @@
             </template>
           </el-table-column>
           <el-table-column label="比分" min-width="90">
-            <template #default="scope">{{ scope.row.result1 }}:{{ scope.row.result2 }}</template>
+            <template #default="scope">
+              <router-link
+                v-if="scope.row.gameid"
+                :to="`/match/${scope.row.gameid}`"
+                class="score-link"
+              >
+                {{ scope.row.result1 }}:{{ scope.row.result2 }}
+              </router-link>
+              <span v-else>{{ scope.row.result1 }}:{{ scope.row.result2 }}</span>
+            </template>
           </el-table-column>
           <el-table-column label="变化" prop="score1" />
         </el-table>
@@ -672,5 +681,15 @@ function parseSpecialRival(raw) {
 
 .clickable-text {
   cursor: pointer;
+}
+
+.score-link {
+  color: #409eff;
+  text-decoration: none;
+  font-weight: 500;
+
+  &:hover {
+    text-decoration: underline;
+  }
 }
 </style>
