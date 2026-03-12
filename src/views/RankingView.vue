@@ -38,43 +38,43 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import UserLink from '../components/UserLink.vue'
-import { getTop100Data, getTopView } from '../api/top'
-import { useUserStore } from '../stores/user'
-import { toList } from '../utils/format'
+import { ref } from 'vue';
+import UserLink from '../components/UserLink.vue';
+import { getTop100Data, getTopView } from '../api/top';
+import { useUserStore } from '../stores/user';
+import { toList } from '../utils/format';
 
-const userStore = useUserStore()
-const loading = ref(false)
-const topList = ref([])
-const tableRows = ref([])
-const activeTid = ref('')
+const userStore = useUserStore();
+const loading = ref(false);
+const topList = ref([]);
+const tableRows = ref([]);
+const activeTid = ref('');
 
 async function loadTopView() {
-  const res = await getTopView(userStore.city.name)
-  topList.value = (res.data?.data || []).filter((v) => ![11, 10, 6].includes(Number(v.tid)))
+  const res = await getTopView(userStore.city.name);
+  topList.value = (res.data?.data || []).filter((v) => ![11, 10, 6].includes(Number(v.tid)));
   if (topList.value.length) {
-    activeTid.value = String(topList.value[0].tid)
-    await loadTop100(activeTid.value)
+    activeTid.value = String(topList.value[0].tid);
+    await loadTop100(activeTid.value);
   }
 }
 
 async function loadTop100(tid) {
-  loading.value = true
+  loading.value = true;
   try {
-    const { data } = await getTop100Data({ city: userStore.city.name, tabIndex: 1, tid })
-    tableRows.value = toList(data.list)
+    const { data } = await getTop100Data({ city: userStore.city.name, tabIndex: 1, tid });
+    tableRows.value = toList(data.list);
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 }
 
 function selectTid(tid) {
-  activeTid.value = tid
-  loadTop100(tid)
+  activeTid.value = tid;
+  loadTop100(tid);
 }
 
-loadTopView()
+loadTopView();
 </script>
 
 <style scoped>

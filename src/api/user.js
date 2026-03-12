@@ -1,49 +1,49 @@
-import { get, post } from '../utils/http'
+import { get, post } from '../utils/http';
 
 export function getUserInfo() {
-  return post('/user/get_userinfo')
+  return post('/user/get_userinfo');
 }
 
 export function getPageGamesByUid(uid, page = 1) {
-  return get('/User/getGames', { uid, page })
+  return get('/User/getGames', { uid, page });
 }
 
 export function getMatchListHisByPage(page = 1) {
-  return post('/center/events', { page, index: 0 })
+  return post('/center/events', { page, index: 0 });
 }
 
 export function getUserListPageByKey(params) {
-  return get('/user/lists', params)
+  return get('/user/lists', params);
 }
 
 export function getDaySign() {
-  return post('/user/sign')
+  return post('/user/sign');
 }
 
 export function getAdvProfile(uid) {
-  return post('/user/adv_profile', { uid })
+  return post('/user/adv_profile', { uid });
 }
 
 export function getUserFolloweesList() {
-  return get('/User/getUserFolloweesList')
+  return get('/User/getUserFolloweesList');
 }
 
 export function getFolloweeEnrolledMatch(uid) {
-  return get('/User/getFolloweeEnrolledMatch', { uid })
+  return get('/User/getFolloweeEnrolledMatch', { uid });
 }
 
 export function goCancelFolloweeByUid(uid) {
-  return get('/User/cancelFollowee', { uid })
+  return get('/User/cancelFollowee', { uid });
 }
 
 export function goFolloweeByUid(uid) {
-  return get('/User/followee', { uid })
+  return get('/User/followee', { uid });
 }
 
 export function getUserTags(params) {
-  return get('/User/get_tags', params)
+  return get('/User/get_tags', params);
 }
 
 export function getUserScores(uid) {
-  return get('/User/getUserScores', { uid })
+  return get('/User/getUserScores', { uid });
 }

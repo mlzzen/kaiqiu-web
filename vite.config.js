@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite'
+import { defineConfig } from 'vite';
 import vize from '@vizejs/vite-plugin';
 
 export default defineConfig({
@@ -11,8 +11,8 @@ export default defineConfig({
         target: 'https://kaiqiuwang.cc/xcx/public/index.php/api',
         changeOrigin: true,
         secure: true,
-        rewrite: (path) => path.replace(/^\/devApi/, '')
-      }
-    }
-  }
-})
+        rewrite: (path) => path.replace(/^\/devApi/, ''),
+      },
+    },
+  },
+});

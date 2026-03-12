@@ -7,7 +7,9 @@
       </div>
       <div class="content">
         <h3 class="title">{{ item.title }}</h3>
-        <div class="line">{{ item.starttime }} <span class="status">{{ item.status }}</span></div>
+        <div class="line">
+          {{ item.starttime }} <span class="status">{{ item.status }}</span>
+        </div>
         <div class="line">比赛地点: {{ item.arena_name || item.location || '-' }}</div>
         <div class="bottom">
           <span>{{ item.viewnum || 0 }} 人浏览</span>
@@ -22,9 +24,9 @@
 defineProps({
   item: {
     type: Object,
-    required: true
-  }
-})
+    required: true,
+  },
+});
 </script>
 
 <style scoped>

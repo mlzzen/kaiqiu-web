@@ -8,7 +8,13 @@
           <el-input v-model="form.account" placeholder="请输入账号" clearable />
         </el-form-item>
         <el-form-item label="密码" prop="password">
-          <el-input v-model="form.password" type="password" show-password placeholder="请输入密码" @keyup.enter="submit" />
+          <el-input
+            v-model="form.password"
+            type="password"
+            show-password
+            placeholder="请输入密码"
+            @keyup.enter="submit"
+          />
         </el-form-item>
         <el-button type="success" class="submit" :loading="loading" @click="submit">登录</el-button>
       </el-form>
@@ -17,41 +23,41 @@
 </template>
 
 <script setup>
-import { reactive, ref } from 'vue'
-import { ElMessage } from 'element-plus'
-import { useRouter } from 'vue-router'
-import { login } from '../api/login'
-import { useUserStore } from '../stores/user'
+import { reactive, ref } from 'vue';
+import { ElMessage } from 'element-plus';
+import { useRouter } from 'vue-router';
+import { login } from '../api/login';
+import { useUserStore } from '../stores/user';
 
-const router = useRouter()
-const userStore = useUserStore()
-const formRef = ref()
-const loading = ref(false)
+const router = useRouter();
+const userStore = useUserStore();
+const formRef = ref();
+const loading = ref(false);
 
 const form = reactive({
   account: '',
-  password: ''
-})
+  password: '',
+});
 
 const rules = {
   account: [{ required: true, message: '请输入账号', trigger: 'blur' }],
-  password: [{ required: true, message: '请输入密码', trigger: 'blur' }]
-}
+  password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
+};
 
 async function submit() {
-  const valid = await formRef.value?.validate().catch(() => false)
+  const valid = await formRef.value?.validate().catch(() => false);
   if (!valid) {
-    return
+    return;
   }
-  loading.value = true
+  loading.value = true;
   try {
-    const res = await login(form)
-    userStore.setToken(res.data?.userinfo?.token || '')
-    userStore.setUserInfo(res.data?.userinfo || {})
-    ElMessage.success('登录成功')
-    router.replace('/home')
+    const res = await login(form);
+    userStore.setToken(res.data?.userinfo?.token || '');
+    userStore.setUserInfo(res.data?.userinfo || {});
+    ElMessage.success('登录成功');
+    router.replace('/home');
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 }
 </script>

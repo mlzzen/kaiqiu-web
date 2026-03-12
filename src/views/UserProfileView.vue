@@ -20,8 +20,12 @@
           </template>
           <el-descriptions :column="1" border>
             <el-descriptions-item label="当前积分">{{ profile.score ?? '-' }}</el-descriptions-item>
-            <el-descriptions-item label="年度积分">{{ profile.maxScoreTheYear ?? '-' }}</el-descriptions-item>
-            <el-descriptions-item label="最高积分">{{ profile.maxscore ?? '-' }}</el-descriptions-item>
+            <el-descriptions-item label="年度积分">{{
+              profile.maxScoreTheYear ?? '-'
+            }}</el-descriptions-item>
+            <el-descriptions-item label="最高积分">{{
+              profile.maxscore ?? '-'
+            }}</el-descriptions-item>
           </el-descriptions>
 
           <template v-if="profile.description">
@@ -33,11 +37,12 @@
             <div class="section-title">收到最多评价</div>
             <div class="tag-list">
               <el-tag
-                      v-for="tag in showTags"
-                      :key="`${tag.ename}-${tag.etype}`"
-                      :type="tag.selected == 1 ? 'success' : 'info'"
-                      effect="plain"
-                      class="tag-item">
+                v-for="tag in showTags"
+                :key="`${tag.ename}-${tag.etype}`"
+                :type="tag.selected == 1 ? 'success' : 'info'"
+                effect="plain"
+                class="tag-item"
+              >
                 {{ tag.ename }} ({{ tag.count }})
               </el-tag>
             </div>
@@ -48,15 +53,19 @@
             <el-descriptions-item label="性别年龄">
               {{ profile.sex || '-' }}{{ profile.age ? ` ${profile.age}岁` : '' }}
             </el-descriptions-item>
-            <el-descriptions-item label="所在">{{ profile.resideprovince || '-' }}</el-descriptions-item>
+            <el-descriptions-item label="所在">{{
+              profile.resideprovince || '-'
+            }}</el-descriptions-item>
             <el-descriptions-item label="专业背景">{{ profile.bg || '-' }}</el-descriptions-item>
-            <el-descriptions-item label="底板型号">{{ `${profile.qiupai || ''} ${profile.qiupaitype || ''}`.trim() || '-'
-              }}</el-descriptions-item>
-            <el-descriptions-item label="正手套胶">{{ `${profile.zhengshou || ''} ${profile.zhengshoutype || ''}`.trim() ||
-              '-'
-              }}</el-descriptions-item>
-            <el-descriptions-item label="反手套胶">{{ `${profile.fanshou || ''} ${profile.fanshoutype || ''}`.trim() || '-'
-              }}</el-descriptions-item>
+            <el-descriptions-item label="底板型号">{{
+              `${profile.qiupai || ''} ${profile.qiupaitype || ''}`.trim() || '-'
+            }}</el-descriptions-item>
+            <el-descriptions-item label="正手套胶">{{
+              `${profile.zhengshou || ''} ${profile.zhengshoutype || ''}`.trim() || '-'
+            }}</el-descriptions-item>
+            <el-descriptions-item label="反手套胶">{{
+              `${profile.fanshou || ''} ${profile.fanshoutype || ''}`.trim() || '-'
+            }}</el-descriptions-item>
           </el-descriptions>
         </el-card>
       </div>
@@ -68,27 +77,61 @@
           <div class="section-title">最近40场比赛积分趋势</div>
           <div class="trend-wrap">
             <svg viewBox="0 0 1000 300" preserveAspectRatio="none" class="trend-svg">
-              <line :x1="chartBox.left" :y1="chartBox.top" :x2="chartBox.left" :y2="chartBox.bottom" stroke="#9ca3af"
-                    stroke-width="1.5" />
-              <line :x1="chartBox.left" :y1="chartBox.bottom" :x2="chartBox.right" :y2="chartBox.bottom"
-                    stroke="#9ca3af" stroke-width="1.5" />
+              <line
+                :x1="chartBox.left"
+                :y1="chartBox.top"
+                :x2="chartBox.left"
+                :y2="chartBox.bottom"
+                stroke="#9ca3af"
+                stroke-width="1.5"
+              />
+              <line
+                :x1="chartBox.left"
+                :y1="chartBox.bottom"
+                :x2="chartBox.right"
+                :y2="chartBox.bottom"
+                stroke="#9ca3af"
+                stroke-width="1.5"
+              />
               <g v-for="tick in yTicks" :key="`y-${tick.value}`">
-                <line :x1="chartBox.left - 6" :y1="tick.y" :x2="chartBox.right" :y2="tick.y" stroke="#e5e7eb"
-                      stroke-width="1" />
-                <text :x="chartBox.left - 10" :y="tick.y + 4" text-anchor="end" font-size="16" fill="#6b7280">{{
-                  tick.label }}</text>
+                <line
+                  :x1="chartBox.left - 6"
+                  :y1="tick.y"
+                  :x2="chartBox.right"
+                  :y2="tick.y"
+                  stroke="#e5e7eb"
+                  stroke-width="1"
+                />
+                <text
+                  :x="chartBox.left - 10"
+                  :y="tick.y + 4"
+                  text-anchor="end"
+                  font-size="16"
+                  fill="#6b7280"
+                >
+                  {{ tick.label }}
+                </text>
               </g>
               <g v-for="tick in xTicks" :key="`x-${tick.index}`">
-                <line :x1="tick.x" :y1="chartBox.bottom" :x2="tick.x" :y2="chartBox.bottom + 5" stroke="#9ca3af"
-                      stroke-width="1" />
-                <text :x="tick.x" :y="chartBox.bottom + 22" text-anchor="middle" font-size="14" fill="#6b7280">{{
-                  tick.label }}</text>
+                <line
+                  :x1="tick.x"
+                  :y1="chartBox.bottom"
+                  :x2="tick.x"
+                  :y2="chartBox.bottom + 5"
+                  stroke="#9ca3af"
+                  stroke-width="1"
+                />
+                <text
+                  :x="tick.x"
+                  :y="chartBox.bottom + 22"
+                  text-anchor="middle"
+                  font-size="14"
+                  fill="#6b7280"
+                >
+                  {{ tick.label }}
+                </text>
               </g>
-              <polyline
-                        fill="none"
-                        stroke="#248dff"
-                        stroke-width="3"
-                        :points="trendPoints" />
+              <polyline fill="none" stroke="#248dff" stroke-width="3" :points="trendPoints" />
               <g v-for="point in trendDots" :key="point.index">
                 <circle :cx="point.x" :cy="point.y" r="3.5" fill="#248dff" />
               </g>
@@ -99,7 +142,11 @@
         <template v-if="top3BeatList.length">
           <div class="section-title">击败分数最高前三名</div>
           <div class="stat-list">
-            <div class="stat-item" v-for="(item, index) in top3BeatList" :key="`top3-beat-${index}`">
+            <div
+              class="stat-item"
+              v-for="(item, index) in top3BeatList"
+              :key="`top3-beat-${index}`"
+            >
               <UserLink :uid="item.uid" :name="item.name" />
             </div>
           </div>
@@ -108,7 +155,11 @@
         <template v-if="top3PlayerList.length">
           <div class="section-title">交手分数最高前三名</div>
           <div class="stat-list">
-            <div class="stat-item" v-for="(item, index) in top3PlayerList" :key="`top3-player-${index}`">
+            <div
+              class="stat-item"
+              v-for="(item, index) in top3PlayerList"
+              :key="`top3-player-${index}`"
+            >
               <UserLink :uid="item.uid" :name="item.name" />
             </div>
           </div>
@@ -117,7 +168,11 @@
         <template v-if="top3BeatManList.length">
           <div class="section-title">击败男子最高前三名</div>
           <div class="stat-list">
-            <div class="stat-item" v-for="(item, index) in top3BeatManList" :key="`top3-man-${index}`">
+            <div
+              class="stat-item"
+              v-for="(item, index) in top3BeatManList"
+              :key="`top3-man-${index}`"
+            >
               <UserLink :uid="item.uid" :name="item.name" />
             </div>
           </div>
@@ -126,7 +181,11 @@
         <template v-if="top3BeatWomanList.length">
           <div class="section-title">击败女子最高前三名</div>
           <div class="stat-list">
-            <div class="stat-item" v-for="(item, index) in top3BeatWomanList" :key="`top3-woman-${index}`">
+            <div
+              class="stat-item"
+              v-for="(item, index) in top3BeatWomanList"
+              :key="`top3-woman-${index}`"
+            >
               <UserLink :uid="item.uid" :name="item.name" />
             </div>
           </div>
@@ -155,15 +214,25 @@
         <template v-if="oftenPlayerList.length">
           <div class="section-title">经常交手</div>
           <div class="tag-list">
-            <el-tag v-for="(item, index) in oftenPlayerList" :key="`often-${index}`" effect="plain">{{ item }}</el-tag>
+            <el-tag
+              v-for="(item, index) in oftenPlayerList"
+              :key="`often-${index}`"
+              effect="plain"
+              >{{ item }}</el-tag
+            >
           </div>
         </template>
 
         <template v-if="allCitiesList.length">
           <div class="section-title">曾参加比赛城市</div>
           <div class="tag-list">
-            <el-tag v-for="(city, index) in allCitiesList" :key="`city-${index}`" type="info" effect="plain">{{ city
-              }}</el-tag>
+            <el-tag
+              v-for="(city, index) in allCitiesList"
+              :key="`city-${index}`"
+              type="info"
+              effect="plain"
+              >{{ city }}</el-tag
+            >
           </div>
         </template>
 
@@ -181,7 +250,11 @@
         <el-table :data="games" stripe v-loading="gamesLoading">
           <el-table-column label="日期" width="130">
             <template #default="scope">
-              <EventLink v-if="getEventId(scope.row)" :event-id="getEventId(scope.row)" :name="scope.row.dateline" />
+              <EventLink
+                v-if="getEventId(scope.row)"
+                :event-id="getEventId(scope.row)"
+                :name="scope.row.dateline"
+              />
               <span v-else>{{ scope.row.dateline }}</span>
             </template>
           </el-table-column>
@@ -211,248 +284,265 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { ElMessageBox } from 'element-plus'
-import UserLink from '../components/UserLink.vue'
-import EventLink from '../components/EventLink.vue'
-import { getAdvProfile, getPageGamesByUid, getUserScores, getUserTags, goCancelFolloweeByUid, goFolloweeByUid } from '../api/user'
-import { useUserStore } from '../stores/user'
+import { computed, ref, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { ElMessageBox } from 'element-plus';
+import UserLink from '../components/UserLink.vue';
+import EventLink from '../components/EventLink.vue';
+import {
+  getAdvProfile,
+  getPageGamesByUid,
+  getUserScores,
+  getUserTags,
+  goCancelFolloweeByUid,
+  goFolloweeByUid,
+} from '../api/user';
+import { useUserStore } from '../stores/user';
 
-const route = useRoute()
-const router = useRouter()
-const userStore = useUserStore()
-const profile = ref({})
-const games = ref([])
-const gamesLoading = ref(false)
-const page = ref(1)
-const pageSize = 20
-const total = ref(0)
-const firstPageGames = ref([])
-const hasNext = ref(false)
-const effectivePageSize = ref(20)
-const showTags = ref([])
-const scoreTrend = ref([])
+const route = useRoute();
+const router = useRouter();
+const userStore = useUserStore();
+const profile = ref({});
+const games = ref([]);
+const gamesLoading = ref(false);
+const page = ref(1);
+const pageSize = 20;
+const total = ref(0);
+const firstPageGames = ref([]);
+const hasNext = ref(false);
+const effectivePageSize = ref(20);
+const showTags = ref([]);
+const scoreTrend = ref([]);
 
-const uid = computed(() => route.params.uid || userStore.userInfo?.user_id || userStore.userInfo?.id)
-const showFollowButton = computed(() => Number(profile.value.hasFollowed) !== -1)
+const uid = computed(
+  () => route.params.uid || userStore.userInfo?.user_id || userStore.userInfo?.id,
+);
+const showFollowButton = computed(() => Number(profile.value.hasFollowed) !== -1);
 const safeDescription = computed(() => {
   try {
-    return decodeURIComponent(profile.value.description || '')
+    return decodeURIComponent(profile.value.description || '');
   } catch {
-    return profile.value.description || ''
+    return profile.value.description || '';
   }
-})
-const oftenPlayerList = computed(() => splitValue(profile.value.OftenPlayer))
-const top3BeatList = computed(() => parseTopList(profile.value.Top3OfBeat, profile.value.Top3OfBeatUsernameScore))
-const top3PlayerList = computed(() => parseTopList(profile.value.TopPlayer, profile.value.TopPlayerUsernameScore))
-const top3BeatManList = computed(() => parseTopList(profile.value.Top3ManOfBeat, profile.value.Top3ManOfBeatUsernameScore))
-const top3BeatWomanList = computed(() => parseTopList(profile.value.Top3WomanOfBeat, profile.value.Top3WomanOfBeatUsernameScore))
-const allCitiesList = computed(() => splitValue(profile.value.allCities))
-const kuZhuList = computed(() => parseSpecialRival(profile.value.kuzhu))
-const fuXingList = computed(() => parseSpecialRival(profile.value.fuxing))
+});
+const oftenPlayerList = computed(() => splitValue(profile.value.OftenPlayer));
+const top3BeatList = computed(() =>
+  parseTopList(profile.value.Top3OfBeat, profile.value.Top3OfBeatUsernameScore),
+);
+const top3PlayerList = computed(() =>
+  parseTopList(profile.value.TopPlayer, profile.value.TopPlayerUsernameScore),
+);
+const top3BeatManList = computed(() =>
+  parseTopList(profile.value.Top3ManOfBeat, profile.value.Top3ManOfBeatUsernameScore),
+);
+const top3BeatWomanList = computed(() =>
+  parseTopList(profile.value.Top3WomanOfBeat, profile.value.Top3WomanOfBeatUsernameScore),
+);
+const allCitiesList = computed(() => splitValue(profile.value.allCities));
+const kuZhuList = computed(() => parseSpecialRival(profile.value.kuzhu));
+const fuXingList = computed(() => parseSpecialRival(profile.value.fuxing));
 
 const trendPoints = computed(() => {
   if (scoreTrend.value.length <= 1) {
-    return ''
+    return '';
   }
-  return trendDots.value.map((p) => `${p.x},${p.y}`).join(' ')
-})
+  return trendDots.value.map((p) => `${p.x},${p.y}`).join(' ');
+});
 
 const chartBox = {
   left: 80,
   right: 970,
   top: 18,
-  bottom: 250
-}
+  bottom: 250,
+};
 
 const scoreRange = computed(() => {
-  const values = scoreTrend.value.map((v) => Number(v.postscore || 0))
-  const max = Math.max(...values)
-  const min = Math.min(...values)
-  const range = Math.max(1, max - min)
-  return { min, max, range }
-})
+  const values = scoreTrend.value.map((v) => Number(v.postscore || 0));
+  const max = Math.max(...values);
+  const min = Math.min(...values);
+  const range = Math.max(1, max - min);
+  return { min, max, range };
+});
 
 const trendDots = computed(() => {
   if (!scoreTrend.value.length) {
-    return []
+    return [];
   }
-  const { min, range } = scoreRange.value
-  const width = chartBox.right - chartBox.left
-  const height = chartBox.bottom - chartBox.top
-  return scoreTrend.value
-    .map((item, index) => {
-      const ratio = scoreTrend.value.length === 1 ? 0 : index / (scoreTrend.value.length - 1)
-      const x = chartBox.left + ratio * width
-      const y = chartBox.bottom - ((Number(item.postscore || 0) - min) / range) * height
-      return { index, x, y, date: item.dateline }
-    })
-})
+  const { min, range } = scoreRange.value;
+  const width = chartBox.right - chartBox.left;
+  const height = chartBox.bottom - chartBox.top;
+  return scoreTrend.value.map((item, index) => {
+    const ratio = scoreTrend.value.length === 1 ? 0 : index / (scoreTrend.value.length - 1);
+    const x = chartBox.left + ratio * width;
+    const y = chartBox.bottom - ((Number(item.postscore || 0) - min) / range) * height;
+    return { index, x, y, date: item.dateline };
+  });
+});
 
 const yTicks = computed(() => {
   if (!scoreTrend.value.length) {
-    return []
+    return [];
   }
-  const count = 4
-  const { min, max } = scoreRange.value
-  const step = (max - min) / count
+  const count = 4;
+  const { min, max } = scoreRange.value;
+  const step = (max - min) / count;
   return Array.from({ length: count + 1 }).map((_, i) => {
-    const value = max - step * i
-    const y = chartBox.top + ((chartBox.bottom - chartBox.top) * i) / count
-    return { value, y, label: Math.round(value) }
-  })
-})
+    const value = max - step * i;
+    const y = chartBox.top + ((chartBox.bottom - chartBox.top) * i) / count;
+    return { value, y, label: Math.round(value) };
+  });
+});
 
 const xTicks = computed(() => {
   if (!trendDots.value.length) {
-    return []
+    return [];
   }
-  const indexes = Array.from(new Set([
-    0,
-    Math.floor((trendDots.value.length - 1) * 0.33),
-    Math.floor((trendDots.value.length - 1) * 0.66),
-    trendDots.value.length - 1
-  ])).filter((i) => i >= 0)
+  const indexes = Array.from(
+    new Set([
+      0,
+      Math.floor((trendDots.value.length - 1) * 0.33),
+      Math.floor((trendDots.value.length - 1) * 0.66),
+      trendDots.value.length - 1,
+    ]),
+  ).filter((i) => i >= 0);
   return indexes.map((i) => {
-    const dot = trendDots.value[i]
-    const raw = dot.date || ''
-    const label = raw.length >= 10 ? raw.slice(5, 10) : raw
-    return { index: i, x: dot.x, label }
-  })
-})
+    const dot = trendDots.value[i];
+    const raw = dot.date || '';
+    const label = raw.length >= 10 ? raw.slice(5, 10) : raw;
+    return { index: i, x: dot.x, label };
+  });
+});
 
 async function loadData() {
   if (!uid.value) {
-    return
+    return;
   }
-  const res = await getAdvProfile(uid.value)
-  profile.value = res.data || {}
-  firstPageGames.value = res.data?.games?.data || []
-  effectivePageSize.value = firstPageGames.value.length > 0 ? firstPageGames.value.length : pageSize
+  const res = await getAdvProfile(uid.value);
+  profile.value = res.data || {};
+  firstPageGames.value = res.data?.games?.data || [];
+  effectivePageSize.value =
+    firstPageGames.value.length > 0 ? firstPageGames.value.length : pageSize;
   total.value = Number(
-    res.data?.games?.total ||
-    res.data?.games?.count ||
-    res.data?.games?.recordsTotal ||
-    0
-  )
+    res.data?.games?.total || res.data?.games?.count || res.data?.games?.recordsTotal || 0,
+  );
   // 原版是无限加载：未知总数时先允许继续翻页，直到某页返回空/不足再收口
-  hasNext.value = total.value > 0 ? effectivePageSize.value < total.value : firstPageGames.value.length > 0
-  await Promise.all([
-    loadUserTags(),
-    loadUserScores()
-  ])
-  await loadGames(1)
+  hasNext.value =
+    total.value > 0 ? effectivePageSize.value < total.value : firstPageGames.value.length > 0;
+  await Promise.all([loadUserTags(), loadUserScores()]);
+  await loadGames(1);
 }
 
 async function loadUserTags() {
   if (!uid.value) {
-    return
+    return;
   }
-  const res = await getUserTags({ uid: uid.value, limitByCount: 6, getNegative: false })
-  showTags.value = (res.data || []).filter((v) => Number(v.count || 0) > 0)
+  const res = await getUserTags({ uid: uid.value, limitByCount: 6, getNegative: false });
+  showTags.value = (res.data || []).filter((v) => Number(v.count || 0) > 0);
 }
 
 async function loadUserScores() {
   if (!uid.value) {
-    return
+    return;
   }
-  const res = await getUserScores(uid.value)
-  scoreTrend.value = (res.data || []).slice(-40)
+  const res = await getUserScores(uid.value);
+  scoreTrend.value = (res.data || []).slice(-40);
 }
 
 async function loadGames(nextPage = 1) {
   if (!uid.value) {
-    return
+    return;
   }
-  page.value = nextPage
-  gamesLoading.value = true
+  page.value = nextPage;
+  gamesLoading.value = true;
   try {
     if (nextPage === 1) {
-      games.value = firstPageGames.value
-      hasNext.value = total.value > 0 ? effectivePageSize.value < total.value : firstPageGames.value.length > 0
-      return
+      games.value = firstPageGames.value;
+      hasNext.value =
+        total.value > 0 ? effectivePageSize.value < total.value : firstPageGames.value.length > 0;
+      return;
     }
-    const res = await getPageGamesByUid(uid.value, nextPage)
-    const rows = res.data?.data || []
-    games.value = rows
-    const remoteTotal = Number(res.data?.total || res.data?.count || 0)
+    const res = await getPageGamesByUid(uid.value, nextPage);
+    const rows = res.data?.data || [];
+    games.value = rows;
+    const remoteTotal = Number(res.data?.total || res.data?.count || 0);
     if (remoteTotal > 0) {
-      total.value = remoteTotal
-      hasNext.value = nextPage * effectivePageSize.value < remoteTotal
+      total.value = remoteTotal;
+      hasNext.value = nextPage * effectivePageSize.value < remoteTotal;
     } else if (rows.length < effectivePageSize.value) {
-      total.value = Math.max(total.value, (nextPage - 1) * effectivePageSize.value + rows.length)
-      hasNext.value = false
+      total.value = Math.max(total.value, (nextPage - 1) * effectivePageSize.value + rows.length);
+      hasNext.value = false;
     } else {
       // 后端未返回总数时，按“可能还有下一页”维持可翻页
-      total.value = Math.max(total.value, nextPage * effectivePageSize.value + 1)
-      hasNext.value = true
+      total.value = Math.max(total.value, nextPage * effectivePageSize.value + 1);
+      hasNext.value = true;
     }
   } finally {
-    gamesLoading.value = false
+    gamesLoading.value = false;
   }
 }
 
 async function toggleFollow() {
   if (Number(profile.value.hasFollowed) === 1) {
     try {
-      await ElMessageBox.confirm('确认取消关注？', '提示', { type: 'warning' })
+      await ElMessageBox.confirm('确认取消关注？', '提示', { type: 'warning' });
     } catch {
-      return
+      return;
     }
-    await goCancelFolloweeByUid(profile.value.uid)
-    profile.value.hasFollowed = 0
-    return
+    await goCancelFolloweeByUid(profile.value.uid);
+    profile.value.hasFollowed = 0;
+    return;
   }
-  await goFolloweeByUid(profile.value.uid)
-  profile.value.hasFollowed = 1
+  await goFolloweeByUid(profile.value.uid);
+  profile.value.hasFollowed = 1;
 }
 
-watch(uid, () => loadData(), { immediate: true })
+watch(uid, () => loadData(), { immediate: true });
 
 function getEventId(row) {
-  return row?.eventid || row?.match_id || row?.id || null
+  return row?.eventid || row?.match_id || row?.id || null;
 }
 
 function goEvent(row) {
-  const eventId = getEventId(row)
+  const eventId = getEventId(row);
   if (!eventId) {
-    return
+    return;
   }
-  router.push(`/event/${eventId}`)
+  router.push(`/event/${eventId}`);
 }
 
 function prevPage() {
   if (page.value <= 1) {
-    return
+    return;
   }
-  loadGames(page.value - 1)
+  loadGames(page.value - 1);
 }
 
 function nextPage() {
   if (!hasNext.value) {
-    return
+    return;
   }
-  loadGames(page.value + 1)
+  loadGames(page.value + 1);
 }
 
 function splitValue(raw, delimiter = ',') {
   if (Array.isArray(raw)) {
-    return raw.map((v) => String(v || '').trim()).filter(Boolean)
+    return raw.map((v) => String(v || '').trim()).filter(Boolean);
   }
   return String(raw || '')
     .split(delimiter)
     .map((v) => v.trim())
-    .filter(Boolean)
+    .filter(Boolean);
 }
 
 function parseTopList(uids, names) {
-  const uidList = splitValue(uids).reverse()
-  const nameList = splitValue(names)
-  return nameList.map((name, index) => ({
-    uid: uidList[index] || '',
-    name: name || ''
-  })).filter(item => item.name)
+  const uidList = splitValue(uids).reverse();
+  const nameList = splitValue(names);
+  return nameList
+    .map((name, index) => ({
+      uid: uidList[index] || '',
+      name: name || '',
+    }))
+    .filter((item) => item.name);
 }
 
 function parseSpecialRival(raw) {
@@ -461,15 +551,15 @@ function parseSpecialRival(raw) {
     .map((item) => item.trim())
     .filter(Boolean)
     .map((item) => {
-      const parts = item.split(',')
+      const parts = item.split(',');
       return {
         name: parts[1] || '',
         score: parts[2] || '',
         uid: parts[3] || '',
-        detail: parts[5] || ''
-      }
+        detail: parts[5] || '',
+      };
     })
-    .filter((item) => item.name)
+    .filter((item) => item.name);
 }
 </script>
 

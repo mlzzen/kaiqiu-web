@@ -1,16 +1,16 @@
 export function formatDistance(juli) {
   if (!juli && juli !== 0) {
-    return '-'
+    return '-';
   }
-  return `距您${Number(juli).toFixed(1)}公里`
+  return `距您${Number(juli).toFixed(1)}公里`;
 }
 
 export function toList(data) {
   if (Array.isArray(data)) {
-    return data
+    return data;
   }
   if (Array.isArray(data?.data)) {
-    return data.data
+    return data.data;
   }
-  return []
+  return [];
 }

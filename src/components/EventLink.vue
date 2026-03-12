@@ -9,13 +9,13 @@
 defineProps({
   eventId: {
     type: [String, Number],
-    default: ''
+    default: '',
   },
   name: {
     type: String,
-    default: ''
-  }
-})
+    default: '',
+  },
+});
 </script>
 
 <style scoped>

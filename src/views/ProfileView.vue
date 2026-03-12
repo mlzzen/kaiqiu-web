@@ -49,56 +49,56 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { ElMessage } from 'element-plus'
-import { useRouter } from 'vue-router'
-import EventLink from '../components/EventLink.vue'
-import { getDaySign, getMatchListHisByPage, getUserInfo } from '../api/user'
-import { toList } from '../utils/format'
+import { ref } from 'vue';
+import { ElMessage } from 'element-plus';
+import { useRouter } from 'vue-router';
+import EventLink from '../components/EventLink.vue';
+import { getDaySign, getMatchListHisByPage, getUserInfo } from '../api/user';
+import { toList } from '../utils/format';
 
-const router = useRouter()
-const userInfo = ref({})
-const eventRows = ref([])
-const loading = ref(false)
-const page = ref(1)
-const total = ref(0)
+const router = useRouter();
+const userInfo = ref({});
+const eventRows = ref([]);
+const loading = ref(false);
+const page = ref(1);
+const total = ref(0);
 
 async function loadUser() {
-  const res = await getUserInfo()
-  userInfo.value = res.data || {}
+  const res = await getUserInfo();
+  userInfo.value = res.data || {};
 }
 
 async function loadEvents(nextPage = 1) {
-  page.value = nextPage
-  loading.value = true
+  page.value = nextPage;
+  loading.value = true;
   try {
-    const res = await getMatchListHisByPage(nextPage)
-    eventRows.value = toList(res.data)
-    total.value = Number(res.data?.total || eventRows.value.length)
+    const res = await getMatchListHisByPage(nextPage);
+    eventRows.value = toList(res.data);
+    total.value = Number(res.data?.total || eventRows.value.length);
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 }
 
 async function goSign() {
-  await getDaySign()
-  ElMessage.success('签到成功')
-  await loadUser()
+  await getDaySign();
+  ElMessage.success('签到成功');
+  await loadUser();
 }
 
 function goMyProfile() {
-  router.push('/user')
+  router.push('/user');
 }
 
 function goFollowing() {
-  router.push('/following')
+  router.push('/following');
 }
 
 function getEventId(row) {
-  return row?.eventid || row?.id || row?.match_id || null
+  return row?.eventid || row?.id || row?.match_id || null;
 }
 
-Promise.all([loadUser(), loadEvents(1)])
+Promise.all([loadUser(), loadEvents(1)]);
 </script>
 
 <style scoped>

@@ -26,7 +26,9 @@
               <el-table-column type="index" label="序号" width="60" align="center" />
               <el-table-column prop="username1" label="选手1" min-width="140" align="center">
                 <template #default="scope">
-                  <span :class="{ winner: scope.row.winner1 }">{{ scope.row.username1 || '待定' }}</span>
+                  <span :class="{ winner: scope.row.winner1 }">{{
+                    scope.row.username1 || '待定'
+                  }}</span>
                 </template>
               </el-table-column>
               <el-table-column label="比分" width="100" align="center">
@@ -38,7 +40,9 @@
               </el-table-column>
               <el-table-column prop="username2" label="选手2" min-width="140" align="center">
                 <template #default="scope">
-                  <span :class="{ winner: scope.row.winner2 }">{{ scope.row.username2 || '待定' }}</span>
+                  <span :class="{ winner: scope.row.winner2 }">{{
+                    scope.row.username2 || '待定'
+                  }}</span>
                 </template>
               </el-table-column>
               <el-table-column prop="gameRemark" label="详情" width="80" align="center" />
@@ -93,28 +97,48 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
-import { ArrowLeft, Refresh } from '@element-plus/icons-vue'
-import { getArrangeKnockout, updateTtScore } from '../api/match'
-import { getEventDetaiByIdAndLocation } from '../api/event'
-import { useUserStore } from '../stores/user'
+import { ref, computed } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { ElMessage } from 'element-plus';
+import { ArrowLeft, Refresh } from '@element-plus/icons-vue';
+import { getArrangeKnockout, updateTtScore } from '../api/match';
+import { getEventDetaiByIdAndLocation } from '../api/event';
+import { useUserStore } from '../stores/user';
 
-const route = useRoute()
-const router = useRouter()
-const userStore = useUserStore()
+const route = useRoute();
+const router = useRouter();
+const userStore = useUserStore();
 
-const loading = ref(false)
-const list = ref([])
-const dialogVisible = ref(false)
+const loading = ref(false);
+const list = ref([]);
+const dialogVisible = ref(false);
 
-const eventId = computed(() => route.params.eventid)
-const itemId = computed(() => route.params.itemid)
+const eventId = computed(() => route.params.eventid);
+const itemId = computed(() => route.params.itemid);
 
-const currentItem = ref({})
+const currentItem = ref({});
 
-const scorePreList = ['0:0', '2:0', '2:1', '1:2', '0:2', '3:0', '3:1', '3:2', '2:3', '1:3', '0:3', '4:0', '4:1', '4:2', '4:3', '3:4', '2:4', '1:4', '0:4']
+const scorePreList = [
+  '0:0',
+  '2:0',
+  '2:1',
+  '1:2',
+  '0:2',
+  '3:0',
+  '3:1',
+  '3:2',
+  '2:3',
+  '1:3',
+  '0:3',
+  '4:0',
+  '4:1',
+  '4:2',
+  '4:3',
+  '3:4',
+  '2:4',
+  '1:4',
+  '0:4',
+];
 
 const rowInfo = ref({
   roundname: '',
@@ -128,95 +152,95 @@ const rowInfo = ref({
   uid1: '',
   uid2: '',
   eventid: '',
-  itemid: ''
-})
+  itemid: '',
+});
 
 async function loadDetail() {
   try {
-    const { lng, lat } = userStore.location
-    const res = await getEventDetaiByIdAndLocation({ id: eventId.value, lng, lat })
-    const items = res.data?.items || []
-    currentItem.value = items.find(v => String(v.id) === String(itemId.value)) || {}
+    const { lng, lat } = userStore.location;
+    const res = await getEventDetaiByIdAndLocation({ id: eventId.value, lng, lat });
+    const items = res.data?.items || [];
+    currentItem.value = items.find((v) => String(v.id) === String(itemId.value)) || {};
   } catch (e) {
-    console.error('loadDetail error:', e)
+    console.error('loadDetail error:', e);
   }
 }
 
 async function refresh() {
-  loading.value = true
+  loading.value = true;
   try {
-    const res = await getArrangeKnockout({ eventid: eventId.value, itemid: itemId.value })
-    list.value = res.data || []
+    const res = await getArrangeKnockout({ eventid: eventId.value, itemid: itemId.value });
+    list.value = res.data || [];
   } catch (e) {
-    ElMessage.error('加载失败')
+    ElMessage.error('加载失败');
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 }
 
 function formatScore(score) {
-  if (score === undefined || score === null || score === '') return '-'
-  return score
+  if (score === undefined || score === null || score === '') return '-';
+  return score;
 }
 
 function getWinnerFlags(game) {
-  const result1 = String(game.result1 || '').trim()
-  const result2 = String(game.result2 || '').trim()
-  const winnerFlags = { winner1: false, winner2: false }
+  const result1 = String(game.result1 || '').trim();
+  const result2 = String(game.result2 || '').trim();
+  const winnerFlags = { winner1: false, winner2: false };
 
   if (game.username1 === '轮空') {
-    winnerFlags.winner2 = true
+    winnerFlags.winner2 = true;
   } else if (game.username2 === '轮空') {
-    winnerFlags.winner1 = true
+    winnerFlags.winner1 = true;
   } else if (result2.includes('弃')) {
-    winnerFlags.winner1 = true
+    winnerFlags.winner1 = true;
   } else if (result1.includes('弃')) {
-    winnerFlags.winner2 = true
+    winnerFlags.winner2 = true;
   } else {
-    const score1 = parseInt(result1, 10)
-    const score2 = parseInt(result2, 10)
+    const score1 = parseInt(result1, 10);
+    const score2 = parseInt(result2, 10);
     if (!Number.isNaN(score1) && !Number.isNaN(score2)) {
-      winnerFlags.winner1 = score1 > score2
-      winnerFlags.winner2 = score2 > score1
+      winnerFlags.winner1 = score1 > score2;
+      winnerFlags.winner2 = score2 > score1;
     }
   }
-  return winnerFlags
+  return winnerFlags;
 }
 
 function setHeaderCellStyle() {
   return {
     fontSize: '12px',
     padding: '8px 4px',
-    textAlign: 'center'
-  }
+    textAlign: 'center',
+  };
 }
 
 function setCellStyle({ row, column, rowIndex, columnIndex }) {
   const style = {
     fontSize: '12px',
     padding: '8px 4px',
-    cursor: 'pointer'
-  }
+    cursor: 'pointer',
+  };
 
   // 比分列可以点击
   if (column.label === '比分') {
-    style.color = '#E6326E'
-    style.fontWeight = '600'
+    style.color = '#E6326E';
+    style.fontWeight = '600';
   }
 
-  return style
+  return style;
 }
 
 function handleCellClick(row, column, cell, event) {
-  if (column.label !== '比分') return
+  if (column.label !== '比分') return;
 
   // 检查选手是否已确定
   if (!row.username1 || !row.username2) {
-    ElMessage.warning('选手未确定，无法录入比分')
-    return
+    ElMessage.warning('选手未确定，无法录入比分');
+    return;
   }
 
-  const winnerFlags = getWinnerFlags(row)
+  const winnerFlags = getWinnerFlags(row);
 
   rowInfo.value = {
     roundname: row.roundname || '',
@@ -232,65 +256,65 @@ function handleCellClick(row, column, cell, event) {
     eventid: eventId.value,
     itemid: itemId.value,
     winner1: winnerFlags.winner1,
-    winner2: winnerFlags.winner2
-  }
+    winner2: winnerFlags.winner2,
+  };
 
-  dialogVisible.value = true
+  dialogVisible.value = true;
 }
 
 function selectScore(item) {
-  rowInfo.value.activeBifen = item
-  rowInfo.value.checkbox = []
+  rowInfo.value.activeBifen = item;
+  rowInfo.value.checkbox = [];
 }
 
 function handleWaiverChange(values) {
-  rowInfo.value.activeBifen = ''
+  rowInfo.value.activeBifen = '';
   if (values.length === 2) {
-    rowInfo.value.activeBifen = 'wo:wo'
+    rowInfo.value.activeBifen = 'wo:wo';
   } else if (values.length === 1) {
     if (values[0] === 'username1') {
-      rowInfo.value.activeBifen = 'wo:2'
+      rowInfo.value.activeBifen = 'wo:2';
     } else {
-      rowInfo.value.activeBifen = '2:wo'
+      rowInfo.value.activeBifen = '2:wo';
     }
   }
 }
 
 function submitScore() {
-  const { activeBifen, gameid, uid1, uid2, eventid, itemid } = rowInfo.value
+  const { activeBifen, gameid, uid1, uid2, eventid, itemid } = rowInfo.value;
 
   if (!activeBifen) {
-    ElMessage.warning('请设置比分')
-    return
+    ElMessage.warning('请设置比分');
+    return;
   }
 
   // 淘汰赛不支持同时弃权
   if (activeBifen === 'wo:wo') {
-    ElMessage.warning('淘汰赛不支持同时弃权')
-    return
+    ElMessage.warning('淘汰赛不支持同时弃权');
+    return;
   }
 
   updateTtScore({ groupid: -1, score: activeBifen, gameid, uid1, uid2, eventid, itemid })
     .then(() => {
-      ElMessage.success('比分更新成功')
-      dialogVisible.value = false
-      refresh()
+      ElMessage.success('比分更新成功');
+      dialogVisible.value = false;
+      refresh();
     })
     .catch(() => {
-      ElMessage.error('更新失败')
-    })
+      ElMessage.error('更新失败');
+    });
 }
 
 function goBack() {
-  router.back()
+  router.back();
 }
 
 function goGroupScore() {
-  router.push(`/set-score/group/${eventId.value}/${itemId.value}`)
+  router.push(`/set-score/group/${eventId.value}/${itemId.value}`);
 }
 
-loadDetail()
-refresh()
+loadDetail();
+refresh();
 </script>
 
 <style scoped>
@@ -333,13 +357,13 @@ refresh()
 
 .round-name {
   text-align: center;
-  color: #F89703;
+  color: #f89703;
   font-weight: 600;
   font-size: 14px;
   margin-bottom: 12px;
   padding: 4px 16px;
   display: inline-block;
-  border: 1px solid #F89703;
+  border: 1px solid #f89703;
   border-radius: 4px;
 }
 
@@ -354,7 +378,7 @@ refresh()
 }
 
 .winner {
-  color: #E6326E;
+  color: #e6326e;
   font-weight: 600;
 }
 
@@ -368,7 +392,7 @@ refresh()
 }
 
 .round-label {
-  color: #F89703;
+  color: #f89703;
   font-weight: 600;
   margin-right: 12px;
 }
@@ -380,7 +404,7 @@ refresh()
 }
 
 .current-score {
-  color: #E6326E;
+  color: #e6326e;
   font-weight: 600;
 }
 
@@ -409,13 +433,13 @@ refresh()
 }
 
 .score-item:hover {
-  border-color: #77B980;
+  border-color: #77b980;
 }
 
 .score-item.active {
-  background: #77B980;
+  background: #77b980;
   color: #fff;
-  border-color: #77B980;
+  border-color: #77b980;
 }
 
 .waiver-section {

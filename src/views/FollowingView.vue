@@ -14,7 +14,11 @@
       </el-table-column>
       <el-table-column label="姓名" min-width="200">
         <template #default="scope">
-          <UserLink :uid="scope.row.fuid" :name="scope.row.nickname" :sub-name="scope.row.realname" />
+          <UserLink
+            :uid="scope.row.fuid"
+            :name="scope.row.nickname"
+            :sub-name="scope.row.realname"
+          />
         </template>
       </el-table-column>
       <el-table-column label="操作" width="260">
@@ -49,59 +53,59 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { ElMessageBox } from 'element-plus'
-import UserLink from '../components/UserLink.vue'
-import EventLink from '../components/EventLink.vue'
-import { getFolloweeEnrolledMatch, getUserFolloweesList, goCancelFolloweeByUid } from '../api/user'
+import { ref } from 'vue';
+import { ElMessageBox } from 'element-plus';
+import UserLink from '../components/UserLink.vue';
+import EventLink from '../components/EventLink.vue';
+import { getFolloweeEnrolledMatch, getUserFolloweesList, goCancelFolloweeByUid } from '../api/user';
 
-const loading = ref(false)
-const rows = ref([])
-const expandedUid = ref('')
-const expandedMatches = ref([])
+const loading = ref(false);
+const rows = ref([]);
+const expandedUid = ref('');
+const expandedMatches = ref([]);
 
 async function loadRows() {
-  loading.value = true
+  loading.value = true;
   try {
-    const res = await getUserFolloweesList()
-    rows.value = res.data?.followeesList || []
+    const res = await getUserFolloweesList();
+    rows.value = res.data?.followeesList || [];
     // 存储到 localstorage
-    const followees = rows.value.map(item => item.fuid)
-    localStorage.setItem('userFollowees', JSON.stringify(followees))
+    const followees = rows.value.map((item) => item.fuid);
+    localStorage.setItem('userFollowees', JSON.stringify(followees));
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 }
 
 async function toggleMatches(row) {
   if (expandedUid.value === row.fuid) {
-    expandedUid.value = ''
-    expandedMatches.value = []
-    return
+    expandedUid.value = '';
+    expandedMatches.value = [];
+    return;
   }
-  const res = await getFolloweeEnrolledMatch(row.fuid)
-  expandedUid.value = row.fuid
-  expandedMatches.value = res.data?.enrolledMatchList || []
+  const res = await getFolloweeEnrolledMatch(row.fuid);
+  expandedUid.value = row.fuid;
+  expandedMatches.value = res.data?.enrolledMatchList || [];
 }
 
 async function cancelFollow(row) {
   try {
-    await ElMessageBox.confirm('确认要取消关注吗？', '提示', { type: 'warning' })
+    await ElMessageBox.confirm('确认要取消关注吗？', '提示', { type: 'warning' });
   } catch {
-    return
+    return;
   }
-  await goCancelFolloweeByUid(row.fuid)
-  rows.value = rows.value.filter((v) => v.fuid !== row.fuid)
+  await goCancelFolloweeByUid(row.fuid);
+  rows.value = rows.value.filter((v) => v.fuid !== row.fuid);
   // 更新 localstorage
-  const followees = rows.value.map(item => item.fuid)
-  localStorage.setItem('userFollowees', JSON.stringify(followees))
+  const followees = rows.value.map((item) => item.fuid);
+  localStorage.setItem('userFollowees', JSON.stringify(followees));
   if (expandedUid.value === row.fuid) {
-    expandedUid.value = ''
-    expandedMatches.value = []
+    expandedUid.value = '';
+    expandedMatches.value = [];
   }
 }
 
-loadRows()
+loadRows();
 </script>
 
 <style scoped>

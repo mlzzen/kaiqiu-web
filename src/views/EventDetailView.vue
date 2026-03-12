@@ -6,9 +6,16 @@
           <div class="title">{{ detail.title || '赛事详情' }}</div>
           <div class="right-actions">
             <el-select v-model="activeItemId" placeholder="选择比赛分项" style="width: 300px">
-              <el-option v-for="item in subEventList" :key="item.id" :label="item.name" :value="item.id" />
+              <el-option
+                v-for="item in subEventList"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id"
+              />
             </el-select>
-            <el-button type="success" :disabled="!activeItemId" @click="openMembers">参赛名单</el-button>
+            <el-button type="success" :disabled="!activeItemId" @click="openMembers"
+              >参赛名单</el-button
+            >
           </div>
         </div>
       </template>
@@ -16,24 +23,37 @@
       <el-descriptions :column="2" border>
         <el-descriptions-item label="联系人">{{ detail.contact || '-' }}</el-descriptions-item>
         <el-descriptions-item label="电话">{{ detail.mobile || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="比赛时间">{{ detail.starttime || '-' }} 至 {{ detail.endtime || '-'
-          }}</el-descriptions-item>
+        <el-descriptions-item label="比赛时间"
+          >{{ detail.starttime || '-' }} 至 {{ detail.endtime || '-' }}</el-descriptions-item
+        >
         <el-descriptions-item label="比赛球馆">{{ detail.arena_name || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="比赛地点" :span="2">{{ detail.location || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="比赛地点" :span="2">{{
+          detail.location || '-'
+        }}</el-descriptions-item>
       </el-descriptions>
 
       <div v-if="currentItem" class="item-info">
         <el-descriptions :column="3" border>
-          <el-descriptions-item label="项目名称">{{ currentItem.name || '-' }}</el-descriptions-item>
-          <el-descriptions-item label="报名人数">{{ currentItem.curr_count || 0 }}/{{ allCount }}</el-descriptions-item>
-          <el-descriptions-item label="比赛类型">{{ currentItem.match_type || '-' }}</el-descriptions-item>
-          <el-descriptions-item label="报名限制">{{ currentItem.condition || '-' }}</el-descriptions-item>
-          <el-descriptions-item label="报名费">{{ currentItem.cost || 0 }} 元 {{ currentItem.postfee || ''
-            }}</el-descriptions-item>
-          <el-descriptions-item label="报名状态">{{ currentItem.is_enter ? '已报名' : '未报名' }}</el-descriptions-item>
+          <el-descriptions-item label="项目名称">{{
+            currentItem.name || '-'
+          }}</el-descriptions-item>
+          <el-descriptions-item label="报名人数"
+            >{{ currentItem.curr_count || 0 }}/{{ allCount }}</el-descriptions-item
+          >
+          <el-descriptions-item label="比赛类型">{{
+            currentItem.match_type || '-'
+          }}</el-descriptions-item>
+          <el-descriptions-item label="报名限制">{{
+            currentItem.condition || '-'
+          }}</el-descriptions-item>
+          <el-descriptions-item label="报名费"
+            >{{ currentItem.cost || 0 }} 元 {{ currentItem.postfee || '' }}</el-descriptions-item
+          >
+          <el-descriptions-item label="报名状态">{{
+            currentItem.is_enter ? '已报名' : '未报名'
+          }}</el-descriptions-item>
         </el-descriptions>
       </div>
-
     </el-card>
 
     <el-card style="margin-top: 14px">
@@ -48,35 +68,55 @@
         <div class="schedule-head">
           <div class="schedule-title">
             <span class="schedule-name">{{ currentItem?.name || '-' }}</span>
-            <span v-if="currentItem?.qualNum > 0" class="schedule-qual">(小组出线{{ currentItem.qualNum }}人)</span>
+            <span v-if="currentItem?.qualNum > 0" class="schedule-qual"
+              >(小组出线{{ currentItem.qualNum }}人)</span
+            >
           </div>
-          <el-button class="schedule-btn" type="success" plain :disabled="!groupSections.length" @click="goSetScore">
+          <el-button
+            class="schedule-btn"
+            type="success"
+            plain
+            :disabled="!groupSections.length"
+            @click="goSetScore"
+          >
             {{ groupSections.length ? '录入成绩' : '设定中...' }}
           </el-button>
         </div>
 
         <template v-if="groupSections.length">
-          <div v-for="(group, groupIndex) in groupSections" :key="groupIndex" class="schedule-group">
+          <div
+            v-for="(group, groupIndex) in groupSections"
+            :key="groupIndex"
+            class="schedule-group"
+          >
             <div class="schedule-group-title">第{{ groupIndex + 1 }}台</div>
             <div class="schedule-table-wrap">
               <el-table
-                        :data="buildGroupRows(group)"
-                        border
-                        class="schedule-table"
-                        :cell-style="setGroupCellStyle"
-                        :header-cell-style="setGroupHeaderStyle">
+                :data="buildGroupRows(group)"
+                border
+                class="schedule-table"
+                :cell-style="setGroupCellStyle"
+                :header-cell-style="setGroupHeaderStyle"
+              >
                 <el-table-column
-                                 prop="newUsername"
-                                 :label="`第${groupIndex + 1}组`"
-                                 width="120"
-                                 fixed="left"
-                                 align="center">
+                  prop="newUsername"
+                  :label="`第${groupIndex + 1}组`"
+                  width="120"
+                  fixed="left"
+                  align="center"
+                >
                   <template #default="scope">
                     <UserLink :uid="scope.row.uid" :name="scope.row.newUsername" />
                   </template>
                 </el-table-column>
-                <el-table-column v-for="col in getGroupColumns(group)" :key="col.key" :prop="col.key" :label="col.label"
-                                 :width="col.width" align="center">
+                <el-table-column
+                  v-for="col in getGroupColumns(group)"
+                  :key="col.key"
+                  :prop="col.key"
+                  :label="col.label"
+                  :width="col.width"
+                  align="center"
+                >
                   <template #default="scope">{{ scope.row[col.key] ?? '' }}</template>
                 </el-table-column>
               </el-table>
@@ -89,8 +129,12 @@
         <div v-if="resultHonors.length" class="results-honors">
           <div class="results-honors-title">名次列表</div>
           <div v-for="(item, index) in resultHonors" :key="index" class="results-honor-row">
-            <UserLink :uid="item.uid" :name="item.name" class="results-honor-name"
-                      :class="{ 'is-first': index === 0 }" />
+            <UserLink
+              :uid="item.uid"
+              :name="item.name"
+              class="results-honor-name"
+              :class="{ 'is-first': index === 0 }"
+            />
             <div class="results-honor-rank">{{ item.honor }}</div>
           </div>
         </div>
@@ -100,31 +144,40 @@
             <div class="results-group-title">第{{ groupIndex + 1 }}台</div>
             <div class="results-table-wrap">
               <el-table
-                        :data="buildResultRows(group)"
-                        border
-                        class="results-table"
-                        :cell-style="setResultCellStyle"
-                        :header-cell-style="setResultHeaderStyle">
+                :data="buildResultRows(group)"
+                border
+                class="results-table"
+                :cell-style="setResultCellStyle"
+                :header-cell-style="setResultHeaderStyle"
+              >
                 <el-table-column
-                                 prop="newUsername"
-                                 :label="`第${groupIndex + 1}组`"
-                                 width="120"
-                                 fixed="left"
-                                 align="center">
+                  prop="newUsername"
+                  :label="`第${groupIndex + 1}组`"
+                  width="120"
+                  fixed="left"
+                  align="center"
+                >
                   <template #default="scope">
                     <UserLink :uid="scope.row.uid" :name="scope.row.newUsername" />
                   </template>
                 </el-table-column>
-                <el-table-column v-for="col in getResultColumns(group)" :key="col.key" :prop="col.key"
-                                 :label="col.label"
-                                 :width="col.width" align="center">
+                <el-table-column
+                  v-for="col in getResultColumns(group)"
+                  :key="col.key"
+                  :prop="col.key"
+                  :label="col.label"
+                  :width="col.width"
+                  align="center"
+                >
                   <template #default="scope">{{ scope.row[col.key] ?? '' }}</template>
                 </el-table-column>
                 <el-table-column prop="score" label="积分" width="70" align="center" />
                 <el-table-column prop="process" label="计算" width="90" align="center">
                   <template #default="scope">
                     <div class="results-calc">
-                      <span v-for="(step, idx) in scope.row.process || []" :key="idx">{{ step }}</span>
+                      <span v-for="(step, idx) in scope.row.process || []" :key="idx">{{
+                        step
+                      }}</span>
                     </div>
                   </template>
                 </el-table-column>
@@ -134,29 +187,50 @@
 
             <div v-if="group?.[0]?.detail_games?.length" class="results-detail">
               <div class="results-detail-toggle" @click="toggleGroupDetail(groupIndex)">
-                {{ isGroupDetailOpen(groupIndex) ? '隐藏' : '显示' }}第{{ groupIndex + 1 }}组详细成绩
+                {{ isGroupDetailOpen(groupIndex) ? '隐藏' : '显示' }}第{{
+                  groupIndex + 1
+                }}组详细成绩
               </div>
               <template v-if="isGroupDetailOpen(groupIndex)">
-                <div v-for="info in group[0].detail_games" :key="info.tgameid" class="results-detail-round">
+                <div
+                  v-for="info in group[0].detail_games"
+                  :key="info.tgameid"
+                  class="results-detail-round"
+                >
                   <div class="results-detail-round-name">{{ info.roundname }}</div>
                   <div class="results-detail-table-wrap">
-                    <el-table :data="info.games || []" border class="results-detail-table"
-                              :cell-style="setDetailCellStyle" :header-cell-style="setResultHeaderStyle">
+                    <el-table
+                      :data="info.games || []"
+                      border
+                      class="results-detail-table"
+                      :cell-style="setDetailCellStyle"
+                      :header-cell-style="setResultHeaderStyle"
+                    >
                       <el-table-column type="index" label="序号" width="70" align="center" />
                       <el-table-column prop="username1" label="选手1" width="200" align="center">
                         <template #default="scope">
-                          <div class="results-detail-name" :class="{ 'is-win': scope.row.result1 > scope.row.result2 }">
-                            {{ scope.row.username1 }}</div>
+                          <div
+                            class="results-detail-name"
+                            :class="{ 'is-win': scope.row.result1 > scope.row.result2 }"
+                          >
+                            {{ scope.row.username1 }}
+                          </div>
                         </template>
                       </el-table-column>
                       <el-table-column prop="username2" label="选手2" width="200" align="center">
                         <template #default="scope">
-                          <div class="results-detail-name" :class="{ 'is-win': scope.row.result2 > scope.row.result1 }">
-                            {{ scope.row.username2 }}</div>
+                          <div
+                            class="results-detail-name"
+                            :class="{ 'is-win': scope.row.result2 > scope.row.result1 }"
+                          >
+                            {{ scope.row.username2 }}
+                          </div>
                         </template>
                       </el-table-column>
                       <el-table-column label="比分" width="90" align="center">
-                        <template #default="scope">{{ `${scope.row.result1}:${scope.row.result2}` }}</template>
+                        <template #default="scope">{{
+                          `${scope.row.result1}:${scope.row.result2}`
+                        }}</template>
                       </el-table-column>
                       <el-table-column label="详情" width="70" align="center">
                         <template #default="scope">
@@ -176,11 +250,19 @@
         <div v-if="resultTtRounds.length" class="results-tt">
           <div class="results-tt-title">淘汰赛对阵</div>
           <div class="results-tt-bracket">
-            <div v-for="(round, roundIndex) in resultTtRounds" :key="roundIndex" class="results-tt-column">
+            <div
+              v-for="(round, roundIndex) in resultTtRounds"
+              :key="roundIndex"
+              class="results-tt-column"
+            >
               <div class="results-tt-round-name">{{ round.roundname }}</div>
               <div class="results-tt-round-body">
-                <div v-for="(game, gameIndex) in round.games" :key="gameIndex" class="results-tt-game"
-                     :style="getTtGameStyle(roundIndex, gameIndex, round.games.length)">
+                <div
+                  v-for="(game, gameIndex) in round.games"
+                  :key="gameIndex"
+                  class="results-tt-game"
+                  :style="getTtGameStyle(roundIndex, gameIndex, round.games.length)"
+                >
                   <div class="results-tt-player" :class="{ winner: game.winner1 }">
                     <span class="results-tt-name">{{ game.username1 }}</span>
                     <span class="results-tt-score">{{ game.result1 }}</span>
@@ -190,7 +272,10 @@
                     <span class="results-tt-name">{{ game.username2 }}</span>
                     <span class="results-tt-score">{{ game.result2 }}</span>
                   </div>
-                  <div class="results-tt-connector" v-if="roundIndex < resultTtRounds.length - 1"></div>
+                  <div
+                    class="results-tt-connector"
+                    v-if="roundIndex < resultTtRounds.length - 1"
+                  ></div>
                 </div>
               </div>
             </div>
@@ -202,26 +287,46 @@
             {{ showTtDetail ? '隐藏' : '显示' }}淘汰赛详细成绩
           </div>
           <template v-if="showTtDetail">
-            <div v-for="info in resultTtDetailGames" :key="info.tgameid" class="results-detail-round">
+            <div
+              v-for="info in resultTtDetailGames"
+              :key="info.tgameid"
+              class="results-detail-round"
+            >
               <div class="results-detail-round-name">{{ info.roundname }}</div>
               <div class="results-detail-table-wrap">
-                <el-table v-if="info.games?.length" :data="info.games" border class="results-detail-table"
-                          :cell-style="setDetailCellStyle" :header-cell-style="setResultHeaderStyle">
+                <el-table
+                  v-if="info.games?.length"
+                  :data="info.games"
+                  border
+                  class="results-detail-table"
+                  :cell-style="setDetailCellStyle"
+                  :header-cell-style="setResultHeaderStyle"
+                >
                   <el-table-column type="index" label="序号" width="70" align="center" />
                   <el-table-column prop="username1" label="选手1" width="200" align="center">
                     <template #default="scope">
-                      <div class="results-detail-name" :class="{ 'is-win': scope.row.result1 > scope.row.result2 }">{{
-                        scope.row.username1 }}</div>
+                      <div
+                        class="results-detail-name"
+                        :class="{ 'is-win': scope.row.result1 > scope.row.result2 }"
+                      >
+                        {{ scope.row.username1 }}
+                      </div>
                     </template>
                   </el-table-column>
                   <el-table-column prop="username2" label="选手2" width="200" align="center">
                     <template #default="scope">
-                      <div class="results-detail-name" :class="{ 'is-win': scope.row.result2 > scope.row.result1 }">{{
-                        scope.row.username2 }}</div>
+                      <div
+                        class="results-detail-name"
+                        :class="{ 'is-win': scope.row.result2 > scope.row.result1 }"
+                      >
+                        {{ scope.row.username2 }}
+                      </div>
                     </template>
                   </el-table-column>
                   <el-table-column label="比分" width="90" align="center">
-                    <template #default="scope">{{ `${scope.row.result1}:${scope.row.result2}` }}</template>
+                    <template #default="scope">{{
+                      `${scope.row.result1}:${scope.row.result2}`
+                    }}</template>
                   </el-table-column>
                   <el-table-column label="详情" width="70" align="center">
                     <template #default="scope">
@@ -273,15 +378,36 @@
         <el-table-column prop="number" label="#" width="60" />
         <el-table-column label="名称" min-width="180">
           <template #default="scope">
-            <UserLink :uid="scope.row.uid" :name="scope.row.username" :sub-name="scope.row.realname" />
+            <UserLink
+              :uid="scope.row.uid"
+              :name="scope.row.username"
+              :sub-name="scope.row.realname"
+            />
           </template>
         </el-table-column>
-        <el-table-column prop="score" label="报名积分" width="120" sortable :sort-method="sortMemberScore" />
-        <el-table-column label="确认" width="120" :filters="paidFilters" :filter-method="filterMemberPaid"
-                         column-key="paid">
+        <el-table-column
+          prop="score"
+          label="报名积分"
+          width="120"
+          sortable
+          :sort-method="sortMemberScore"
+        />
+        <el-table-column
+          label="确认"
+          width="120"
+          :filters="paidFilters"
+          :filter-method="filterMemberPaid"
+          column-key="paid"
+        >
           <template #default="scope">{{ paidMap[scope.row.paid] || scope.row.paid }}</template>
         </el-table-column>
-        <el-table-column label="性别" width="80" :filters="sexFilters" :filter-method="filterMemberSex" column-key="sex">
+        <el-table-column
+          label="性别"
+          width="80"
+          :filters="sexFilters"
+          :filter-method="filterMemberSex"
+          column-key="sex"
+        >
           <template #default="scope">{{ sexMap[scope.row.sex] || '-' }}</template>
         </el-table-column>
       </el-table>
@@ -290,173 +416,189 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue'
-import { ArrowRight } from '@element-plus/icons-vue'
-import { useRoute, useRouter } from 'vue-router'
-import UserLink from '../components/UserLink.vue'
-import { getAllHonors, getAllResult, getEventDetaiByIdAndLocation, getGroups, getMemberDetail, getScoreChangeByEventid } from '../api/event'
-import { useUserStore } from '../stores/user'
+import { computed, ref, watch } from 'vue';
+import { ArrowRight } from '@element-plus/icons-vue';
+import { useRoute, useRouter } from 'vue-router';
+import UserLink from '../components/UserLink.vue';
+import {
+  getAllHonors,
+  getAllResult,
+  getEventDetaiByIdAndLocation,
+  getGroups,
+  getMemberDetail,
+  getScoreChangeByEventid,
+} from '../api/event';
+import { useUserStore } from '../stores/user';
 
-const route = useRoute()
-const router = useRouter()
-const userStore = useUserStore()
-const loading = ref(false)
-const tabLoading = ref(false)
-const memberLoading = ref(false)
+const route = useRoute();
+const router = useRouter();
+const userStore = useUserStore();
+const loading = ref(false);
+const tabLoading = ref(false);
+const memberLoading = ref(false);
 
-const detail = ref({})
-const subEventList = ref([])
-const activeItemId = ref(null)
-const activeTab = ref('groups')
+const detail = ref({});
+const subEventList = ref([]);
+const activeItemId = ref(null);
+const activeTab = ref('groups');
 
-const groupSections = ref([])
-const resultGroups = ref([])
-const resultHonors = ref([])
-const resultTtGames = ref([])
-const resultTtDetailGames = ref([])
-const resultInit = ref(false)
-const showTtDetail = ref(false)
-const honorRows = ref([])
-const scoreRows = ref([])
+const groupSections = ref([]);
+const resultGroups = ref([]);
+const resultHonors = ref([]);
+const resultTtGames = ref([]);
+const resultTtDetailGames = ref([]);
+const resultInit = ref(false);
+const showTtDetail = ref(false);
+const honorRows = ref([]);
+const scoreRows = ref([]);
 
-const memberVisible = ref(false)
-const memberRows = ref([])
-const scoreTypeVisible = ref(false)
+const memberVisible = ref(false);
+const memberRows = ref([]);
+const scoreTypeVisible = ref(false);
 
-const paidMap = { 0: '交费处理中', 1: '已交付', 2: '已报名' }
-const sexMap = { 1: '男', 2: '女' }
-const paidFilters = Object.keys(paidMap).map((key) => ({ text: paidMap[key], value: String(key) }))
-const sexFilters = Object.keys(sexMap).map((key) => ({ text: sexMap[key], value: String(key) }))
+const paidMap = { 0: '交费处理中', 1: '已交付', 2: '已报名' };
+const sexMap = { 1: '男', 2: '女' };
+const paidFilters = Object.keys(paidMap).map((key) => ({ text: paidMap[key], value: String(key) }));
+const sexFilters = Object.keys(sexMap).map((key) => ({ text: sexMap[key], value: String(key) }));
 
-const eventId = computed(() => route.params.id)
-const currentItem = computed(() => subEventList.value.find((v) => String(v.id) === String(activeItemId.value)) || null)
+const eventId = computed(() => route.params.id);
+const currentItem = computed(
+  () => subEventList.value.find((v) => String(v.id) === String(activeItemId.value)) || null,
+);
 const allCount = computed(() => {
   if (!currentItem.value) {
-    return '-'
+    return '-';
   }
-  const num = Number(currentItem.value.count || 0) - Number(currentItem.value.sub_count || 0)
-  return Number.isNaN(num) ? '-' : num
-})
+  const num = Number(currentItem.value.count || 0) - Number(currentItem.value.sub_count || 0);
+  return Number.isNaN(num) ? '-' : num;
+});
 const detailHtml = computed(() => {
   try {
-    return decodeURIComponent(detail.value?.detail || '')
+    return decodeURIComponent(detail.value?.detail || '');
   } catch {
-    return detail.value?.detail || ''
+    return detail.value?.detail || '';
   }
-})
+});
 
 async function loadDetail() {
-  loading.value = true
+  loading.value = true;
   try {
-    const { lng, lat } = userStore.location
-    const res = await getEventDetaiByIdAndLocation({ id: eventId.value, lng, lat })
-    detail.value = res.data?.detail || {}
-    subEventList.value = res.data?.items || []
+    const { lng, lat } = userStore.location;
+    const res = await getEventDetaiByIdAndLocation({ id: eventId.value, lng, lat });
+    detail.value = res.data?.detail || {};
+    subEventList.value = res.data?.items || [];
     if (!activeItemId.value && subEventList.value.length) {
-      activeItemId.value = subEventList.value[0].id
+      activeItemId.value = subEventList.value[0].id;
     }
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 }
 
 function buildGroupRows(group = []) {
   return (group || []).map((row, index) => ({
     ...row,
-    newUsername: `${index + 1}${row.username || row.name || ''}`
-  }))
+    newUsername: `${index + 1}${row.username || row.name || ''}`,
+  }));
 }
 
 function getGroupColumns(group = []) {
-  const count = Array.isArray(group) ? group.length : 0
-  const width = count ? Math.max(70, Math.floor(720 / count)) : 80
+  const count = Array.isArray(group) ? group.length : 0;
+  const width = count ? Math.max(70, Math.floor(720 / count)) : 80;
   return Array.from({ length: count }, (_, index) => ({
     key: `col${index + 1}`,
     label: String(index + 1),
-    width
-  }))
+    width,
+  }));
 }
 
 function buildResultRows(group = []) {
   if (!Array.isArray(group) || !group.length) {
-    return []
+    return [];
   }
-  const { games = {}, colors = {}, teamid } = group[0]
-  const viewId = teamid && teamid !== '0' ? 'teamid' : 'uid'
+  const { games = {}, colors = {}, teamid } = group[0];
+  const viewId = teamid && teamid !== '0' ? 'teamid' : 'uid';
   return group.map((row, index) => {
     const matrix = group.reduce((acc, item, sindex) => {
-      const key = `${group[index][viewId]}:${group[sindex][viewId]}`
-      acc[`col${sindex + 1}`] = sindex === index ? '' : games[key]
-      acc[`col${sindex + 1}-color`] = sindex === index ? '' : colors[key]
+      const key = `${group[index][viewId]}:${group[sindex][viewId]}`;
+      acc[`col${sindex + 1}`] = sindex === index ? '' : games[key];
+      acc[`col${sindex + 1}-color`] = sindex === index ? '' : colors[key];
       if (viewId === 'uid') {
-        acc[`col${sindex + 1}-info`] = sindex === index ? '' : { groupid: group[index].groupid, uid1: group[index][viewId], uid2: group[sindex][viewId] }
+        acc[`col${sindex + 1}-info`] =
+          sindex === index
+            ? ''
+            : {
+                groupid: group[index].groupid,
+                uid1: group[index][viewId],
+                uid2: group[sindex][viewId],
+              };
       }
-      return acc
-    }, {})
+      return acc;
+    }, {});
     return {
       ...row,
       ...matrix,
-      newUsername: `${index + 1}${row.username || row.name || ''}`
-    }
-  })
+      newUsername: `${index + 1}${row.username || row.name || ''}`,
+    };
+  });
 }
 
 function getResultColumns(group = []) {
-  const count = Array.isArray(group) ? group.length : 0
-  const width = count ? Math.max(50, Math.floor(360 / count)) : 60
+  const count = Array.isArray(group) ? group.length : 0;
+  const width = count ? Math.max(50, Math.floor(360 / count)) : 60;
   return Array.from({ length: count }, (_, index) => ({
     key: `col${index + 1}`,
     label: String(index + 1),
-    width
-  }))
+    width,
+  }));
 }
 
 function setGroupHeaderStyle() {
   return {
     fontSize: '12px',
-    padding: '6px 4px'
-  }
+    padding: '6px 4px',
+  };
 }
 
 function setGroupCellStyle({ row, rowIndex, columnIndex }) {
   const style = {
     fontSize: '12px',
-    padding: '6px 4px'
-  }
+    padding: '6px 4px',
+  };
   if (rowIndex + 1 === columnIndex) {
-    style.background = '#F2F1EE'
+    style.background = '#F2F1EE';
   }
   if (row?.uid && String(row.uid) === String(userStore.userInfo?.id)) {
-    style.color = '#F89703'
-    style.fontWeight = 600
+    style.color = '#F89703';
+    style.fontWeight = 600;
   }
-  return style
+  return style;
 }
 
 function setResultHeaderStyle() {
   return {
     fontSize: '12px',
-    padding: '6px 4px'
-  }
+    padding: '6px 4px',
+  };
 }
 
 function setResultCellStyle({ row, rowIndex, columnIndex, column }) {
   const style = {
     fontSize: '12px',
     padding: '6px 4px',
-    height: '32px'
-  }
+    height: '32px',
+  };
   if (rowIndex + 1 === columnIndex) {
-    style.background = '#F2F1EE'
+    style.background = '#F2F1EE';
   }
   if (column?.property?.startsWith('col') && row[`${column.property}-color`] === 1) {
-    style.color = '#E6326E'
+    style.color = '#E6326E';
   }
   if (column?.property === 'rank' && Number(row.rank) <= Number(currentItem.value?.qualNum || 0)) {
-    style.color = '#E6326E'
-    style.fontWeight = 600
+    style.color = '#E6326E';
+    style.fontWeight = 600;
   }
-  return style
+  return style;
 }
 
 function setDetailCellStyle() {
@@ -464,43 +606,43 @@ function setDetailCellStyle() {
     fontSize: '12px',
     padding: '6px 4px',
     background: '#F2F0F2',
-    height: '32px'
-  }
+    height: '32px',
+  };
 }
 
 function toggleGroupDetail(index) {
-  resultGroupDetailOpen.value = {}
-  resultGroupDetailOpen.value[index] = !isGroupDetailOpen(index)
+  resultGroupDetailOpen.value = {};
+  resultGroupDetailOpen.value[index] = !isGroupDetailOpen(index);
 }
 
 function isGroupDetailOpen(index) {
-  return !!resultGroupDetailOpen.value[index]
+  return !!resultGroupDetailOpen.value[index];
 }
 
 function getWinnerFlags(game = {}) {
-  const result1 = String(game.result1 || '').trim()
-  const result2 = String(game.result2 || '').trim()
-  const winnerFlags = { winner1: false, winner2: false }
+  const result1 = String(game.result1 || '').trim();
+  const result2 = String(game.result2 || '').trim();
+  const winnerFlags = { winner1: false, winner2: false };
   if (game.username1 === '轮空') {
-    winnerFlags.winner2 = true
+    winnerFlags.winner2 = true;
   } else if (game.username2 === '轮空') {
-    winnerFlags.winner1 = true
+    winnerFlags.winner1 = true;
   } else if (result2.includes('弃')) {
-    winnerFlags.winner1 = true
+    winnerFlags.winner1 = true;
   } else if (result1.includes('弃')) {
-    winnerFlags.winner2 = true
+    winnerFlags.winner2 = true;
   } else {
-    const score1 = parseInt(result1, 10)
-    const score2 = parseInt(result2, 10)
+    const score1 = parseInt(result1, 10);
+    const score2 = parseInt(result2, 10);
     if (!Number.isNaN(score1) && !Number.isNaN(score2)) {
-      winnerFlags.winner1 = score1 > score2
-      winnerFlags.winner2 = score2 > score1
+      winnerFlags.winner1 = score1 > score2;
+      winnerFlags.winner2 = score2 > score1;
     }
   }
-  return winnerFlags
+  return winnerFlags;
 }
 
-const resultGroupDetailOpen = ref({})
+const resultGroupDetailOpen = ref({});
 const resultTtRounds = computed(() => {
   return (resultTtGames.value || [])
     .slice()
@@ -511,138 +653,158 @@ const resultTtRounds = computed(() => {
         ...game,
         result1: String(game.result1 || '').trim(),
         result2: String(game.result2 || '').trim(),
-        ...getWinnerFlags(game)
-      }))
-    }))
-})
+        ...getWinnerFlags(game),
+      })),
+    }));
+});
 
 function getTtGameStyle(roundIndex, gameIndex, total) {
-  const baseGap = 18
-  const gap = baseGap * Math.pow(2, roundIndex)
-  const offset = roundIndex === 0 ? 0 : gap / 2
-  const marginBottom = gameIndex === total - 1 ? 0 : gap
+  const baseGap = 18;
+  const gap = baseGap * Math.pow(2, roundIndex);
+  const offset = roundIndex === 0 ? 0 : gap / 2;
+  const marginBottom = gameIndex === total - 1 ? 0 : gap;
   return {
     marginTop: gameIndex === 0 ? `${offset}px` : '0px',
-    marginBottom: `${marginBottom}px`
-  }
+    marginBottom: `${marginBottom}px`,
+  };
 }
 
 async function loadTabData() {
   if (!activeItemId.value) {
-    return
+    return;
   }
-  tabLoading.value = true
+  tabLoading.value = true;
   try {
     if (activeTab.value === 'groups') {
-      groupSections.value = []
-      const res = await getGroups({ eventid: eventId.value, itemid: activeItemId.value })
-      const groups = res.data?.[activeItemId.value]?.groups || res.data?.[String(activeItemId.value)]?.groups || []
-      groupSections.value = groups
-      return
+      groupSections.value = [];
+      const res = await getGroups({ eventid: eventId.value, itemid: activeItemId.value });
+      const groups =
+        res.data?.[activeItemId.value]?.groups ||
+        res.data?.[String(activeItemId.value)]?.groups ||
+        [];
+      groupSections.value = groups;
+      return;
     }
 
     if (activeTab.value === 'results') {
-      resultInit.value = false
-      resultGroups.value = []
-      resultHonors.value = []
-      resultTtGames.value = []
-      resultTtDetailGames.value = []
-      resultGroupDetailOpen.value = {}
-      showTtDetail.value = false
+      resultInit.value = false;
+      resultGroups.value = [];
+      resultHonors.value = [];
+      resultTtGames.value = [];
+      resultTtDetailGames.value = [];
+      resultGroupDetailOpen.value = {};
+      showTtDetail.value = false;
       const [resultRes, honorsRes] = await Promise.all([
         getAllResult({ eventid: eventId.value, itemid: activeItemId.value }),
-        getAllHonors({ eventid: eventId.value })
-      ])
+        getAllHonors({ eventid: eventId.value }),
+      ]);
       if (resultRes.data) {
-        resultGroups.value = resultRes.data.groups?.[activeItemId.value] || resultRes.data.groups?.[String(activeItemId.value)] || []
-        resultTtGames.value = resultRes.data.ttgames?.[activeItemId.value] || resultRes.data.ttgames?.[String(activeItemId.value)] || []
-        resultTtDetailGames.value = resultRes.data.ttdetailgames?.[activeItemId.value] || resultRes.data.ttdetailgames?.[String(activeItemId.value)] || []
+        resultGroups.value =
+          resultRes.data.groups?.[activeItemId.value] ||
+          resultRes.data.groups?.[String(activeItemId.value)] ||
+          [];
+        resultTtGames.value =
+          resultRes.data.ttgames?.[activeItemId.value] ||
+          resultRes.data.ttgames?.[String(activeItemId.value)] ||
+          [];
+        resultTtDetailGames.value =
+          resultRes.data.ttdetailgames?.[activeItemId.value] ||
+          resultRes.data.ttdetailgames?.[String(activeItemId.value)] ||
+          [];
       }
       if (honorsRes.data) {
-        resultHonors.value = honorsRes.data[activeItemId.value]?.filter((v) => Number(v.uid) !== 0) || honorsRes.data[String(activeItemId.value)]?.filter((v) => Number(v.uid) !== 0) || []
+        resultHonors.value =
+          honorsRes.data[activeItemId.value]?.filter((v) => Number(v.uid) !== 0) ||
+          honorsRes.data[String(activeItemId.value)]?.filter((v) => Number(v.uid) !== 0) ||
+          [];
       }
-      resultInit.value = true
-      return
+      resultInit.value = true;
+      return;
     }
 
     if (activeTab.value === 'honors') {
-      const res = await getAllHonors({ eventid: eventId.value })
-      const rows = res.data?.[activeItemId.value] || res.data?.[String(activeItemId.value)] || []
-      honorRows.value = rows.filter((v) => Number(v.uid) !== 0)
-      return
+      const res = await getAllHonors({ eventid: eventId.value });
+      const rows = res.data?.[activeItemId.value] || res.data?.[String(activeItemId.value)] || [];
+      honorRows.value = rows.filter((v) => Number(v.uid) !== 0);
+      return;
     }
 
-    const res = await getScoreChangeByEventid(eventId.value)
-    scoreRows.value = res.data?.sc?.[activeItemId.value] || res.data?.sc?.[String(activeItemId.value)] || []
+    const res = await getScoreChangeByEventid(eventId.value);
+    scoreRows.value =
+      res.data?.sc?.[activeItemId.value] || res.data?.sc?.[String(activeItemId.value)] || [];
   } finally {
-    tabLoading.value = false
+    tabLoading.value = false;
   }
 }
 
 async function openMembers() {
   if (!currentItem.value) {
-    return
+    return;
   }
-  memberVisible.value = true
-  memberLoading.value = true
+  memberVisible.value = true;
+  memberLoading.value = true;
   try {
-    const res = await getMemberDetail({ match_id: detail.value.eventid, id: currentItem.value.id })
-    memberRows.value = res.data?.list || []
+    const res = await getMemberDetail({ match_id: detail.value.eventid, id: currentItem.value.id });
+    memberRows.value = res.data?.list || [];
   } finally {
-    memberLoading.value = false
+    memberLoading.value = false;
   }
 }
 
 function sortMemberScore(a, b) {
-  const left = Number(a?.score ?? 0)
-  const right = Number(b?.score ?? 0)
+  const left = Number(a?.score ?? 0);
+  const right = Number(b?.score ?? 0);
   if (Number.isNaN(left) || Number.isNaN(right)) {
-    return String(a?.score ?? '').localeCompare(String(b?.score ?? ''))
+    return String(a?.score ?? '').localeCompare(String(b?.score ?? ''));
   }
-  return left - right
+  return left - right;
 }
 
 function filterMemberPaid(value, row) {
-  return String(row?.paid ?? '') === String(value)
+  return String(row?.paid ?? '') === String(value);
 }
 
 function filterMemberSex(value, row) {
-  return String(row?.sex ?? '') === String(value)
+  return String(row?.sex ?? '') === String(value);
 }
 
 function setChange(change) {
-  const num = Number(change || 0)
-  return num > 0 ? `+${num}` : String(num)
+  const num = Number(change || 0);
+  return num > 0 ? `+${num}` : String(num);
 }
 
 function goSetScore() {
   if (!activeItemId.value) {
-    return
+    return;
   }
   // 简单处理：默认先显示小组赛录入，后续可以根据是否有淘汰赛数据来选择
   // 这里可以先让用户选择是小组赛还是淘汰赛
-  router.push(`/set-score/group/${eventId.value}/${activeItemId.value}`)
+  router.push(`/set-score/group/${eventId.value}/${activeItemId.value}`);
 }
 
-watch(eventId, async () => {
-  activeItemId.value = null
-  activeTab.value = 'groups'
-  groupSections.value = []
-  resultGroups.value = []
-  resultHonors.value = []
-  resultTtGames.value = []
-  resultTtDetailGames.value = []
-  resultGroupDetailOpen.value = {}
-  resultInit.value = false
-  showTtDetail.value = false
-  memberRows.value = []
-  await loadDetail()
-  await loadTabData()
-}, { immediate: true })
+watch(
+  eventId,
+  async () => {
+    activeItemId.value = null;
+    activeTab.value = 'groups';
+    groupSections.value = [];
+    resultGroups.value = [];
+    resultHonors.value = [];
+    resultTtGames.value = [];
+    resultTtDetailGames.value = [];
+    resultGroupDetailOpen.value = {};
+    resultInit.value = false;
+    showTtDetail.value = false;
+    memberRows.value = [];
+    await loadDetail();
+    await loadTabData();
+  },
+  { immediate: true },
+);
 
 watch(activeItemId, () => {
-  loadTabData()
-})
+  loadTabData();
+});
 </script>
 
 <style scoped>

@@ -9,8 +9,19 @@
         <el-menu-item index="/profile">我的</el-menu-item>
       </el-menu>
       <div class="right">
-        <el-select v-model="cityName" filterable placeholder="选择城市" @change="onCityChange" style="width: 160px">
-          <el-option v-for="item in cityOptions" :key="item.id" :label="item.name" :value="item.name" />
+        <el-select
+          v-model="cityName"
+          filterable
+          placeholder="选择城市"
+          @change="onCityChange"
+          style="width: 160px"
+        >
+          <el-option
+            v-for="item in cityOptions"
+            :key="item.id"
+            :label="item.name"
+            :value="item.name"
+          />
         </el-select>
         <el-dropdown>
           <span class="user">{{ userStore.userInfo?.username || '未登录用户' }}</span>
@@ -30,60 +41,60 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
-import { useUserStore } from '../stores/user'
-import { getCities } from '../api/publicc'
+import { computed, onMounted, ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { ElMessage } from 'element-plus';
+import { useUserStore } from '../stores/user';
+import { getCities } from '../api/publicc';
 
-const route = useRoute()
-const router = useRouter()
-const userStore = useUserStore()
-const cityOptions = ref([{ id: userStore.city.id, name: userStore.city.name }])
-const cityName = ref(userStore.city.name)
+const route = useRoute();
+const router = useRouter();
+const userStore = useUserStore();
+const cityOptions = ref([{ id: userStore.city.id, name: userStore.city.name }]);
+const cityName = ref(userStore.city.name);
 
 const activePath = computed(() => {
   if (route.path.startsWith('/event')) {
-    return '/home'
+    return '/home';
   }
   if (route.path.startsWith('/user') || route.path.startsWith('/following')) {
-    return '/profile'
+    return '/profile';
   }
-  return route.path
-})
+  return route.path;
+});
 
 function toPath(path) {
-  router.push(path)
+  router.push(path);
 }
 
 function doLogout() {
-  userStore.logout()
-  ElMessage.success('已退出')
-  router.replace('/login')
+  userStore.logout();
+  ElMessage.success('已退出');
+  router.replace('/login');
 }
 
 function onCityChange(value) {
-  const found = cityOptions.value.find((v) => v.name === value)
+  const found = cityOptions.value.find((v) => v.name === value);
   if (found) {
-    userStore.setCity(found)
+    userStore.setCity(found);
   }
 }
 
 onMounted(async () => {
   try {
-    const res = await getCities()
-    const rows = res.data?.data || []
+    const res = await getCities();
+    const rows = res.data?.data || [];
     if (rows.length) {
-      cityOptions.value = rows
+      cityOptions.value = rows;
       if (!rows.some((v) => v.name === cityName.value)) {
-        cityName.value = rows[0].name
-        userStore.setCity(rows[0])
+        cityName.value = rows[0].name;
+        userStore.setCity(rows[0]);
       }
     }
   } catch {
     // ignore
   }
-})
+});
 </script>
 
 <style scoped>

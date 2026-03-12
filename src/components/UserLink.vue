@@ -1,5 +1,10 @@
 <template>
-  <router-link v-if="uid" :to="`/user/${uid}`" class="user-link" :class="{ 'is-following': isFollowing }">
+  <router-link
+    v-if="uid"
+    :to="`/user/${uid}`"
+    class="user-link"
+    :class="{ 'is-following': isFollowing }"
+  >
     <slot>{{ name }}</slot>
     <span v-if="subName" class="sub-name">({{ subName }})</span>
   </router-link>
@@ -7,31 +12,31 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed } from 'vue';
 
 const props = defineProps({
   uid: {
     type: [String, Number],
-    default: ''
+    default: '',
   },
   name: {
     type: String,
-    default: ''
+    default: '',
   },
   subName: {
     type: String,
-    default: ''
+    default: '',
   },
-})
+});
 
 const isFollowing = computed(() => {
   try {
-    const followees = JSON.parse(localStorage.getItem('userFollowees') || '[]')
-    return followees.includes(String(props.uid))
+    const followees = JSON.parse(localStorage.getItem('userFollowees') || '[]');
+    return followees.includes(String(props.uid));
   } catch {
-    return false
+    return false;
   }
-})
+});
 </script>
 
 <style scoped>
