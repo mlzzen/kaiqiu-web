@@ -889,6 +889,14 @@ watch(activeItemId, () => {
   color: #374151;
 }
 
+.html img {
+  width: 500px !important;
+}
+
+:deep(.html img) {
+  width: 500px !important;
+}
+
 .schedule {
   display: flex;
   flex-direction: column;
