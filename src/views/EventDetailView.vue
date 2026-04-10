@@ -441,7 +441,11 @@
           :filter-method="filterMemberPaid"
           column-key="paid"
         >
-          <template #default="scope">{{ paidMap[scope.row.paid] || scope.row.paid }}</template>
+          <template #default="scope">
+            <span v-if="scope.row.paid === 1" style="color: #67c23a; font-weight: bold">{{ paidMap[scope.row.paid] }}</span>
+            <span v-else-if="scope.row.paid === 2" style="color: #409eff; font-weight: bold">{{ paidMap[scope.row.paid] }}</span>
+            <span v-else>{{ paidMap[scope.row.paid] || scope.row.paid }}</span>
+          </template>
         </el-table-column>
         <el-table-column
           label="性别"
@@ -498,7 +502,7 @@ const memberVisible = ref(false);
 const memberRows = ref([]);
 const scoreTypeVisible = ref(false);
 
-const paidMap = { 0: '交费处理中', 1: '已交付', 2: '已报名' };
+const paidMap = { 0: '交费处理中', 1: '已交费', 2: '已报名' };
 const sexMap = { 1: '男', 2: '女' };
 const paidFilters = Object.keys(paidMap).map((key) => ({ text: paidMap[key], value: String(key) }));
 const sexFilters = Object.keys(sexMap).map((key) => ({ text: sexMap[key], value: String(key) }));
