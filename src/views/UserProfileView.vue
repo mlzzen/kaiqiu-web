@@ -261,12 +261,28 @@
           </el-table-column>
           <el-table-column label="选手1" min-width="140">
             <template #default="scope">
-              <UserLink :uid="scope.row.uid1" :name="scope.row.username1" />
+              <template v-if="scope.row.flag === '1'">
+                <div class="doubles-player">
+                  <UserLink :uid="scope.row.uid1" :name="scope.row.username1" />
+                  <UserLink :uid="scope.row.uid11" :name="scope.row.username11" />
+                </div>
+              </template>
+              <template v-else>
+                <UserLink :uid="scope.row.uid1" :name="scope.row.username1" />
+              </template>
             </template>
           </el-table-column>
           <el-table-column label="选手2" min-width="140">
             <template #default="scope">
-              <UserLink :uid="scope.row.uid2" :name="scope.row.username2" />
+              <template v-if="scope.row.flag === '1'">
+                <div class="doubles-player">
+                  <UserLink :uid="scope.row.uid2" :name="scope.row.username2" />
+                  <UserLink :uid="scope.row.uid22" :name="scope.row.username22" />
+                </div>
+              </template>
+              <template v-else>
+                <UserLink :uid="scope.row.uid2" :name="scope.row.username2" />
+              </template>
             </template>
           </el-table-column>
           <el-table-column label="比分" min-width="90">
@@ -677,6 +693,13 @@ function parseSpecialRival(raw) {
   display: flex;
   gap: 8px;
   color: #374151;
+}
+
+.doubles-player {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  line-height: 1.3;
 }
 
 .clickable-text {
