@@ -22,10 +22,10 @@
             <el-descriptions-item label="当前积分">{{ profile.score ?? '-' }}</el-descriptions-item>
             <el-descriptions-item label="年度积分">{{
               profile.maxScoreTheYear ?? '-'
-            }}</el-descriptions-item>
+              }}</el-descriptions-item>
             <el-descriptions-item label="最高积分">{{
               profile.maxscore ?? '-'
-            }}</el-descriptions-item>
+              }}</el-descriptions-item>
           </el-descriptions>
 
           <template v-if="profile.description">
@@ -37,12 +37,11 @@
             <div class="section-title">收到最多评价</div>
             <div class="tag-list">
               <el-tag
-                v-for="tag in showTags"
-                :key="`${tag.ename}-${tag.etype}`"
-                :type="tag.selected == 1 ? 'success' : 'info'"
-                effect="plain"
-                class="tag-item"
-              >
+                      v-for="tag in showTags"
+                      :key="`${tag.ename}-${tag.etype}`"
+                      :type="tag.selected == 1 ? 'success' : 'info'"
+                      effect="plain"
+                      class="tag-item">
                 {{ tag.ename }} ({{ tag.count }})
               </el-tag>
             </div>
@@ -55,17 +54,17 @@
             </el-descriptions-item>
             <el-descriptions-item label="所在">{{
               profile.resideprovince || '-'
-            }}</el-descriptions-item>
+              }}</el-descriptions-item>
             <el-descriptions-item label="专业背景">{{ profile.bg || '-' }}</el-descriptions-item>
             <el-descriptions-item label="底板型号">{{
               `${profile.qiupai || ''} ${profile.qiupaitype || ''}`.trim() || '-'
-            }}</el-descriptions-item>
+              }}</el-descriptions-item>
             <el-descriptions-item label="正手套胶">{{
               `${profile.zhengshou || ''} ${profile.zhengshoutype || ''}`.trim() || '-'
-            }}</el-descriptions-item>
+              }}</el-descriptions-item>
             <el-descriptions-item label="反手套胶">{{
               `${profile.fanshou || ''} ${profile.fanshoutype || ''}`.trim() || '-'
-            }}</el-descriptions-item>
+              }}</el-descriptions-item>
           </el-descriptions>
         </el-card>
       </div>
@@ -78,56 +77,50 @@
           <div class="trend-wrap">
             <svg viewBox="0 0 1000 300" preserveAspectRatio="none" class="trend-svg">
               <line
-                :x1="chartBox.left"
-                :y1="chartBox.top"
-                :x2="chartBox.left"
-                :y2="chartBox.bottom"
-                stroke="#9ca3af"
-                stroke-width="1.5"
-              />
+                    :x1="chartBox.left"
+                    :y1="chartBox.top"
+                    :x2="chartBox.left"
+                    :y2="chartBox.bottom"
+                    stroke="#9ca3af"
+                    stroke-width="1.5" />
               <line
-                :x1="chartBox.left"
-                :y1="chartBox.bottom"
-                :x2="chartBox.right"
-                :y2="chartBox.bottom"
-                stroke="#9ca3af"
-                stroke-width="1.5"
-              />
+                    :x1="chartBox.left"
+                    :y1="chartBox.bottom"
+                    :x2="chartBox.right"
+                    :y2="chartBox.bottom"
+                    stroke="#9ca3af"
+                    stroke-width="1.5" />
               <g v-for="tick in yTicks" :key="`y-${tick.value}`">
                 <line
-                  :x1="chartBox.left - 6"
-                  :y1="tick.y"
-                  :x2="chartBox.right"
-                  :y2="tick.y"
-                  stroke="#e5e7eb"
-                  stroke-width="1"
-                />
+                      :x1="chartBox.left - 6"
+                      :y1="tick.y"
+                      :x2="chartBox.right"
+                      :y2="tick.y"
+                      stroke="#e5e7eb"
+                      stroke-width="1" />
                 <text
-                  :x="chartBox.left - 10"
-                  :y="tick.y + 4"
-                  text-anchor="end"
-                  font-size="16"
-                  fill="#6b7280"
-                >
+                      :x="chartBox.left - 10"
+                      :y="tick.y + 4"
+                      text-anchor="end"
+                      font-size="16"
+                      fill="#6b7280">
                   {{ tick.label }}
                 </text>
               </g>
               <g v-for="tick in xTicks" :key="`x-${tick.index}`">
                 <line
-                  :x1="tick.x"
-                  :y1="chartBox.bottom"
-                  :x2="tick.x"
-                  :y2="chartBox.bottom + 5"
-                  stroke="#9ca3af"
-                  stroke-width="1"
-                />
+                      :x1="tick.x"
+                      :y1="chartBox.bottom"
+                      :x2="tick.x"
+                      :y2="chartBox.bottom + 5"
+                      stroke="#9ca3af"
+                      stroke-width="1" />
                 <text
-                  :x="tick.x"
-                  :y="chartBox.bottom + 22"
-                  text-anchor="middle"
-                  font-size="14"
-                  fill="#6b7280"
-                >
+                      :x="tick.x"
+                      :y="chartBox.bottom + 22"
+                      text-anchor="middle"
+                      font-size="14"
+                      fill="#6b7280">
                   {{ tick.label }}
                 </text>
               </g>
@@ -143,10 +136,9 @@
           <div class="section-title">击败分数最高前三名</div>
           <div class="stat-list">
             <div
-              class="stat-item"
-              v-for="(item, index) in top3BeatList"
-              :key="`top3-beat-${index}`"
-            >
+                 class="stat-item"
+                 v-for="(item, index) in top3BeatList"
+                 :key="`top3-beat-${index}`">
               <UserLink :uid="item.uid" :name="item.name" />
             </div>
           </div>
@@ -156,10 +148,9 @@
           <div class="section-title">交手分数最高前三名</div>
           <div class="stat-list">
             <div
-              class="stat-item"
-              v-for="(item, index) in top3PlayerList"
-              :key="`top3-player-${index}`"
-            >
+                 class="stat-item"
+                 v-for="(item, index) in top3PlayerList"
+                 :key="`top3-player-${index}`">
               <UserLink :uid="item.uid" :name="item.name" />
             </div>
           </div>
@@ -169,10 +160,9 @@
           <div class="section-title">击败男子最高前三名</div>
           <div class="stat-list">
             <div
-              class="stat-item"
-              v-for="(item, index) in top3BeatManList"
-              :key="`top3-man-${index}`"
-            >
+                 class="stat-item"
+                 v-for="(item, index) in top3BeatManList"
+                 :key="`top3-man-${index}`">
               <UserLink :uid="item.uid" :name="item.name" />
             </div>
           </div>
@@ -182,10 +172,9 @@
           <div class="section-title">击败女子最高前三名</div>
           <div class="stat-list">
             <div
-              class="stat-item"
-              v-for="(item, index) in top3BeatWomanList"
-              :key="`top3-woman-${index}`"
-            >
+                 class="stat-item"
+                 v-for="(item, index) in top3BeatWomanList"
+                 :key="`top3-woman-${index}`">
               <UserLink :uid="item.uid" :name="item.name" />
             </div>
           </div>
@@ -215,11 +204,9 @@
           <div class="section-title">经常交手</div>
           <div class="tag-list">
             <el-tag
-              v-for="(item, index) in oftenPlayerList"
-              :key="`often-${index}`"
-              effect="plain"
-              >{{ item }}</el-tag
-            >
+                    v-for="(item, index) in oftenPlayerList"
+                    :key="`often-${index}`"
+                    effect="plain">{{ item }}</el-tag>
           </div>
         </template>
 
@@ -227,12 +214,10 @@
           <div class="section-title">曾参加比赛城市</div>
           <div class="tag-list">
             <el-tag
-              v-for="(city, index) in allCitiesList"
-              :key="`city-${index}`"
-              type="info"
-              effect="plain"
-              >{{ city }}</el-tag
-            >
+                    v-for="(city, index) in allCitiesList"
+                    :key="`city-${index}`"
+                    type="info"
+                    effect="plain">{{ city }}</el-tag>
           </div>
         </template>
 
@@ -252,10 +237,9 @@
           <el-table-column label="日期" width="130">
             <template #default="scope">
               <EventLink
-                v-if="getEventId(scope.row)"
-                :event-id="getEventId(scope.row)"
-                :name="scope.row.dateline"
-              />
+                         v-if="getEventId(scope.row)"
+                         :event-id="getEventId(scope.row)"
+                         :name="scope.row.dateline" />
               <span v-else>{{ scope.row.dateline }}</span>
             </template>
           </el-table-column>
@@ -288,16 +272,36 @@
           <el-table-column label="比分" min-width="90">
             <template #default="scope">
               <router-link
-                v-if="scope.row.gameid"
-                :to="`/match/${scope.row.gameid}`"
-                class="score-link"
-              >
+                           v-if="scope.row.gameid && scope.row.flag === '0'"
+                           :to="`/match/${scope.row.gameid}`"
+                           class="score-link"
+                           :class="{
+                            'score-win': scope.row.result1 > scope.row.result2,
+                            'score-lose': scope.row.result1 < scope.row.result2
+                          }">
                 {{ scope.row.result1 }}:{{ scope.row.result2 }}
               </router-link>
-              <span v-else>{{ scope.row.result1 }}:{{ scope.row.result2 }}</span>
+              <span
+                    v-else
+                    :class="{
+                      'score-win': scope.row.result1 > scope.row.result2,
+                      'score-lose': scope.row.result1 < scope.row.result2
+                    }">
+                {{ scope.row.result1 }}:{{ scope.row.result2 }}
+              </span>
             </template>
           </el-table-column>
-          <el-table-column label="变化" prop="score1" />
+          <el-table-column label="变化" min-width="80">
+            <template #default="scope">
+              <span
+                    :class="{
+                      'score-win': Number(scope.row.score1) > 0,
+                      'score-lose': Number(scope.row.score1) < 0
+                    }">
+                {{ scope.row.score1 }}
+              </span>
+            </template>
+          </el-table-column>
         </el-table>
         <div class="pager">
           <el-button :disabled="page <= 1 || gamesLoading" @click="prevPage">上一页</el-button>
@@ -702,12 +706,22 @@ function parseSpecialRival(raw) {
   line-height: 1.3;
 }
 
+.score-win {
+  color: #ef4444 !important;
+  font-weight: 400;
+}
+
+.score-lose {
+  color: inherit;
+  font-weight: 400;
+}
+
 .clickable-text {
   cursor: pointer;
 }
 
 .score-link {
-  color: #409eff;
+  color: inherit;
   text-decoration: none;
   font-weight: 500;
 
