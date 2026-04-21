@@ -387,33 +387,12 @@
       <div class="html" v-html="detailHtml"></div>
     </el-card>
 
-    <el-drawer v-model="memberVisible" size="72%" title="参赛名单">
-      <el-table :data="memberRows" stripe v-loading="memberLoading" height="100%">
-        <el-table-column prop="number" label="#" width="60" />
-        <el-table-column label="名称" min-width="180">
-          <template #default="scope">
-            <UserLink
-                      :uid="scope.row.uid"
-                      :name="scope.row.username"
-                      :sub-name="scope.row.realname" />
-          </template>
-        </el-table-column>
-        <el-table-column prop="score" label="报名积分" width="120" sortable :sort-method="sortMemberScore" />
-        <el-table-column label="确认" width="120" :filters="paidFilters" :filter-method="filterMemberPaid"
-                         column-key="paid">
-          <template #default="scope">
-            <span v-if="scope.row.paid === 1" style="color: #67c23a; font-weight: bold">{{ paidMap[scope.row.paid]
-              }}</span>
-            <span v-else-if="scope.row.paid === 2" style="color: #409eff; font-weight: bold">{{ paidMap[scope.row.paid]
-              }}</span>
-            <span v-else>{{ paidMap[scope.row.paid] || scope.row.paid }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="性别" width="80" :filters="sexFilters" :filter-method="filterMemberSex" column-key="sex">
-          <template #default="scope">{{ sexMap[scope.row.sex] || '-' }}</template>
-        </el-table-column>
-      </el-table>
-    </el-drawer>
+    <MemberDrawer
+      v-model="memberVisible"
+      :members="memberRows"
+      :loading="memberLoading"
+      @refresh="loadMemberDetail"
+    />
   </div>
 </template>
 
@@ -422,6 +401,7 @@ import { computed, ref, watch } from 'vue';
 import { ArrowRight } from '@element-plus/icons-vue';
 import { useRoute, useRouter } from 'vue-router';
 import UserLink from '../components/UserLink.vue';
+import MemberDrawer from '../components/MemberDrawer.vue';
 import {
   getAllHonors,
   getAllResult,
@@ -457,11 +437,6 @@ const scoreRows = ref([]);
 const memberVisible = ref(false);
 const memberRows = ref([]);
 const scoreTypeVisible = ref(false);
-
-const paidMap = { 0: '交费处理中', 1: '已交费', 2: '已报名' };
-const sexMap = { 1: '男', 2: '女' };
-const paidFilters = Object.keys(paidMap).map((key) => ({ text: paidMap[key], value: String(key) }));
-const sexFilters = Object.keys(sexMap).map((key) => ({ text: sexMap[key], value: String(key) }));
 
 const eventId = computed(() => route.params.id);
 const currentItem = computed(
@@ -738,37 +713,6 @@ async function loadTabData() {
   }
 }
 
-async function openMembers() {
-  if (!currentItem.value) {
-    return;
-  }
-  memberVisible.value = true;
-  memberLoading.value = true;
-  try {
-    const res = await getMemberDetail({ match_id: detail.value.eventid, id: currentItem.value.id });
-    memberRows.value = res.data?.list || [];
-  } finally {
-    memberLoading.value = false;
-  }
-}
-
-function sortMemberScore(a, b) {
-  const left = Number(a?.score ?? 0);
-  const right = Number(b?.score ?? 0);
-  if (Number.isNaN(left) || Number.isNaN(right)) {
-    return String(a?.score ?? '').localeCompare(String(b?.score ?? ''));
-  }
-  return left - right;
-}
-
-function filterMemberPaid(value, row) {
-  return String(row?.paid ?? '') === String(value);
-}
-
-function filterMemberSex(value, row) {
-  return String(row?.sex ?? '') === String(value);
-}
-
 function setChange(change) {
   const num = Number(change || 0);
   return num > 0 ? `+${num}` : String(num);
@@ -781,6 +725,10 @@ function goSetScore() {
   // 简单处理：默认先显示小组赛录入，后续可以根据是否有淘汰赛数据来选择
   // 这里可以先让用户选择是小组赛还是淘汰赛
   router.push(`/set-score/group/${eventId.value}/${activeItemId.value}`);
+}
+
+function openMembers() {
+  memberVisible.value = true;
 }
 
 watch(
@@ -799,13 +747,28 @@ watch(
     memberRows.value = [];
     await loadDetail();
     await loadTabData();
+    await loadMemberDetail();
   },
   { immediate: true },
 );
 
 watch(activeItemId, () => {
   loadTabData();
+  loadMemberDetail();
 });
+
+async function loadMemberDetail() {
+  if (!currentItem.value || !detail.value.eventid) {
+    return;
+  }
+  memberLoading.value = true;
+  try {
+    const res = await getMemberDetail({ match_id: detail.value.eventid, id: currentItem.value.id });
+    memberRows.value = res.data?.list || [];
+  } finally {
+    memberLoading.value = false;
+  }
+}
 </script>
 
 <style scoped>
