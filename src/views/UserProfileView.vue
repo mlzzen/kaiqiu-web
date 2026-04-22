@@ -271,16 +271,16 @@
           </el-table-column>
           <el-table-column label="比分" min-width="90">
             <template #default="scope">
-              <router-link
+              <span
                            v-if="scope.row.gameid && scope.row.flag === '0'"
-                           :to="`/match/${scope.row.gameid}`"
                            class="score-link"
+                           @click="openMatch(scope.row.gameid)"
                            :class="{
                             'score-win': scope.row.result1 > scope.row.result2,
                             'score-lose': scope.row.result1 < scope.row.result2
                           }">
                 {{ scope.row.result1 }}:{{ scope.row.result2 }}
-              </router-link>
+              </span>
               <span
                     v-else
                     :class="{
@@ -311,6 +311,12 @@
       </el-card>
     </el-col>
   </el-row>
+
+  <MatchDetailDialog
+    v-model:visible="dialogVisible"
+    :gameid="currentGameid"
+    @open-match="openMatch"
+  />
 </template>
 
 <script setup>
@@ -319,6 +325,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { ElMessageBox } from 'element-plus';
 import UserLink from '../components/UserLink.vue';
 import EventLink from '../components/EventLink.vue';
+import MatchDetailDialog from '../components/MatchDetailDialog.vue';
 import {
   getAdvProfile,
   getPageGamesByUid,
@@ -343,6 +350,13 @@ const hasNext = ref(false);
 const effectivePageSize = ref(20);
 const showTags = ref([]);
 const scoreTrend = ref([]);
+const dialogVisible = ref(false);
+const currentGameid = ref('');
+
+const openMatch = (gameid) => {
+  currentGameid.value = gameid;
+  dialogVisible.value = true;
+};
 
 const uid = computed(
   () => route.params.uid || userStore.userInfo?.user_id || userStore.userInfo?.id,

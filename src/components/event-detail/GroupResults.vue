@@ -80,24 +80,23 @@
                 </el-table-column>
                 <el-table-column label="比分" width="90" align="center">
                   <template #default="scope">
-                    <router-link
+                    <span
                       v-if="scope.row.gameid"
-                      :to="`/match/${scope.row.gameid}`"
-                      class="score-link">
+                      class="score-link"
+                      @click="openMatch(scope.row.gameid)">
                       {{ `${scope.row.result1}:${scope.row.result2}` }}
-                    </router-link>
+                    </span>
                     <span v-else>{{ `${scope.row.result1}:${scope.row.result2}` }}</span>
                   </template>
                 </el-table-column>
                 <el-table-column label="详情" width="70" align="center">
                   <template #default="scope">
-                    <router-link
+                    <el-icon
                       v-if="String(scope.row.flag) === '0' && scope.row.gameid"
-                      :to="`/match/${scope.row.gameid}`">
-                      <el-icon>
-                        <ArrowRight />
-                      </el-icon>
-                    </router-link>
+                      class="detail-icon"
+                      @click="openMatch(scope.row.gameid)">
+                      <ArrowRight />
+                    </el-icon>
                   </template>
                 </el-table-column>
               </el-table>
@@ -107,12 +106,19 @@
       </div>
     </div>
   </template>
+
+  <MatchDetailDialog
+    v-model:visible="dialogVisible"
+    :gameid="currentGameid"
+    @open-match="openMatch"
+  />
 </template>
 
 <script setup>
 import { ref } from 'vue';
 import { ArrowRight } from '@element-plus/icons-vue';
 import UserLink from '../UserLink.vue';
+import MatchDetailDialog from '../MatchDetailDialog.vue';
 
 const props = defineProps({
   groups: {
@@ -126,6 +132,13 @@ const props = defineProps({
 });
 
 const resultGroupDetailOpen = ref({});
+const dialogVisible = ref(false);
+const currentGameid = ref('');
+
+const openMatch = (gameid) => {
+  currentGameid.value = gameid;
+  dialogVisible.value = true;
+};
 
 function toggleGroupDetail(index) {
   resultGroupDetailOpen.value = {};
@@ -297,5 +310,14 @@ function setDetailCellStyle() {
 
 .score-link:hover {
   text-decoration: underline;
+}
+
+.detail-icon {
+  cursor: pointer;
+  color: #409eff;
+}
+
+.detail-icon:hover {
+  color: #66b1ff;
 }
 </style>

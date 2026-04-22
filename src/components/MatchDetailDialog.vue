@@ -243,7 +243,6 @@ const handleClose = () => {
 .match-detail {
   max-height: 70vh;
   overflow-y: auto;
-  padding: 20px;
 }
 
 .players-section {

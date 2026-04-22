@@ -9,17 +9,23 @@
             :style="getTtGameStyle(roundIndex, gameIndex, round.games.length)">
             <div class="results-tt-player" :class="{ winner: game.winner1 }">
               <span class="results-tt-name">{{ game.username1 }}</span>
-              <router-link v-if="game.gameid" :to="`/match/${game.gameid}`" class="results-tt-score">
+              <span
+                v-if="game.gameid"
+                class="results-tt-score"
+                @click="openMatch(game.gameid)">
                 {{ game.result1 }}
-              </router-link>
+              </span>
               <span v-else class="results-tt-score">{{ game.result1 }}</span>
             </div>
             <div class="results-tt-divider"></div>
             <div class="results-tt-player" :class="{ winner: game.winner2 }">
               <span class="results-tt-name">{{ game.username2 }}</span>
-              <router-link v-if="game.gameid" :to="`/match/${game.gameid}`" class="results-tt-score">
+              <span
+                v-if="game.gameid"
+                class="results-tt-score"
+                @click="openMatch(game.gameid)">
                 {{ game.result2 }}
-              </router-link>
+              </span>
               <span v-else class="results-tt-score">{{ game.result2 }}</span>
             </div>
             <div class="results-tt-connector" v-if="roundIndex < resultTtRounds.length - 1"></div>
@@ -28,10 +34,17 @@
       </div>
     </div>
   </div>
+
+  <MatchDetailDialog
+    v-model:visible="dialogVisible"
+    :gameid="currentGameid"
+    @open-match="openMatch"
+  />
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { ref, computed } from 'vue';
+import MatchDetailDialog from '../MatchDetailDialog.vue';
 
 const props = defineProps({
   ttGames: {
@@ -39,6 +52,14 @@ const props = defineProps({
     default: () => [],
   },
 });
+
+const dialogVisible = ref(false);
+const currentGameid = ref('');
+
+const openMatch = (gameid) => {
+  currentGameid.value = gameid;
+  dialogVisible.value = true;
+};
 
 function getWinnerFlags(game = {}) {
   const result1 = String(game.result1 || '').trim();
@@ -165,5 +186,10 @@ function getTtGameStyle(roundIndex, gameIndex, total) {
 
 .results-tt-score {
   color: #248dff;
+  cursor: pointer;
+}
+
+.results-tt-score:hover {
+  text-decoration: underline;
 }
 </style>
