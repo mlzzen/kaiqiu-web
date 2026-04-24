@@ -98,6 +98,9 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+.el-main {
+  --el-main-padding: 8px;
+}
 .layout {
   min-height: 100vh;
 }
