@@ -3,41 +3,39 @@
     <template #header>
       <div class="head">
         <div class="title-row">
-          <div class="title-info">
-            <div class="title">{{ detail.title || '赛事详情' }}</div>
-            <div v-if="detail.note" class="title-note">{{ detail.note }}</div>
+          <div class="title">{{ detail.title || '赛事详情' }}</div>
+          <div class="right-actions">
+            <el-select
+              :model-value="activeItemId"
+              @update:model-value="$emit('update:activeItemId', $event)"
+              placeholder="选择比赛分项"
+              :style="isMobile ? 'width: 140px' : 'width: 300px'"
+              size="small"
+              v-if="isMobile">
+              <el-option
+                v-for="item in subEventList"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id" />
+            </el-select>
+            <el-select
+              v-if="!isMobile"
+              :model-value="activeItemId"
+              @update:model-value="$emit('update:activeItemId', $event)"
+              placeholder="选择比赛分项"
+              style="width: 300px">
+              <el-option
+                v-for="item in subEventList"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id" />
+            </el-select>
+            <el-button type="success" :disabled="!activeItemId" :size="isMobile ? 'small' : ''" @click="$emit('openMembers')">
+              参赛名单
+            </el-button>
           </div>
         </div>
-        <div class="right-actions">
-          <el-select
-            :model-value="activeItemId"
-            @update:model-value="$emit('update:activeItemId', $event)"
-            placeholder="选择比赛分项"
-            :style="isMobile ? 'width: 100%' : 'width: 300px'"
-            size="small"
-            v-if="isMobile">
-            <el-option
-              v-for="item in subEventList"
-              :key="item.id"
-              :label="item.name"
-              :value="item.id" />
-          </el-select>
-          <el-select
-            v-if="!isMobile"
-            :model-value="activeItemId"
-            @update:model-value="$emit('update:activeItemId', $event)"
-            placeholder="选择比赛分项"
-            style="width: 300px">
-            <el-option
-              v-for="item in subEventList"
-              :key="item.id"
-              :label="item.name"
-              :value="item.id" />
-          </el-select>
-          <el-button type="success" :disabled="!activeItemId" @click="$emit('openMembers')" size="small">
-            参赛名单
-          </el-button>
-        </div>
+        <div v-if="detail.note" class="title-note">{{ detail.note }}</div>
       </div>
     </template>
 
@@ -122,7 +120,7 @@ onBeforeUnmount(() => {
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .head {
   display: flex;
   flex-direction: column;
@@ -136,16 +134,14 @@ onBeforeUnmount(() => {
   gap: 12px;
 }
 
-.title-info {
-  flex: 1;
-  min-width: 0;
+.event-header.mobile .title-row {
+  flex-direction: column;
 }
 
 .right-actions {
   display: flex;
   gap: 10px;
   flex-shrink: 0;
-  width: 100%;
 }
 
 .event-header.mobile .right-actions {
