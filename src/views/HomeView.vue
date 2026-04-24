@@ -20,7 +20,8 @@
 
     <el-row :gutter="16" class="list">
       <el-col v-for="item in rows" :key="item.eventid" :xs="24" :sm="12" :md="8" :lg="6">
-        <EventCard :item="item" />
+        <MobileEventCard v-if="isMobile" :item="item" />
+        <EventCard v-else :item="item" />
       </el-col>
     </el-row>
 
@@ -34,10 +35,11 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, watch, computed, onMounted, onBeforeUnmount } from 'vue';
 import { ElMessage } from 'element-plus';
 import { Search } from '@element-plus/icons-vue';
 import EventCard from '../components/EventCard.vue';
+import MobileEventCard from '../components/MobileEventCard.vue';
 import { getMatchListByPage } from '../api/match';
 import { useUserStore } from '../stores/user';
 import { toList } from '../utils/format';
@@ -49,6 +51,20 @@ const keyword = ref('');
 const page = ref(1);
 const hasMore = ref(false);
 const PAGE_SIZE = 10;
+const windowWidth = ref(window.innerWidth);
+const isMobile = computed(() => windowWidth.value < 768);
+
+const updateWindowWidth = () => {
+  windowWidth.value = window.innerWidth;
+};
+
+onMounted(() => {
+  window.addEventListener('resize', updateWindowWidth);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', updateWindowWidth);
+});
 
 async function loadList(nextPage = 1, append = false) {
   if (loading.value) {

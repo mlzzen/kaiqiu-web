@@ -80,37 +80,24 @@
       <el-button type="success" @click="search(1)">搜索</el-button>
     </div>
 
-    <el-table :data="rows" stripe v-loading="loading">
-      <el-table-column type="index" label="#" width="60"> </el-table-column>
-      <el-table-column v-if="tab === 'match'" label="比赛名称" min-width="240">
-        <template #default="scope">
-          <EventLink :event-id="getEventId(scope.row)" :name="scope.row.title" />
-        </template>
-      </el-table-column>
-      <el-table-column v-if="tab === 'match'" label="状态" width="100">
-        <template #default="scope">
-          <el-tag size="small" :type="scope.row.status === '已结束' ? 'info' : 'success'">
-            {{ scope.row.status || '-' }}
-          </el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column v-if="tab === 'match'" label="城市" prop="city" width="120" />
-      <el-table-column v-if="tab === 'match'" label="起止日期" min-width="240">
-        <template #default="scope">
-          {{ formatDateRange(scope.row) }}
-        </template>
-      </el-table-column>
-      <el-table-column v-if="tab === 'match'" label="球馆" prop="arena_name" min-width="220" />
-      <el-table-column v-if="tab === 'match'" label="参加人数" width="110">
-        <template #default="scope">{{ `${scope.row.membernum || 0}人参加` }}</template>
-      </el-table-column>
-      <el-table-column v-if="tab === 'match'" label="浏览人数" width="110">
-        <template #default="scope">{{ `${scope.row.viewnum || 0}人浏览` }}</template>
-      </el-table-column>
-      <el-table-column v-if="tab === 'match'" label="距离" width="140">
-        <template #default="scope">{{ formatDistance(scope.row.juli) }}</template>
-      </el-table-column>
+    <!-- 比赛 tab -->
+    <template v-if="tab === 'match'">
+      <!-- 手机端：MobileEventCard 卡片列表 -->
+      <div v-if="isMobile" class="match-card-list" v-loading="loading">
+        <MobileEventCard v-for="(item, index) in rows" :key="index" :item="item" />
+      </div>
+      <!-- 桌面端：EventCard 网格 -->
+      <div v-else class="match-grid-wrap" v-loading="loading">
+        <el-row :gutter="16">
+          <el-col v-for="(item, index) in rows" :key="index" :sm="12" :md="8" :lg="6">
+            <EventCard :item="item" />
+          </el-col>
+        </el-row>
+      </div>
+    </template>
 
+    <!-- 球馆/积分 tab：表格 -->
+    <el-table v-if="tab !== 'match'" :data="rows" stripe v-loading="loading">
       <el-table-column v-if="tab === 'arena'" label="球馆名称" prop="name" min-width="220" />
       <el-table-column v-if="tab === 'arena'" label="城市" prop="city" width="120" />
       <el-table-column v-if="tab === 'arena'" label="地址" prop="location" min-width="320" />
@@ -149,7 +136,8 @@
 import { computed, ref, watch, onMounted, onBeforeUnmount } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import UserLink from '../components/UserLink.vue';
-import EventLink from '../components/EventLink.vue';
+import EventCard from '../components/EventCard.vue';
+import MobileEventCard from '../components/MobileEventCard.vue';
 import { getArenaListPageByKey } from '../api/arena';
 import { getMatchListPageByKey } from '../api/match';
 import { getCities } from '../api/publicc';
@@ -365,8 +353,7 @@ function formatDateRange(row) {
   const start = row?.starttime || '-';
   const end = row?.endtime || '';
   return end ? `${start} 至 ${end}` : start;
-}
-</script>
+}</script>
 
 <style scoped>
 .filters {
@@ -407,5 +394,22 @@ function formatDateRange(row) {
 .date-separator {
   color: #909399;
   font-size: 13px;
+}
+
+/* 手机端比赛卡片列表 */
+.match-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 4px 0;
+}
+
+/* 桌面端比赛卡片网格 */
+.match-grid-wrap {
+  margin-top: 6px;
+}
+
+.match-grid-wrap :deep(.el-row) {
+  row-gap: 16px;
 }
 </style>
