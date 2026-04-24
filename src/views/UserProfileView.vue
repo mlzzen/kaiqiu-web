@@ -494,6 +494,7 @@ function buildChartOption(data) {
   return {
     tooltip: {
       trigger: 'item',
+      triggerOn: isMobile.value ? 'click' : 'mousemove',
       formatter: (params) => {
         const item = data[params.dataIndex];
         return `
