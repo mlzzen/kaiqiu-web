@@ -71,7 +71,7 @@
         <template #default="scope">
           <UserLink :uid="scope.row.fuid" name="进入主页" />
           <el-button link type="success" style="margin-left: 16px" @click="toggleMatches(scope.row)">
-            {{ expandedUid === scope.row.fuid ? '收起近期赛事' : '查看近期赛事' }}
+            查看近期赛事
           </el-button>
           <el-button link type="danger" @click="cancelFollow(scope.row)">不再关注</el-button>
         </template>
@@ -150,6 +150,7 @@ async function toggleMatches(row) {
     return;
   }
   const res = await getFolloweeEnrolledMatch(row.fuid);
+  dialogVisible.value = true;
   expandedUid.value = row.fuid;
   expandedNickname.value = row.nickname;
   expandedMatches.value = res.data?.enrolledMatchList || [];
