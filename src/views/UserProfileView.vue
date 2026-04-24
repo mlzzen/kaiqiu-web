@@ -484,6 +484,13 @@ function buildChartOption(data) {
   const dates = data.map((v) => formatDate(v.dateline));
   const scores = data.map((v) => Number(v.postscore || 0));
 
+  // 计算积分范围，让 y 轴聚焦在变化区间
+  const minScore = Math.min(...scores);
+  const maxScore = Math.max(...scores);
+  const padding = Math.max(Math.round((maxScore - minScore) * 0.15), 10);
+  const yMin = Math.max(0, minScore - padding);
+  const yMax = maxScore + padding;
+
   return {
     tooltip: {
       trigger: 'item',
@@ -500,9 +507,9 @@ function buildChartOption(data) {
       },
     },
     grid: {
-      left: isMobile.value ? 45 : 50,
+      left: isMobile.value ? 45 : 55,
       right: isMobile.value ? 15 : 20,
-      top: 20,
+      top: 25,
       bottom: isMobile.value ? 35 : 40,
     },
     xAxis: {
@@ -515,6 +522,14 @@ function buildChartOption(data) {
     },
     yAxis: {
       type: 'value',
+      min: yMin,
+      max: yMax,
+      splitLine: {
+        lineStyle: {
+          type: 'dashed',
+          color: '#e8e8e8',
+        },
+      },
       axisLabel: {
         fontSize: isMobile.value ? 10 : 12,
       },
@@ -523,7 +538,7 @@ function buildChartOption(data) {
       {
         data: scores,
         type: 'line',
-        smooth: true,
+        smooth: false,
         symbol: 'circle',
         symbolSize: 8,
         lineStyle: {
