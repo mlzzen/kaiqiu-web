@@ -41,6 +41,12 @@ const router = createRouter({
           meta: { title: '赛事详情' },
         },
         {
+          path: 'event-members/:eventid/:itemid',
+          name: 'event-members',
+          component: () => import('../views/EventMemberListView.vue'),
+          meta: { title: '参赛名单' },
+        },
+        {
           path: 'set-score/group/:eventid/:itemid',
           name: 'set-score-group',
           component: () => import('../views/SetScoreGroupView.vue'),

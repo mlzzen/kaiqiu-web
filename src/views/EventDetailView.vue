@@ -222,7 +222,11 @@ function goSetScore() {
 }
 
 function openMembers() {
-  memberVisible.value = true;
+  if (isMobile.value) {
+    router.push(`/event-members/${detail.value.eventid}/${activeItemId.value}`);
+  } else {
+    memberVisible.value = true;
+  }
 }
 
 async function loadMemberDetail() {
