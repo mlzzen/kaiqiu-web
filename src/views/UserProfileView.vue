@@ -471,6 +471,9 @@ function buildChartOption(data) {
     tooltip: {
       trigger: 'item',
       triggerOn: isMobile.value ? 'click' : 'mousemove',
+      position: (point, _params, _dom, _rect, size) => {
+        return [point[0] - size.contentSize[0] / 2, point[1] + 20];
+      },
       formatter: (params) => {
         const item = data[params.dataIndex];
         return `
