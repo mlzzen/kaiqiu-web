@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="event-detail" :class="{ 'mobile': isMobile }">
     <EventDetailHeader
       :loading="loading"
       :detail="detail"
@@ -11,8 +11,8 @@
       @update:active-item-id="activeItemId = $event"
     />
 
-    <el-card style="margin-top: 14px">
-      <el-tabs v-model="activeTab" @tab-change="loadTabData">
+    <el-card class="event-tabs-card">
+      <el-tabs v-model="activeTab" @tab-change="loadTabData" :class="{ 'mobile': isMobile }">
         <el-tab-pane label="赛程" name="groups" />
         <el-tab-pane label="成绩" name="results" />
         <el-tab-pane label="名次" name="honors" />
@@ -63,7 +63,7 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue';
+import { computed, ref, watch, onMounted, onBeforeUnmount } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { getAllHonors, getAllResult, getEventDetaiByIdAndLocation, getGroups, getMemberDetail, getScoreChangeByEventid } from '../api/event';
 import { useUserStore } from '../stores/user';
@@ -78,6 +78,21 @@ import MemberDrawer from '../components/MemberDrawer.vue';
 const route = useRoute();
 const router = useRouter();
 const userStore = useUserStore();
+
+const windowWidth = ref(window.innerWidth);
+const isMobile = computed(() => windowWidth.value < 768);
+
+const updateWindowWidth = () => {
+  windowWidth.value = window.innerWidth;
+};
+
+onMounted(() => {
+  window.addEventListener('resize', updateWindowWidth);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', updateWindowWidth);
+});
 
 const loading = ref(false);
 const tabLoading = ref(false);
@@ -247,3 +262,18 @@ watch(activeItemId, () => {
   loadMemberDetail();
 });
 </script>
+
+<style scoped>
+.event-detail.mobile {
+  padding: 4px;
+}
+
+.event-detail.mobile .event-tabs-card {
+  margin-top: 8px;
+}
+
+.event-detail.mobile :deep(.el-tabs__item) {
+  font-size: 13px;
+  padding: 0 12px;
+}
+</style>

@@ -29,10 +29,10 @@ defineProps({
 }
 
 .html img {
-  width: 500px !important;
+  width: 368px !important;
 }
 
 :deep(.html img) {
-  width: 500px !important;
+  width: 368px !important;
 }
 </style>

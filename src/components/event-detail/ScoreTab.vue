@@ -1,16 +1,18 @@
 <template>
-  <el-table :data="scoreRows" stripe v-loading="loading">
-    <el-table-column label="姓名" min-width="160">
-      <template #default="scope">
-        <UserLink :uid="scope.row.uid" :name="scope.row.realname" />
-      </template>
-    </el-table-column>
-    <el-table-column prop="prescore" label="赛前积分" width="120" />
-    <el-table-column prop="postscore" label="赛后积分" width="120" />
-    <el-table-column label="变化" width="100">
-      <template #default="scope">{{ setChange(scope.row.change) }}</template>
-    </el-table-column>
-  </el-table>
+  <div class="score-wrap">
+    <el-table :data="scoreRows" stripe v-loading="loading" size="small">
+      <el-table-column label="姓名" min-width="120">
+        <template #default="scope">
+          <UserLink :uid="scope.row.uid" :name="scope.row.realname" />
+        </template>
+      </el-table-column>
+      <el-table-column prop="prescore" label="赛前积分" width="90" />
+      <el-table-column prop="postscore" label="赛后积分" width="90" />
+      <el-table-column label="变化" width="80">
+        <template #default="scope">{{ setChange(scope.row.change) }}</template>
+      </el-table-column>
+    </el-table>
+  </div>
 </template>
 
 <script setup>
@@ -32,3 +34,9 @@ function setChange(change) {
   return num > 0 ? `+${num}` : String(num);
 }
 </script>
+
+<style scoped>
+.score-wrap {
+  overflow-x: auto;
+}
+</style>

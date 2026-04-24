@@ -1,11 +1,11 @@
 <template>
-  <div class="schedule" v-loading="loading">
+  <div class="schedule" v-loading="loading" :class="{ 'mobile': isMobile }">
     <div class="schedule-head">
       <div class="schedule-title">
         <span class="schedule-name">{{ currentItem?.name || '-' }}</span>
         <span v-if="currentItem?.qualNum > 0" class="schedule-qual">(小组出线{{ currentItem.qualNum }}人)</span>
       </div>
-      <el-button class="schedule-btn" type="success" plain :disabled="!groupSections.length" @click="$emit('goSetScore')">
+      <el-button class="schedule-btn" type="success" plain :disabled="!groupSections.length" @click="$emit('goSetScore')" size="small">
         {{ groupSections.length ? '录入成绩' : '设定中...' }}
       </el-button>
     </div>
@@ -22,11 +22,12 @@
             border
             class="schedule-table"
             :cell-style="setGroupCellStyle"
-            :header-cell-style="setGroupHeaderStyle">
+            :header-cell-style="setGroupHeaderStyle"
+            size="small">
             <el-table-column
               prop="newUsername"
               :label="`第${groupIndex + 1}组`"
-              width="120"
+              width="100"
               fixed="left"
               align="center">
               <template #default="scope">
@@ -45,6 +46,7 @@
 </template>
 
 <script setup>
+import { ref, onMounted, onBeforeUnmount, computed } from 'vue';
 import UserLink from '../UserLink.vue';
 
 const props = defineProps({
@@ -64,6 +66,21 @@ const props = defineProps({
 
 defineEmits(['goSetScore']);
 
+const windowWidth = ref(window.innerWidth);
+const isMobile = computed(() => windowWidth.value < 768);
+
+const updateWindowWidth = () => {
+  windowWidth.value = window.innerWidth;
+};
+
+onMounted(() => {
+  window.addEventListener('resize', updateWindowWidth);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', updateWindowWidth);
+});
+
 function buildGroupRows(group = []) {
   return (group || []).map((row, index) => ({
     ...row,
@@ -73,7 +90,7 @@ function buildGroupRows(group = []) {
 
 function getGroupColumns(group = []) {
   const count = Array.isArray(group) ? group.length : 0;
-  const width = count ? Math.max(70, Math.floor(720 / count)) : 80;
+  const width = count ? Math.max(50, Math.floor(600 / count)) : 60;
   return Array.from({ length: count }, (_, index) => ({
     key: `col${index + 1}`,
     label: String(index + 1),
@@ -83,15 +100,16 @@ function getGroupColumns(group = []) {
 
 function setGroupHeaderStyle() {
   return {
-    fontSize: '12px',
-    padding: '6px 4px',
+    fontSize: '11px',
+    padding: '4px 2px',
   };
 }
 
 function setGroupCellStyle({ row, rowIndex, columnIndex }) {
   const style = {
-    fontSize: '12px',
-    padding: '6px 4px',
+    fontSize: '11px',
+    padding: '4px 2px',
+    height: '28px',
   };
   if (rowIndex + 1 === columnIndex) {
     style.background = '#F2F1EE';
@@ -156,7 +174,7 @@ function setGroupCellStyle({ row, rowIndex, columnIndex }) {
 }
 
 .schedule-table {
-  min-width: 640px;
+  min-width: 500px;
 }
 
 .schedule-table :deep(.el-table__header-wrapper),

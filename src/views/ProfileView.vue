@@ -1,5 +1,55 @@
 <template>
-  <el-row :gutter="16">
+  <!-- 手机端布局 -->
+  <div class="mobile-layout" v-if="isMobile">
+    <el-card class="mobile-card">
+      <div class="profile">
+        <el-avatar :size="80" :src="userInfo.image" />
+        <h3>{{ userInfo.username || '未登录' }}</h3>
+        <div class="meta">真实姓名: {{ userInfo.realname || '-' }}</div>
+        <div class="meta">当前积分: {{ userInfo.score ?? '-' }}</div>
+        <div class="meta">当前信用: {{ userInfo.credit ?? '-' }}</div>
+        <div class="meta">当前金币: {{ userInfo.gold ?? '-' }}</div>
+        <el-button type="success" plain @click="goSign" size="small">每日签到</el-button>
+      </div>
+    </el-card>
+
+    <el-card class="mobile-card">
+      <div class="actions-grid">
+        <el-button type="success" @click="goMyProfile" size="small">我的主页</el-button>
+        <el-button @click="goFollowing" size="small">我的关注</el-button>
+        <el-button @click="goRanking" size="small">排行榜</el-button>
+      </div>
+    </el-card>
+
+    <el-card class="mobile-card">
+      <template #header>
+        <div class="header">参赛记录</div>
+      </template>
+      <el-table :data="eventRows" stripe v-loading="loading" size="small">
+        <el-table-column label="赛事名称" min-width="160">
+          <template #default="scope">
+            <EventLink :event-id="getEventId(scope.row)" :name="scope.row.title" />
+          </template>
+        </el-table-column>
+        <el-table-column prop="city" label="城市" width="70" />
+        <el-table-column prop="starttime" label="时间" width="100" />
+      </el-table>
+      <div class="pager">
+        <el-pagination
+          size="small"
+          background
+          layout="prev, pager, next"
+          :current-page="page"
+          :page-size="10"
+          :total="total"
+          @current-change="loadEvents"
+        />
+      </div>
+    </el-card>
+  </div>
+
+  <!-- 桌面端布局 -->
+  <el-row :gutter="16" v-else>
     <el-col :span="8">
       <el-card>
         <div class="profile">
@@ -19,6 +69,7 @@
         <div class="actions">
           <el-button type="success" @click="goMyProfile">我的积分/个人主页</el-button>
           <el-button @click="goFollowing">我的关注</el-button>
+          <el-button @click="goRanking">排行榜</el-button>
         </div>
         <template #header>
           <div class="header">参赛记录</div>
@@ -49,7 +100,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted, onBeforeUnmount, computed } from 'vue';
 import { ElMessage } from 'element-plus';
 import { useRouter } from 'vue-router';
 import EventLink from '../components/EventLink.vue';
@@ -62,6 +113,20 @@ const eventRows = ref([]);
 const loading = ref(false);
 const page = ref(1);
 const total = ref(0);
+const windowWidth = ref(window.innerWidth);
+const isMobile = computed(() => windowWidth.value < 768);
+
+const updateWindowWidth = () => {
+  windowWidth.value = window.innerWidth;
+};
+
+onMounted(() => {
+  window.addEventListener('resize', updateWindowWidth);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', updateWindowWidth);
+});
 
 async function loadUser() {
   const res = await getUserInfo();
@@ -92,6 +157,10 @@ function goMyProfile() {
 
 function goFollowing() {
   router.push('/following');
+}
+
+function goRanking() {
+  router.push('/ranking');
 }
 
 function getEventId(row) {
@@ -128,6 +197,17 @@ Promise.all([loadUser(), loadEvents(1)]);
   margin-bottom: 14px;
 }
 
+.actions-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.actions-grid .el-button {
+  flex: 1;
+  min-width: 80px;
+}
+
 .pager {
   margin-top: 14px;
   display: flex;
@@ -141,5 +221,33 @@ Promise.all([loadUser(), loadEvents(1)]);
 
 .link-primary:hover {
   text-decoration: underline;
+}
+
+/* 手机端布局 */
+.mobile-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 4px;
+}
+
+.mobile-card {
+  width: 100%;
+}
+
+.mobile-card .header {
+  font-size: 14px;
+}
+
+.mobile-card .el-table {
+  font-size: 12px;
+}
+
+.mobile-card :deep(.el-card__header) {
+  padding: 10px 12px;
+}
+
+.mobile-card :deep(.el-card__body) {
+  padding: 12px;
 }
 </style>

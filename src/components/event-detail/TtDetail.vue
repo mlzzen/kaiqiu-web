@@ -16,9 +16,10 @@
             border
             class="results-detail-table"
             :cell-style="setDetailCellStyle"
-            :header-cell-style="setResultHeaderStyle">
-            <el-table-column type="index" label="序号" width="70" align="center" />
-            <el-table-column prop="username1" label="选手1" width="200" align="center">
+            :header-cell-style="setResultHeaderStyle"
+            size="small">
+            <el-table-column type="index" label="序号" width="50" align="center" />
+            <el-table-column prop="username1" label="选手1" width="120" align="center">
               <template #default="scope">
                 <div
                   class="results-detail-name"
@@ -27,7 +28,7 @@
                 </div>
               </template>
             </el-table-column>
-            <el-table-column prop="username2" label="选手2" width="200" align="center">
+            <el-table-column prop="username2" label="选手2" width="120" align="center">
               <template #default="scope">
                 <div
                   class="results-detail-name"
@@ -36,7 +37,7 @@
                 </div>
               </template>
             </el-table-column>
-            <el-table-column label="比分" width="90" align="center">
+            <el-table-column label="比分" width="80" align="center">
               <template #default="scope">
                 <span
                   v-if="scope.row.gameid"
@@ -47,7 +48,7 @@
                 <span v-else>{{ `${scope.row.result1}:${scope.row.result2}` }}</span>
               </template>
             </el-table-column>
-            <el-table-column label="详情" width="70" align="center">
+            <el-table-column label="详情" width="60" align="center">
               <template #default="scope">
                 <el-icon
                   v-if="String(scope.row.flag) === '0' && scope.row.gameid"
@@ -93,17 +94,17 @@ const openMatch = (gameid) => {
 
 function setResultHeaderStyle() {
   return {
-    fontSize: '12px',
-    padding: '6px 4px',
+    fontSize: '11px',
+    padding: '4px 2px',
   };
 }
 
 function setDetailCellStyle() {
   return {
-    fontSize: '12px',
-    padding: '6px 4px',
+    fontSize: '11px',
+    padding: '4px 2px',
     background: '#F2F0F2',
-    height: '32px',
+    height: '28px',
   };
 }
 </script>
@@ -141,12 +142,13 @@ function setDetailCellStyle() {
 }
 
 .results-detail-table-wrap {
-  width: 640px;
+  width: 100%;
   max-width: 100%;
+  overflow-x: auto;
 }
 
 .results-detail-table {
-  width: 100%;
+  width: 420px;
 }
 
 .results-detail-name {

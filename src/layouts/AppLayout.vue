@@ -1,6 +1,7 @@
 <template>
   <el-container class="layout">
-    <el-header class="header">
+    <!-- 桌面端 Header -->
+    <el-header class="header" v-if="!isMobile">
       <div class="brand">开球网 PC 版</div>
       <el-menu mode="horizontal" :default-active="activePath" @select="toPath" class="menu">
         <el-menu-item index="/home">首页赛事</el-menu-item>
@@ -34,14 +35,32 @@
         </el-dropdown>
       </div>
     </el-header>
-    <el-main class="main">
+
+    <!-- 主内容区 -->
+    <el-main class="main" :class="{ 'mobile': isMobile }">
       <router-view />
     </el-main>
+
+    <!-- 手机端底部 Tabbar -->
+    <div class="tabbar" v-if="isMobile">
+      <div class="tab-item" :class="{ active: activeTab === '/home' }" @click="toPath('/home')">
+        <span class="tab-icon">🏠</span>
+        <span class="tab-label">首页</span>
+      </div>
+      <div class="tab-item" :class="{ active: activeTab === '/search' }" @click="toPath('/search')">
+        <span class="tab-icon">🔍</span>
+        <span class="tab-label">搜索</span>
+      </div>
+      <div class="tab-item" :class="{ active: activeTab === '/profile' }" @click="toPath('/profile')">
+        <span class="tab-icon">👤</span>
+        <span class="tab-label">我的</span>
+      </div>
+    </div>
   </el-container>
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, onBeforeUnmount, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { ElMessage } from 'element-plus';
 import { useUserStore } from '../stores/user';
@@ -52,6 +71,20 @@ const router = useRouter();
 const userStore = useUserStore();
 const cityOptions = ref([{ id: userStore.city.id, name: userStore.city.name }]);
 const cityName = ref(userStore.city.name);
+const windowWidth = ref(window.innerWidth);
+const isMobile = computed(() => windowWidth.value < 768);
+
+const updateWindowWidth = () => {
+  windowWidth.value = window.innerWidth;
+};
+
+onMounted(() => {
+  window.addEventListener('resize', updateWindowWidth);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', updateWindowWidth);
+});
 
 const activePath = computed(() => {
   if (route.path.startsWith('/event')) {
@@ -61,6 +94,13 @@ const activePath = computed(() => {
     return '/profile';
   }
   return route.path;
+});
+
+const activeTab = computed(() => {
+  if (route.path.startsWith('/home')) return '/home';
+  if (route.path.startsWith('/search')) return '/search';
+  if (route.path.startsWith('/profile') || route.path.startsWith('/user') || route.path.startsWith('/following')) return '/profile';
+  return '/home';
 });
 
 function toPath(path) {
@@ -101,6 +141,7 @@ onMounted(async () => {
 .el-main {
   --el-main-padding: 8px;
 }
+
 .layout {
   min-height: 100vh;
 }
@@ -141,5 +182,47 @@ onMounted(async () => {
 
 .main {
   width: 100%;
+}
+
+.main.mobile {
+  --el-main-padding: 4px;
+  padding-bottom: 60px;
+}
+
+/* 手机端底部 Tabbar */
+.tabbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  height: 56px;
+  background: #fff;
+  border-top: 1px solid #e5e7eb;
+  z-index: 1000;
+}
+
+.tab-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 16px;
+  cursor: pointer;
+  color: #6b7280;
+}
+
+.tab-item.active {
+  color: #2f4d32;
+}
+
+.tab-icon {
+  font-size: 20px;
+}
+
+.tab-label {
+  font-size: 11px;
 }
 </style>
