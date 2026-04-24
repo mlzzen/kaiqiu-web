@@ -15,7 +15,29 @@
         @keyup.enter="search(1)"
       />
       <template v-if="tab === 'match'">
+        <!-- 手机端使用原生日期输入 -->
+        <template v-if="isMobile">
+          <div class="date-inputs">
+            <el-input
+              v-model="dateStart"
+              type="date"
+              value-format="YYYY-MM-DD"
+              placeholder="开始日期"
+              style="width: 140px"
+            />
+            <span class="date-separator">至</span>
+            <el-input
+              v-model="dateEnd"
+              type="date"
+              value-format="YYYY-MM-DD"
+              placeholder="结束日期"
+              style="width: 140px"
+            />
+          </div>
+        </template>
+        <!-- 桌面端使用日期范围选择器 -->
         <el-date-picker
+          v-else
           v-model="dateRange"
           type="daterange"
           range-separator="至"
@@ -124,7 +146,7 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue';
+import { computed, ref, watch, onMounted, onBeforeUnmount } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import UserLink from '../components/UserLink.vue';
 import EventLink from '../components/EventLink.vue';
@@ -147,6 +169,20 @@ const distance = ref('');
 const bootstrapped = ref(false);
 const hasMore = ref(false);
 const PAGE_SIZE = 10;
+const windowWidth = ref(window.innerWidth);
+const isMobile = computed(() => windowWidth.value < 768);
+
+const updateWindowWidth = () => {
+  windowWidth.value = window.innerWidth;
+};
+
+onMounted(() => {
+  window.addEventListener('resize', updateWindowWidth);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', updateWindowWidth);
+});
 
 function formatYmd(date) {
   const y = date.getFullYear();
@@ -157,6 +193,8 @@ function formatYmd(date) {
 
 const today = formatYmd(new Date());
 const dateRange = ref([today, today]);
+const dateStart = ref(today);
+const dateEnd = ref(today);
 const matchCity = ref('');
 const matchTags = ref([]);
 const cityOptions = ref([{ id: userStore.city.id, name: userStore.city.name }]);
@@ -168,13 +206,21 @@ const placeholder = computed(() => {
   return '请输入比赛名称';
 });
 
+// 同步手机端日期和桌面端日期选择器
+const effectiveDateRange = computed(() => {
+  if (isMobile.value) {
+    return [dateStart.value, dateEnd.value];
+  }
+  return dateRange.value;
+});
+
 function buildQuery() {
   const query = {
     tab: tab.value || 'match',
     keyword: keyword.value || undefined,
   };
   if (tab.value === 'match') {
-    const [startDate, endDate] = dateRange.value || [];
+    const [startDate, endDate] = effectiveDateRange.value || [];
     if (startDate && endDate) {
       query.start = startDate;
       query.end = endDate;
@@ -200,11 +246,15 @@ function applyQuery() {
     const start = typeof q.start === 'string' ? q.start : today;
     const end = typeof q.end === 'string' ? q.end : today;
     dateRange.value = [start, end];
+    dateStart.value = start;
+    dateEnd.value = end;
     matchCity.value = typeof q.city === 'string' ? q.city : '';
     distance.value = typeof q.distance === 'string' ? q.distance : '';
     matchTags.value = typeof q.tags === 'string' && q.tags.length ? q.tags.split(',') : [];
   } else {
     dateRange.value = [today, today];
+    dateStart.value = today;
+    dateEnd.value = today;
     matchCity.value = '';
     distance.value = '';
     matchTags.value = [];
@@ -222,7 +272,7 @@ async function search(nextPage = 1, append = false) {
     const { lng, lat } = userStore.location;
     let res;
     if (tab.value === 'match') {
-      const [startDate, endDate] = dateRange.value || [];
+      const [startDate, endDate] = effectiveDateRange.value || [];
       const startMatchTimestamp = startDate
         ? String(Math.floor(new Date(`${startDate} 00:00:00`).getTime() / 1000))
         : '';
@@ -279,8 +329,10 @@ watch(tab, () => {
   page.value = 1;
   rows.value = [];
   hasMore.value = false;
-  if (tab.value === 'match' && (!dateRange.value || dateRange.value.length !== 2)) {
+  if (tab.value === 'match' && (!effectiveDateRange.value || effectiveDateRange.value.length !== 2)) {
     dateRange.value = [today, today];
+    dateStart.value = today;
+    dateEnd.value = today;
   }
   search(1, false);
 });
@@ -344,5 +396,16 @@ function formatDateRange(row) {
 
 .link-primary:hover {
   text-decoration: underline;
+}
+
+.date-inputs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.date-separator {
+  color: #909399;
+  font-size: 13px;
 }
 </style>
