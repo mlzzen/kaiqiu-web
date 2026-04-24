@@ -31,24 +31,7 @@
     <!-- 2. 最近40场比赛积分趋势 -->
     <el-card class="mobile-card" v-if="scoreTrend.length">
       <div class="section-title">最近40场比赛积分趋势</div>
-      <div class="trend-wrap">
-        <svg viewBox="0 0 1000 300" preserveAspectRatio="none" class="trend-svg">
-          <line :x1="chartBox.left" :y1="chartBox.top" :x2="chartBox.left" :y2="chartBox.bottom" stroke="#9ca3af" stroke-width="1.5" />
-          <line :x1="chartBox.left" :y1="chartBox.bottom" :x2="chartBox.right" :y2="chartBox.bottom" stroke="#9ca3af" stroke-width="1.5" />
-          <g v-for="tick in yTicks" :key="`y-${tick.value}`">
-            <line :x1="chartBox.left - 6" :y1="tick.y" :x2="chartBox.right" :y2="tick.y" stroke="#e5e7eb" stroke-width="1" />
-            <text :x="chartBox.left - 10" :y="tick.y + 4" text-anchor="end" font-size="16" fill="#6b7280">{{ tick.label }}</text>
-          </g>
-          <g v-for="tick in xTicks" :key="`x-${tick.index}`">
-            <line :x1="tick.x" :y1="chartBox.bottom" :x2="tick.x" :y2="chartBox.bottom + 5" stroke="#9ca3af" stroke-width="1" />
-            <text :x="tick.x" :y="chartBox.bottom + 22" text-anchor="middle" font-size="14" fill="#6b7280">{{ tick.label }}</text>
-          </g>
-          <polyline fill="none" stroke="#248dff" stroke-width="3" :points="trendPoints" />
-          <g v-for="point in trendDots" :key="point.index">
-            <circle :cx="point.x" :cy="point.y" r="3.5" fill="#248dff" />
-          </g>
-        </svg>
-      </div>
+      <div ref="mobileChartRef" class="trend-chart"></div>
     </el-card>
 
     <!-- 3. 比赛信息 -->
@@ -257,24 +240,7 @@
       <el-card>
         <template v-if="scoreTrend.length">
           <div class="section-title">最近40场比赛积分趋势</div>
-          <div class="trend-wrap">
-            <svg viewBox="0 0 1000 300" preserveAspectRatio="none" class="trend-svg">
-              <line :x1="chartBox.left" :y1="chartBox.top" :x2="chartBox.left" :y2="chartBox.bottom" stroke="#9ca3af" stroke-width="1.5" />
-              <line :x1="chartBox.left" :y1="chartBox.bottom" :x2="chartBox.right" :y2="chartBox.bottom" stroke="#9ca3af" stroke-width="1.5" />
-              <g v-for="tick in yTicks" :key="`y-${tick.value}`">
-                <line :x1="chartBox.left - 6" :y1="tick.y" :x2="chartBox.right" :y2="tick.y" stroke="#e5e7eb" stroke-width="1" />
-                <text :x="chartBox.left - 10" :y="tick.y + 4" text-anchor="end" font-size="16" fill="#6b7280">{{ tick.label }}</text>
-              </g>
-              <g v-for="tick in xTicks" :key="`x-${tick.index}`">
-                <line :x1="tick.x" :y1="chartBox.bottom" :x2="tick.x" :y2="chartBox.bottom + 5" stroke="#9ca3af" stroke-width="1" />
-                <text :x="tick.x" :y="chartBox.bottom + 22" text-anchor="middle" font-size="14" fill="#6b7280">{{ tick.label }}</text>
-              </g>
-              <polyline fill="none" stroke="#248dff" stroke-width="3" :points="trendPoints" />
-              <g v-for="point in trendDots" :key="point.index">
-                <circle :cx="point.x" :cy="point.y" r="3.5" fill="#248dff" />
-              </g>
-            </svg>
-          </div>
+          <div ref="desktopChartRef" class="trend-chart"></div>
         </template>
 
         <template v-if="top3BeatList.length">
@@ -422,12 +388,36 @@
     :gameid="currentGameid"
     @open-match="openMatch"
   />
+
+  <!-- 积分趋势详情弹窗 -->
+  <el-dialog
+    v-model="showTrendDetail"
+    :title="`${selectedTrendItem?.postscore || ''}分`"
+    width="320px"
+    destroy-on-close
+  >
+    <div v-if="selectedTrendItem" class="trend-detail">
+      <div class="trend-detail-row">
+        <span class="trend-detail-label">日期</span>
+        <span class="trend-detail-value">{{ formatDate(selectedTrendItem.dateline) }}</span>
+      </div>
+      <div class="trend-detail-row">
+        <span class="trend-detail-label">地点</span>
+        <span class="trend-detail-value">{{ selectedTrendItem.province || '' }}{{ selectedTrendItem.city || '' }}</span>
+      </div>
+      <div class="trend-detail-row">
+        <span class="trend-detail-label">比赛</span>
+        <span class="trend-detail-value">{{ selectedTrendItem.title || '-' }}</span>
+      </div>
+    </div>
+  </el-dialog>
 </template>
 
 <script setup>
-import { computed, ref, watch, onMounted, onBeforeUnmount } from 'vue';
+import { computed, ref, watch, onMounted, onBeforeUnmount, nextTick } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { ElMessageBox } from 'element-plus';
+import * as echarts from 'echarts';
 import UserLink from '../components/UserLink.vue';
 import EventLink from '../components/EventLink.vue';
 import MatchDetailDialog from '../components/MatchDetailDialog.vue';
@@ -459,9 +449,16 @@ const dialogVisible = ref(false);
 const currentGameid = ref('');
 const windowWidth = ref(window.innerWidth);
 const isMobile = computed(() => windowWidth.value < 768);
+const mobileChartRef = ref(null);
+const desktopChartRef = ref(null);
+let mobileChart = null;
+let desktopChart = null;
+const selectedTrendItem = ref(null);
+const showTrendDetail = ref(false);
 
 const updateWindowWidth = () => {
   windowWidth.value = window.innerWidth;
+  resizeCharts();
 };
 
 onMounted(() => {
@@ -470,6 +467,144 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   window.removeEventListener('resize', updateWindowWidth);
+  if (mobileChart) {
+    mobileChart.dispose();
+  }
+  if (desktopChart) {
+    desktopChart.dispose();
+  }
+});
+
+function formatDate(dateStr) {
+  if (!dateStr || dateStr.length < 8) return dateStr;
+  return `${dateStr.slice(0, 4)}-${dateStr.slice(4, 6)}-${dateStr.slice(6, 8)}`;
+}
+
+function buildChartOption(data) {
+  const dates = data.map((v) => formatDate(v.dateline));
+  const scores = data.map((v) => Number(v.postscore || 0));
+
+  return {
+    tooltip: {
+      trigger: 'item',
+      formatter: (params) => {
+        const item = data[params.dataIndex];
+        return `
+          <div style="padding: 4px;">
+            <div><strong>${item.postscore}分</strong></div>
+            <div style="color:#666;font-size:12px;">${formatDate(item.dateline)}</div>
+            <div style="color:#666;font-size:12px;">${item.province || ''}${item.city || ''}</div>
+            <div style="color:#666;font-size:12px;max-width:200px;word-break:break-all;">${item.title || ''}</div>
+          </div>
+        `;
+      },
+    },
+    grid: {
+      left: isMobile.value ? 45 : 50,
+      right: isMobile.value ? 15 : 20,
+      top: 20,
+      bottom: isMobile.value ? 35 : 40,
+    },
+    xAxis: {
+      type: 'category',
+      data: dates,
+      axisLabel: {
+        fontSize: isMobile.value ? 10 : 12,
+        rotate: isMobile.value ? 45 : 0,
+      },
+    },
+    yAxis: {
+      type: 'value',
+      axisLabel: {
+        fontSize: isMobile.value ? 10 : 12,
+      },
+    },
+    series: [
+      {
+        data: scores,
+        type: 'line',
+        smooth: true,
+        symbol: 'circle',
+        symbolSize: 8,
+        lineStyle: {
+          width: 2,
+          color: '#248dff',
+        },
+        itemStyle: {
+          color: '#248dff',
+        },
+        emphasis: {
+          scale: true,
+          scaleSize: 12,
+        },
+      },
+    ],
+  };
+}
+
+function initCharts() {
+  if (scoreTrend.value.length === 0) return;
+
+  const option = buildChartOption(scoreTrend.value);
+
+  if (isMobile.value && mobileChartRef.value) {
+    if (!mobileChart) {
+      mobileChart = echarts.init(mobileChartRef.value);
+      mobileChart.on('click', onChartClick);
+    }
+    mobileChart.setOption(option);
+  }
+
+  if (!isMobile.value && desktopChartRef.value) {
+    if (!desktopChart) {
+      desktopChart = echarts.init(desktopChartRef.value);
+      desktopChart.on('click', onChartClick);
+    }
+    desktopChart.setOption(option);
+  }
+}
+
+function resizeCharts() {
+  if (mobileChart) {
+    mobileChart.resize();
+  }
+  if (desktopChart) {
+    desktopChart.resize();
+  }
+}
+
+function onChartClick(params) {
+  if (params.componentType === 'series') {
+    const index = params.dataIndex;
+    if (index >= 0 && index < scoreTrend.value.length) {
+      selectedTrendItem.value = scoreTrend.value[index];
+      showTrendDetail.value = true;
+    }
+  }
+}
+
+watch(windowWidth, () => {
+  resizeCharts();
+});
+
+watch(scoreTrend, () => {
+  nextTick(() => {
+    initCharts();
+  });
+}, { deep: true });
+
+watch(isMobile, () => {
+  nextTick(() => {
+    if (desktopChart) {
+      desktopChart.dispose();
+      desktopChart = null;
+    }
+    if (mobileChart) {
+      mobileChart.dispose();
+      mobileChart = null;
+    }
+    initCharts();
+  });
 });
 
 const openMatch = (gameid) => {
@@ -504,77 +639,6 @@ const top3BeatWomanList = computed(() =>
 const allCitiesList = computed(() => splitValue(profile.value.allCities));
 const kuZhuList = computed(() => parseSpecialRival(profile.value.kuzhu));
 const fuXingList = computed(() => parseSpecialRival(profile.value.fuxing));
-
-const trendPoints = computed(() => {
-  if (scoreTrend.value.length <= 1) {
-    return '';
-  }
-  return trendDots.value.map((p) => `${p.x},${p.y}`).join(' ');
-});
-
-const chartBox = {
-  left: 80,
-  right: 970,
-  top: 18,
-  bottom: 250,
-};
-
-const scoreRange = computed(() => {
-  const values = scoreTrend.value.map((v) => Number(v.postscore || 0));
-  const max = Math.max(...values);
-  const min = Math.min(...values);
-  const range = Math.max(1, max - min);
-  return { min, max, range };
-});
-
-const trendDots = computed(() => {
-  if (!scoreTrend.value.length) {
-    return [];
-  }
-  const { min, range } = scoreRange.value;
-  const width = chartBox.right - chartBox.left;
-  const height = chartBox.bottom - chartBox.top;
-  return scoreTrend.value.map((item, index) => {
-    const ratio = scoreTrend.value.length === 1 ? 0 : index / (scoreTrend.value.length - 1);
-    const x = chartBox.left + ratio * width;
-    const y = chartBox.bottom - ((Number(item.postscore || 0) - min) / range) * height;
-    return { index, x, y, date: item.dateline };
-  });
-});
-
-const yTicks = computed(() => {
-  if (!scoreTrend.value.length) {
-    return [];
-  }
-  const count = 4;
-  const { min, max } = scoreRange.value;
-  const step = (max - min) / count;
-  return Array.from({ length: count + 1 }).map((_, i) => {
-    const value = max - step * i;
-    const y = chartBox.top + ((chartBox.bottom - chartBox.top) * i) / count;
-    return { value, y, label: Math.round(value) };
-  });
-});
-
-const xTicks = computed(() => {
-  if (!trendDots.value.length) {
-    return [];
-  }
-  const indexes = Array.from(
-    new Set([
-      0,
-      Math.floor((trendDots.value.length - 1) * 0.33),
-      Math.floor((trendDots.value.length - 1) * 0.66),
-      trendDots.value.length - 1,
-    ]),
-  ).filter((i) => i >= 0);
-  return indexes.map((i) => {
-    const dot = trendDots.value[i];
-    const raw = dot.date || '';
-    const label = raw.length >= 10 ? raw.slice(5, 10) : raw;
-    return { index: i, x: dot.x, label };
-  });
-});
 
 async function loadData() {
   if (!uid.value) {
@@ -781,17 +845,30 @@ function parseSpecialRival(raw) {
   font-weight: 700;
 }
 
-.trend-wrap {
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  background: #fafafa;
-  padding: 10px;
-}
-
-.trend-svg {
+.trend-chart {
   width: 100%;
   height: 280px;
-  display: block;
+}
+
+.trend-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.trend-detail-row {
+  display: flex;
+  gap: 12px;
+}
+
+.trend-detail-label {
+  color: #6b7280;
+  flex-shrink: 0;
+}
+
+.trend-detail-value {
+  color: #374151;
+  word-break: break-all;
 }
 
 .tag-list {
