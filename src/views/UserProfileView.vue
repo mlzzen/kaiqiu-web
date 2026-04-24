@@ -388,29 +388,6 @@
     :gameid="currentGameid"
     @open-match="openMatch"
   />
-
-  <!-- 积分趋势详情弹窗 -->
-  <el-dialog
-    v-model="showTrendDetail"
-    :title="`${selectedTrendItem?.postscore || ''}分`"
-    width="320px"
-    destroy-on-close
-  >
-    <div v-if="selectedTrendItem" class="trend-detail">
-      <div class="trend-detail-row">
-        <span class="trend-detail-label">日期</span>
-        <span class="trend-detail-value">{{ formatDate(selectedTrendItem.dateline) }}</span>
-      </div>
-      <div class="trend-detail-row">
-        <span class="trend-detail-label">地点</span>
-        <span class="trend-detail-value">{{ selectedTrendItem.province || '' }}{{ selectedTrendItem.city || '' }}</span>
-      </div>
-      <div class="trend-detail-row">
-        <span class="trend-detail-label">比赛</span>
-        <span class="trend-detail-value">{{ selectedTrendItem.title || '-' }}</span>
-      </div>
-    </div>
-  </el-dialog>
 </template>
 
 <script setup>
@@ -454,7 +431,6 @@ const desktopChartRef = ref(null);
 let mobileChart = null;
 let desktopChart = null;
 const selectedTrendItem = ref(null);
-const showTrendDetail = ref(false);
 
 const updateWindowWidth = () => {
   windowWidth.value = window.innerWidth;
@@ -597,7 +573,6 @@ function onChartClick(params) {
     const index = params.dataIndex;
     if (index >= 0 && index < scoreTrend.value.length) {
       selectedTrendItem.value = scoreTrend.value[index];
-      showTrendDetail.value = true;
     }
   }
 }
