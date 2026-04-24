@@ -507,9 +507,9 @@ function buildChartOption(data) {
       },
     },
     grid: {
-      left: isMobile.value ? 45 : 55,
+      left: isMobile.value ? 50 : 55,
       right: isMobile.value ? 15 : 20,
-      top: 25,
+      top: isMobile.value ? 35 : 25,
       bottom: isMobile.value ? 35 : 40,
     },
     xAxis: {
@@ -540,7 +540,7 @@ function buildChartOption(data) {
         type: 'line',
         smooth: false,
         symbol: 'circle',
-        symbolSize: 8,
+        symbolSize: isMobile.value ? 12 : 8,
         lineStyle: {
           width: 2,
           color: '#248dff',
@@ -550,7 +550,10 @@ function buildChartOption(data) {
         },
         emphasis: {
           scale: true,
-          scaleSize: 12,
+          focus: 'series',
+          lineStyle: {
+            width: 3,
+          },
         },
       },
     ],
