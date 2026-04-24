@@ -1,5 +1,52 @@
 <template>
-  <el-card>
+  <!-- 手机端布局 -->
+  <div class="following-mobile" v-if="isMobile">
+    <div class="following-header">我的关注</div>
+    <div v-if="!rows.length && !loading" class="following-empty">暂无关注</div>
+    <div v-else class="following-list">
+      <div v-for="row in rows" :key="row.fuid" class="following-item">
+        <div class="following-row" @click="toggleMatches(row)">
+          <div class="following-info">
+            <router-link :to="`/user/${row.fuid}`" @click.stop>
+              <el-avatar :src="row.face_url" :size="50" />
+            </router-link>
+            <div class="following-text">
+              <div class="following-name">
+                <UserLink :uid="row.fuid" :name="row.nickname" :sub-name="row.realname" />
+              </div>
+              <div class="following-expand-hint">
+                {{ expandedUid === row.fuid ? '点击收起' : '查看近期赛事' }}
+              </div>
+            </div>
+          </div>
+          <div class="following-actions">
+            <router-link :to="`/user/${row.fuid}`" @click.stop>
+              <el-button size="small" type="primary" plain>进入主页</el-button>
+            </router-link>
+            <el-button size="small" type="danger" plain @click.stop="cancelFollow(row)">不再关注</el-button>
+          </div>
+        </div>
+        <div v-if="expandedUid === row.fuid" class="following-expanded">
+          <div class="following-expanded-title">{{ row.nickname }}的近期报名赛事</div>
+          <el-table v-if="expandedMatches.length" :data="expandedMatches" size="small">
+            <el-table-column prop="title" label="赛事" min-width="180">
+              <template #default="scope">
+                <EventLink :event-id="scope.row.eventid" :name="scope.row.title" />
+              </template>
+            </el-table-column>
+            <el-table-column label="地区" width="100">
+              <template #default="scope">{{ scope.row.city || scope.row.province }}</template>
+            </el-table-column>
+          </el-table>
+          <el-empty v-else description="暂无近期报名比赛" :image-size="60" />
+        </div>
+      </div>
+    </div>
+    <div v-loading="loading" class="following-loading" />
+  </div>
+
+  <!-- 桌面端布局 -->
+  <el-card v-else>
     <template #header>
       <div class="header">我的关注</div>
     </template>
@@ -56,7 +103,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted, onBeforeUnmount, computed } from 'vue';
 import { ElMessageBox } from 'element-plus';
 import UserLink from '../components/UserLink.vue';
 import EventLink from '../components/EventLink.vue';
@@ -68,13 +115,26 @@ const dialogVisible = ref(false);
 const expandedUid = ref('');
 const expandedNickname = ref('');
 const expandedMatches = ref([]);
+const windowWidth = ref(window.innerWidth);
+const isMobile = computed(() => windowWidth.value < 768);
+
+const updateWindowWidth = () => {
+  windowWidth.value = window.innerWidth;
+};
+
+onMounted(() => {
+  window.addEventListener('resize', updateWindowWidth);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', updateWindowWidth);
+});
 
 async function loadRows() {
   loading.value = true;
   try {
     const res = await getUserFolloweesList();
     rows.value = res.data?.followeesList || [];
-    // 存储到 localstorage
     const followees = rows.value.map((item) => item.fuid);
     localStorage.setItem('userFollowees', JSON.stringify(followees));
   } finally {
@@ -84,7 +144,6 @@ async function loadRows() {
 
 async function toggleMatches(row) {
   if (expandedUid.value === row.fuid) {
-    dialogVisible.value = false;
     expandedUid.value = '';
     expandedNickname.value = '';
     expandedMatches.value = [];
@@ -94,7 +153,6 @@ async function toggleMatches(row) {
   expandedUid.value = row.fuid;
   expandedNickname.value = row.nickname;
   expandedMatches.value = res.data?.enrolledMatchList || [];
-  dialogVisible.value = true;
 }
 
 async function cancelFollow(row) {
@@ -105,11 +163,9 @@ async function cancelFollow(row) {
   }
   await goCancelFolloweeByUid(row.fuid);
   rows.value = rows.value.filter((v) => v.fuid !== row.fuid);
-  // 更新 localstorage
   const followees = rows.value.map((item) => item.fuid);
   localStorage.setItem('userFollowees', JSON.stringify(followees));
   if (expandedUid.value === row.fuid) {
-    dialogVisible.value = false;
     expandedUid.value = '';
     expandedNickname.value = '';
     expandedMatches.value = [];
@@ -139,5 +195,95 @@ loadRows();
 
 .link-primary:hover {
   text-decoration: underline;
+}
+
+/* 手机端布局 */
+.following-mobile {
+  padding: 8px;
+}
+
+.following-header {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  padding: 0 4px;
+}
+
+.following-empty {
+  text-align: center;
+  color: #6b7280;
+  padding: 40px 0;
+}
+
+.following-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.following-item {
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.following-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  cursor: pointer;
+}
+
+.following-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.following-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.following-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.following-expand-hint {
+  font-size: 12px;
+  color: #409eff;
+  margin-top: 4px;
+}
+
+.following-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.following-actions .el-button {
+  width: 90px;
+}
+
+.following-expanded {
+  padding: 0 12px 12px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.following-expanded-title {
+  font-size: 13px;
+  color: #6b7280;
+  padding: 10px 0 8px;
+}
+
+.following-loading {
+  height: 100px;
 }
 </style>
