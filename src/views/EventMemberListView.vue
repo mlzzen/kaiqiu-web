@@ -1,33 +1,60 @@
 <template>
-  <div class="event-member-list" :class="{ 'mobile': isMobile }">
+  <div class="event-member-list" :class="{ mobile: isMobile }">
     <div class="page-header">
       <el-button text :icon="ArrowLeft" @click="goBack">返回</el-button>
       <span class="page-title">参赛名单</span>
       <el-button type="primary" :icon="Refresh" @click="loadData" circle title="刷新" />
     </div>
 
-    <el-table :data="members" stripe v-loading="loading" height="calc(100vh - 120px)" max-height="calc(100vh - 120px)" :class="{ 'compact': isMobile }">
+    <el-table
+      :data="members"
+      stripe
+      v-loading="loading"
+      height="calc(100vh - 120px)"
+      max-height="calc(100vh - 120px)"
+      :class="{ compact: isMobile }"
+    >
       <el-table-column prop="number" label="#" :width="isMobile ? 36 : 60" />
       <el-table-column label="名称" :min-width="isMobile ? 80 : 180">
         <template #default="scope">
           <UserLink
             :uid="scope.row.uid"
             :name="scope.row.username"
-            :sub-name="scope.row.realname" />
+            :sub-name="scope.row.realname"
+          />
         </template>
       </el-table-column>
-      <el-table-column prop="score" label="报名积分" :width="isMobile ? 72 : 120" sortable :sort-method="sortMemberScore" />
-      <el-table-column label="确认" :width="isMobile ? 64 : 120" :filters="paidFilters" :filter-method="filterMemberPaid"
-        column-key="paid">
+      <el-table-column
+        prop="score"
+        label="报名积分"
+        :width="isMobile ? 72 : 120"
+        sortable
+        :sort-method="sortMemberScore"
+      />
+      <el-table-column
+        label="确认"
+        :width="isMobile ? 64 : 120"
+        :filters="paidFilters"
+        :filter-method="filterMemberPaid"
+        column-key="paid"
+      >
         <template #default="scope">
-          <span v-if="scope.row.paid === 1" style="color: #67c23a; font-weight: bold">{{ paidMap[scope.row.paid]
-            }}</span>
-          <span v-else-if="scope.row.paid === 2" style="color: #409eff; font-weight: bold">{{ paidMap[scope.row.paid]
-            }}</span>
+          <span v-if="scope.row.paid === 1" style="color: #67c23a; font-weight: bold">{{
+            paidMap[scope.row.paid]
+          }}</span>
+          <span v-else-if="scope.row.paid === 2" style="color: #409eff; font-weight: bold">{{
+            paidMap[scope.row.paid]
+          }}</span>
           <span v-else>{{ paidMap[scope.row.paid] || scope.row.paid }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="性别" :width="isMobile ? 44 : 80" :filters="sexFilters" :filter-method="filterMemberSex" column-key="sex">
+      <el-table-column
+        label="性别"
+        :width="isMobile ? 44 : 80"
+        :filters="sexFilters"
+        :filter-method="filterMemberSex"
+        column-key="sex"
+      >
         <template #default="scope">{{ sexMap[scope.row.sex] || '-' }}</template>
       </el-table-column>
     </el-table>

@@ -9,7 +9,11 @@
         <template #default="scope">
           <template v-if="scope.row.members && scope.row.members.length">
             <span v-for="(member, mIdx) in scope.row.members" :key="member.uid">
-              <UserLink v-if="member.uid && member.uid !== '0'" :uid="member.uid" :name="member.name" />
+              <UserLink
+                v-if="member.uid && member.uid !== '0'"
+                :uid="member.uid"
+                :name="member.name"
+              />
               <span v-else>{{ member.name }}</span>
               <span v-if="mIdx < scope.row.members.length - 1"> / </span>
             </span>

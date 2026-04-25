@@ -9,31 +9,37 @@
           class="results-table"
           :cell-style="setResultCellStyle"
           :header-cell-style="setResultHeaderStyle"
-          size="small">
+          size="small"
+        >
           <el-table-column
             prop="newUsername"
             :label="`第${groupIndex + 1}组`"
             width="100"
             fixed="left"
-            align="center">
+            align="center"
+          >
             <template #default="scope">
               <UserLink :uid="scope.row.uid" :name="scope.row.newUsername" />
             </template>
           </el-table-column>
-          <el-table-column v-for="col in getResultColumns(group)" :key="col.key" :prop="col.key"
+          <el-table-column
+            v-for="col in getResultColumns(group)"
+            :key="col.key"
+            :prop="col.key"
             :label="col.label"
-            :width="col.width" align="center">
+            :width="col.width"
+            align="center"
+          >
             <template #default="scope">
               {{ scope.row.gameid }}
-              {{ scope.row[col.key] ?? '' }}</template>
+              {{ scope.row[col.key] ?? '' }}</template
+            >
           </el-table-column>
           <el-table-column prop="score" label="积分" width="60" align="center" />
           <el-table-column prop="process" label="计算" width="80" align="center">
             <template #default="scope">
               <div class="results-calc">
-                <span v-for="(step, idx) in scope.row.process || []" :key="idx">{{
-                  step
-                  }}</span>
+                <span v-for="(step, idx) in scope.row.process || []" :key="idx">{{ step }}</span>
               </div>
             </template>
           </el-table-column>
@@ -43,15 +49,14 @@
 
       <div v-if="group?.[0]?.detail_games?.length" class="results-detail">
         <div class="results-detail-toggle" @click="toggleGroupDetail(groupIndex)">
-          {{ isGroupDetailOpen(groupIndex) ? '隐藏' : '显示' }}第{{
-            groupIndex + 1
-          }}组详细成绩
+          {{ isGroupDetailOpen(groupIndex) ? '隐藏' : '显示' }}第{{ groupIndex + 1 }}组详细成绩
         </div>
         <template v-if="isGroupDetailOpen(groupIndex)">
           <div
             v-for="info in group[0].detail_games"
             :key="info.tgameid"
-            class="results-detail-round">
+            class="results-detail-round"
+          >
             <div class="results-detail-round-name">{{ info.roundname }}</div>
             <div class="results-detail-table-wrap">
               <el-table
@@ -60,13 +65,15 @@
                 class="results-detail-table"
                 :cell-style="setDetailCellStyle"
                 :header-cell-style="setResultHeaderStyle"
-                size="small">
+                size="small"
+              >
                 <el-table-column type="index" label="序号" width="50" align="center" />
                 <el-table-column prop="username1" label="选手1" width="140" align="center">
                   <template #default="scope">
                     <div
                       class="results-detail-name"
-                      :class="{ 'is-win': scope.row.result1 > scope.row.result2 }">
+                      :class="{ 'is-win': scope.row.result1 > scope.row.result2 }"
+                    >
                       {{ scope.row.username1 }}
                     </div>
                   </template>
@@ -75,7 +82,8 @@
                   <template #default="scope">
                     <div
                       class="results-detail-name"
-                      :class="{ 'is-win': scope.row.result2 > scope.row.result1 }">
+                      :class="{ 'is-win': scope.row.result2 > scope.row.result1 }"
+                    >
                       {{ scope.row.username2 }}
                     </div>
                   </template>
@@ -85,7 +93,8 @@
                     <span
                       v-if="scope.row.gameid"
                       class="score-link"
-                      @click="openMatch(scope.row.gameid)">
+                      @click="openMatch(scope.row.gameid)"
+                    >
                       {{ `${scope.row.result1}:${scope.row.result2}` }}
                     </span>
                     <span v-else>{{ `${scope.row.result1}:${scope.row.result2}` }}</span>
@@ -96,7 +105,8 @@
                     <el-icon
                       v-if="String(scope.row.flag) === '0' && scope.row.gameid"
                       class="detail-icon"
-                      @click="openMatch(scope.row.gameid)">
+                      @click="openMatch(scope.row.gameid)"
+                    >
                       <ArrowRight />
                     </el-icon>
                   </template>

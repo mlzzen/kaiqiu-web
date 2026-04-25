@@ -37,7 +37,7 @@
     </el-header>
 
     <!-- 主内容区 -->
-    <el-main class="main" :class="{ 'mobile': isMobile }">
+    <el-main class="main" :class="{ mobile: isMobile }">
       <router-view />
     </el-main>
 
@@ -51,7 +51,11 @@
         <span class="tab-icon">🔍</span>
         <span class="tab-label">搜索</span>
       </div>
-      <div class="tab-item" :class="{ active: activeTab === '/profile' }" @click="toPath('/profile')">
+      <div
+        class="tab-item"
+        :class="{ active: activeTab === '/profile' }"
+        @click="toPath('/profile')"
+      >
         <span class="tab-icon">👤</span>
         <span class="tab-label">我的</span>
       </div>
@@ -99,7 +103,12 @@ const activePath = computed(() => {
 const activeTab = computed(() => {
   if (route.path.startsWith('/home')) return '/home';
   if (route.path.startsWith('/search')) return '/search';
-  if (route.path.startsWith('/profile') || route.path.startsWith('/user') || route.path.startsWith('/following')) return '/profile';
+  if (
+    route.path.startsWith('/profile') ||
+    route.path.startsWith('/user') ||
+    route.path.startsWith('/following')
+  )
+    return '/profile';
   return '/home';
 });
 

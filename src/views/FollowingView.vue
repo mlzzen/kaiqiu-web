@@ -23,7 +23,9 @@
             <router-link :to="`/user/${row.fuid}`" @click.stop>
               <el-button size="small" type="primary" plain>进入主页</el-button>
             </router-link>
-            <el-button size="small" type="danger" plain @click.stop="cancelFollow(row)">不再关注</el-button>
+            <el-button size="small" type="danger" plain @click.stop="cancelFollow(row)"
+              >不再关注</el-button
+            >
           </div>
         </div>
         <div v-if="expandedUid === row.fuid" class="following-expanded">
@@ -62,15 +64,21 @@
       <el-table-column label="姓名" min-width="200">
         <template #default="scope">
           <UserLink
-                    :uid="scope.row.fuid"
-                    :name="scope.row.nickname"
-                    :sub-name="scope.row.realname" />
+            :uid="scope.row.fuid"
+            :name="scope.row.nickname"
+            :sub-name="scope.row.realname"
+          />
         </template>
       </el-table-column>
       <el-table-column label="操作" width="320">
         <template #default="scope">
           <UserLink :uid="scope.row.fuid" name="进入主页" />
-          <el-button link type="success" style="margin-left: 16px" @click="toggleMatches(scope.row)">
+          <el-button
+            link
+            type="success"
+            style="margin-left: 16px"
+            @click="toggleMatches(scope.row)"
+          >
             查看近期赛事
           </el-button>
           <el-button link type="danger" @click="cancelFollow(scope.row)">不再关注</el-button>
@@ -78,13 +86,22 @@
       </el-table-column>
     </el-table>
 
-    <el-dialog v-model="dialogVisible" :title="`${expandedNickname} - 近期报名赛事`" width="680px" destroy-on-close>
+    <el-dialog
+      v-model="dialogVisible"
+      :title="`${expandedNickname} - 近期报名赛事`"
+      width="680px"
+      destroy-on-close
+    >
       <el-empty v-if="!expandedMatches.length" description="暂无近期报名比赛" />
       <el-table v-else :data="expandedMatches" stripe>
         <el-table-column label="海报" width="80">
           <template #default="scope">
             <EventLink :event-id="scope.row.eventid">
-              <el-image :src="scope.row.poster" fit="cover" style="width:60px;height:60px;border-radius:4px;" />
+              <el-image
+                :src="scope.row.poster"
+                fit="cover"
+                style="width: 60px; height: 60px; border-radius: 4px"
+              />
             </EventLink>
           </template>
         </el-table-column>

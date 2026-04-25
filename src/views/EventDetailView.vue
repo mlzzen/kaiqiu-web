@@ -1,5 +1,5 @@
 <template>
-  <div class="event-detail" :class="{ 'mobile': isMobile }">
+  <div class="event-detail" :class="{ mobile: isMobile }">
     <EventDetailHeader
       :loading="loading"
       :detail="detail"
@@ -12,7 +12,7 @@
     />
 
     <el-card class="event-tabs-card">
-      <el-tabs v-model="activeTab" @tab-change="loadTabData" :class="{ 'mobile': isMobile }">
+      <el-tabs v-model="activeTab" @tab-change="loadTabData" :class="{ mobile: isMobile }">
         <el-tab-pane label="赛程" name="groups" />
         <el-tab-pane label="成绩" name="results" />
         <el-tab-pane label="名次" name="honors" />
@@ -38,17 +38,9 @@
         :current-item="currentItem"
       />
 
-      <HonorsTab
-        v-else-if="activeTab === 'honors'"
-        :loading="tabLoading"
-        :honor-rows="honorRows"
-      />
+      <HonorsTab v-else-if="activeTab === 'honors'" :loading="tabLoading" :honor-rows="honorRows" />
 
-      <ScoreTab
-        v-else
-        :loading="tabLoading"
-        :score-rows="scoreRows"
-      />
+      <ScoreTab v-else :loading="tabLoading" :score-rows="scoreRows" />
     </el-card>
 
     <EventInfoCard :detail-html="detailHtml" />
@@ -65,7 +57,14 @@
 <script setup>
 import { computed, ref, watch, onMounted, onBeforeUnmount } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { getAllHonors, getAllResult, getEventDetaiByIdAndLocation, getGroups, getMemberDetail, getScoreChangeByEventid } from '../api/event';
+import {
+  getAllHonors,
+  getAllResult,
+  getEventDetaiByIdAndLocation,
+  getGroups,
+  getMemberDetail,
+  getScoreChangeByEventid,
+} from '../api/event';
 import { useUserStore } from '../stores/user';
 import EventDetailHeader from '../components/event-detail/EventDetailHeader.vue';
 import ScheduleTab from '../components/event-detail/ScheduleTab.vue';
@@ -192,9 +191,7 @@ async function loadTabData() {
       }
       if (honorsRes.data) {
         resultHonors.value =
-          honorsRes.data[activeItemId.value] ||
-          honorsRes.data[String(activeItemId.value)] ||
-          [];
+          honorsRes.data[activeItemId.value] || honorsRes.data[String(activeItemId.value)] || [];
       }
       resultInit.value = true;
       return;
@@ -202,7 +199,8 @@ async function loadTabData() {
 
     if (activeTab.value === 'honors') {
       const res = await getAllHonors({ eventid: eventId.value });
-      honorRows.value = res.data?.[activeItemId.value] || res.data?.[String(activeItemId.value)] || [];
+      honorRows.value =
+        res.data?.[activeItemId.value] || res.data?.[String(activeItemId.value)] || [];
       return;
     }
 

@@ -2,17 +2,22 @@
   <div v-if="ttGames.length" class="results-tt">
     <div class="results-tt-title">淘汰赛对阵</div>
     <div class="results-tt-bracket">
-      <div v-for="(round, roundIndex) in resultTtRounds" :key="roundIndex" class="results-tt-column">
+      <div
+        v-for="(round, roundIndex) in resultTtRounds"
+        :key="roundIndex"
+        class="results-tt-column"
+      >
         <div class="results-tt-round-name">{{ round.roundname }}</div>
         <div class="results-tt-round-body">
-          <div v-for="(game, gameIndex) in round.games" :key="gameIndex" class="results-tt-game"
-            :style="getTtGameStyle(roundIndex, gameIndex, round.games.length)">
+          <div
+            v-for="(game, gameIndex) in round.games"
+            :key="gameIndex"
+            class="results-tt-game"
+            :style="getTtGameStyle(roundIndex, gameIndex, round.games.length)"
+          >
             <div class="results-tt-player" :class="{ winner: game.winner1 }">
               <span class="results-tt-name">{{ game.username1 }}</span>
-              <span
-                v-if="game.gameid"
-                class="results-tt-score"
-                @click="openMatch(game.gameid)">
+              <span v-if="game.gameid" class="results-tt-score" @click="openMatch(game.gameid)">
                 {{ game.result1 }}
               </span>
               <span v-else class="results-tt-score">{{ game.result1 }}</span>
@@ -20,10 +25,7 @@
             <div class="results-tt-divider"></div>
             <div class="results-tt-player" :class="{ winner: game.winner2 }">
               <span class="results-tt-name">{{ game.username2 }}</span>
-              <span
-                v-if="game.gameid"
-                class="results-tt-score"
-                @click="openMatch(game.gameid)">
+              <span v-if="game.gameid" class="results-tt-score" @click="openMatch(game.gameid)">
                 {{ game.result2 }}
               </span>
               <span v-else class="results-tt-score">{{ game.result2 }}</span>

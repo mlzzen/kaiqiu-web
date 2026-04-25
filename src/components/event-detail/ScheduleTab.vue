@@ -1,20 +1,26 @@
 <template>
-  <div class="schedule" v-loading="loading" :class="{ 'mobile': isMobile }">
+  <div class="schedule" v-loading="loading" :class="{ mobile: isMobile }">
     <div class="schedule-head">
       <div class="schedule-title">
         <span class="schedule-name">{{ currentItem?.name || '-' }}</span>
-        <span v-if="currentItem?.qualNum > 0" class="schedule-qual">(小组出线{{ currentItem.qualNum }}人)</span>
+        <span v-if="currentItem?.qualNum > 0" class="schedule-qual"
+          >(小组出线{{ currentItem.qualNum }}人)</span
+        >
       </div>
-      <el-button class="schedule-btn" type="success" plain :disabled="!groupSections.length" @click="$emit('goSetScore')" size="small">
+      <el-button
+        class="schedule-btn"
+        type="success"
+        plain
+        :disabled="!groupSections.length"
+        @click="$emit('goSetScore')"
+        size="small"
+      >
         {{ groupSections.length ? '录入成绩' : '设定中...' }}
       </el-button>
     </div>
 
     <template v-if="groupSections.length">
-      <div
-        v-for="(group, groupIndex) in groupSections"
-        :key="groupIndex"
-        class="schedule-group">
+      <div v-for="(group, groupIndex) in groupSections" :key="groupIndex" class="schedule-group">
         <div class="schedule-group-title">第{{ groupIndex + 1 }}台</div>
         <div class="schedule-table-wrap">
           <el-table
@@ -23,19 +29,27 @@
             class="schedule-table"
             :cell-style="setGroupCellStyle"
             :header-cell-style="setGroupHeaderStyle"
-            size="small">
+            size="small"
+          >
             <el-table-column
               prop="newUsername"
               :label="`第${groupIndex + 1}组`"
               width="100"
               fixed="left"
-              align="center">
+              align="center"
+            >
               <template #default="scope">
                 <UserLink :uid="scope.row.uid" :name="scope.row.newUsername" />
               </template>
             </el-table-column>
-            <el-table-column v-for="col in getGroupColumns(group)" :key="col.key" :prop="col.key" :label="col.label"
-              :width="col.width" align="center">
+            <el-table-column
+              v-for="col in getGroupColumns(group)"
+              :key="col.key"
+              :prop="col.key"
+              :label="col.label"
+              :width="col.width"
+              align="center"
+            >
               <template #default="scope">{{ scope.row[col.key] ?? '' }}</template>
             </el-table-column>
           </el-table>

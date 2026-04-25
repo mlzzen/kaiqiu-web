@@ -10,7 +10,9 @@
         <span class="card-date">{{ item.starttime || '-' }}</span>
         <span :class="['card-status', statusClass(item.status)]">{{ item.status || '-' }}</span>
       </div>
-      <div class="card-row card-location">{{ item.city || '' }}{{ item.arena_name ? ` ${item.arena_name}` : '' }}</div>
+      <div class="card-row card-location">
+        {{ item.city || '' }}{{ item.arena_name ? ` ${item.arena_name}` : '' }}
+      </div>
       <div class="card-row card-meta">
         <span>{{ formatDistance(item.juli) }}</span>
         <span>{{ `${item.viewnum || 0}人浏览` }}</span>
@@ -32,7 +34,11 @@ const props = defineProps({
 
 const router = useRouter();
 
-const defaultPoster = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="200" height="150" viewBox="0 0 200 150"><rect fill="#f0f0f0" width="200" height="150"/><text x="100" y="80" text-anchor="middle" fill="#ccc" font-size="14">暂无海报</text></svg>');
+const defaultPoster =
+  'data:image/svg+xml,' +
+  encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="150" viewBox="0 0 200 150"><rect fill="#f0f0f0" width="200" height="150"/><text x="100" y="80" text-anchor="middle" fill="#ccc" font-size="14">暂无海报</text></svg>',
+  );
 
 function getEventId(row) {
   return row?.eventid || row?.id || row?.match_id || null;
@@ -66,7 +72,7 @@ function statusClass(status) {
   background: #fff;
   border-radius: 10px;
   overflow: hidden;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
   cursor: pointer;
 }
 

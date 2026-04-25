@@ -115,7 +115,9 @@
           </el-table-column>
           <el-table-column label="比分" align="center" width="120">
             <template #default="{ row }">
-              <span class="score-link" @click.stop="openMatch(row.gameid)">{{ row.result1 }}:{{ row.result2 }}</span>
+              <span class="score-link" @click.stop="openMatch(row.gameid)"
+                >{{ row.result1 }}:{{ row.result2 }}</span
+              >
             </template>
           </el-table-column>
           <el-table-column prop="change_score1" label="变化" align="center" width="110" />
@@ -192,7 +194,7 @@ watch(
       loadData();
     }
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 const setHeaderStyle = () => {

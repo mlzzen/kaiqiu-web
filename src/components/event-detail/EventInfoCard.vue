@@ -1,5 +1,5 @@
 <template>
-  <el-card style="margin-top: 14px" class="event-info-card" :class="{ 'mobile': isMobile }">
+  <el-card style="margin-top: 14px" class="event-info-card" :class="{ mobile: isMobile }">
     <div class="section-title">比赛信息</div>
     <div class="html" v-html="detailHtml"></div>
   </el-card>

@@ -11,7 +11,11 @@
           <div class="results-honor-members">
             <template v-if="item.members && item.members.length">
               <span v-for="(member, mIdx) in item.members" :key="member.uid">
-                <UserLink v-if="member.uid && member.uid !== '0'" :uid="member.uid" :name="member.name" />
+                <UserLink
+                  v-if="member.uid && member.uid !== '0'"
+                  :uid="member.uid"
+                  :name="member.name"
+                />
                 <span v-else>{{ member.name }}</span>
                 <span v-if="mIdx < item.members.length - 1"> / </span>
               </span>

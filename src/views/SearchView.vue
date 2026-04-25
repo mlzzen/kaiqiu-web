@@ -102,27 +102,33 @@
       <el-table-column v-if="tab === 'arena'" label="城市" prop="city" width="120" />
       <el-table-column v-if="tab === 'arena'" label="地址" prop="location" min-width="320" />
 
-      <el-table-column v-if="tab === 'player'" label="昵称(username2)" min-width="220">
+      <el-table-column v-if="tab === 'player'" label="姓名" width="100">
         <template #default="scope">
           <UserLink
             :uid="scope.row.uid || scope.row.id"
-            :name="scope.row.username2 || scope.row.username || '-'"
+            :name="scope.row.username2 || '-'"
+            :subName="scope.row.realname || '-'"
           />
         </template>
       </el-table-column>
+      <el-table-column v-if="tab === 'player'" label="当前积分" prop="score" width="80" />
       <el-table-column
-        v-if="tab === 'player'"
-        label="省份(resideprovince)"
-        prop="resideprovince"
-        min-width="140"
+        v-if="tab === 'player' && !isMobile"
+        label="最高积分"
+        prop="maxscore"
+        width="110"
       />
-      <el-table-column v-if="tab === 'player'" label="生于(birthyear)" min-width="130">
+      <el-table-column v-if="tab === 'player'" label="性别" prop="sex" width="60"
+        ><template #default="{ row }">
+          {{ row.sex === '1' ? '男' : '女' }}
+        </template>
+      </el-table-column>
+      <el-table-column v-if="tab === 'player'" label="省份" prop="resideprovince" width="100" />
+      <el-table-column v-if="tab === 'player'" label="生于" width="130">
         <template #default="scope">
           {{ scope.row.birthyear ? `${scope.row.birthyear}年` : '-' }}
         </template>
       </el-table-column>
-      <el-table-column v-if="tab === 'player'" label="当前积分" prop="score" width="110" />
-      <el-table-column v-if="tab === 'player'" label="最高积分" prop="maxscore" width="110" />
     </el-table>
 
     <div class="pager">
@@ -250,7 +256,7 @@ function applyQuery() {
 }
 
 async function search(nextPage = 1, append = false) {
-  if (loading.value) {
+  if (loading.value || (tab.value === 'player' && keyword.value === '')) {
     return;
   }
   page.value = nextPage;
@@ -317,7 +323,10 @@ watch(tab, () => {
   page.value = 1;
   rows.value = [];
   hasMore.value = false;
-  if (tab.value === 'match' && (!effectiveDateRange.value || effectiveDateRange.value.length !== 2)) {
+  if (
+    tab.value === 'match' &&
+    (!effectiveDateRange.value || effectiveDateRange.value.length !== 2)
+  ) {
     dateRange.value = [today, today];
     dateStart.value = today;
     dateEnd.value = today;
@@ -353,7 +362,8 @@ function formatDateRange(row) {
   const start = row?.starttime || '-';
   const end = row?.endtime || '';
   return end ? `${start} 至 ${end}` : start;
-}</script>
+}
+</script>
 
 <style scoped>
 .filters {

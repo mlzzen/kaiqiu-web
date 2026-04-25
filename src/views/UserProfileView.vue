@@ -47,11 +47,19 @@
         <el-descriptions-item label="性别年龄">
           {{ profile.sex || '-' }}{{ profile.age ? ` ${profile.age}岁` : '' }}
         </el-descriptions-item>
-        <el-descriptions-item label="所在">{{ profile.resideprovince || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="所在">{{
+          profile.resideprovince || '-'
+        }}</el-descriptions-item>
         <el-descriptions-item label="专业背景">{{ profile.bg || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="底板型号">{{ `${profile.qiupai || ''} ${profile.qiupaitype || ''}`.trim() || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="正手套胶">{{ `${profile.zhengshou || ''} ${profile.zhengshoutype || ''}`.trim() || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="反手套胶">{{ `${profile.fanshou || ''} ${profile.fanshoutype || ''}`.trim() || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="底板型号">{{
+          `${profile.qiupai || ''} ${profile.qiupaitype || ''}`.trim() || '-'
+        }}</el-descriptions-item>
+        <el-descriptions-item label="正手套胶">{{
+          `${profile.zhengshou || ''} ${profile.zhengshoutype || ''}`.trim() || '-'
+        }}</el-descriptions-item>
+        <el-descriptions-item label="反手套胶">{{
+          `${profile.fanshou || ''} ${profile.fanshoutype || ''}`.trim() || '-'
+        }}</el-descriptions-item>
       </el-descriptions>
     </el-card>
 
@@ -68,7 +76,11 @@
       <template v-if="top3PlayerList.length">
         <div class="section-title">交手分数最高前三名</div>
         <div class="stat-list">
-          <div class="stat-item" v-for="(item, index) in top3PlayerList" :key="`top3-player-${index}`">
+          <div
+            class="stat-item"
+            v-for="(item, index) in top3PlayerList"
+            :key="`top3-player-${index}`"
+          >
             <UserLink :uid="item.uid" :name="item.name" />
           </div>
         </div>
@@ -76,7 +88,11 @@
       <template v-if="top3BeatManList.length">
         <div class="section-title">击败男子最高前三名</div>
         <div class="stat-list">
-          <div class="stat-item" v-for="(item, index) in top3BeatManList" :key="`top3-man-${index}`">
+          <div
+            class="stat-item"
+            v-for="(item, index) in top3BeatManList"
+            :key="`top3-man-${index}`"
+          >
             <UserLink :uid="item.uid" :name="item.name" />
           </div>
         </div>
@@ -84,7 +100,11 @@
       <template v-if="top3BeatWomanList.length">
         <div class="section-title">击败女子最高前三名</div>
         <div class="stat-list">
-          <div class="stat-item" v-for="(item, index) in top3BeatWomanList" :key="`top3-woman-${index}`">
+          <div
+            class="stat-item"
+            v-for="(item, index) in top3BeatWomanList"
+            :key="`top3-woman-${index}`"
+          >
             <UserLink :uid="item.uid" :name="item.name" />
           </div>
         </div>
@@ -110,19 +130,34 @@
       <template v-if="oftenPlayerList.length">
         <div class="section-title">经常交手</div>
         <div class="tag-list">
-          <el-tag v-for="(item, index) in oftenPlayerList" :key="`often-${index}`" effect="plain">{{ item }}</el-tag>
+          <el-tag v-for="(item, index) in oftenPlayerList" :key="`often-${index}`" effect="plain">{{
+            item
+          }}</el-tag>
         </div>
       </template>
       <template v-if="allCitiesList.length">
         <div class="section-title">曾参加比赛城市</div>
         <div class="tag-list">
-          <el-tag v-for="(city, index) in allCitiesList" :key="`city-${index}`" type="info" effect="plain">{{ city }}</el-tag>
+          <el-tag
+            v-for="(city, index) in allCitiesList"
+            :key="`city-${index}`"
+            type="info"
+            effect="plain"
+            >{{ city }}</el-tag
+          >
         </div>
       </template>
       <template v-if="showTags.length">
         <div class="section-title">收到最多评价</div>
         <div class="tag-list">
-          <el-tag v-for="tag in showTags" :key="`${tag.ename}-${tag.etype}`" :type="tag.selected == 1 ? 'success' : 'info'" effect="plain" class="tag-item">{{ tag.ename }} ({{ tag.count }})</el-tag>
+          <el-tag
+            v-for="tag in showTags"
+            :key="`${tag.ename}-${tag.etype}`"
+            :type="tag.selected == 1 ? 'success' : 'info'"
+            effect="plain"
+            class="tag-item"
+            >{{ tag.ename }} ({{ tag.count }})</el-tag
+          >
         </div>
       </template>
       <template v-if="profile.honors?.length">
@@ -143,7 +178,11 @@
         <el-table-column label="#" type="index" width="25" />
         <el-table-column label="日期" width="80">
           <template #default="scope">
-            <EventLink v-if="getEventId(scope.row)" :event-id="getEventId(scope.row)" :name="scope.row.dateline" />
+            <EventLink
+              v-if="getEventId(scope.row)"
+              :event-id="getEventId(scope.row)"
+              :name="scope.row.dateline"
+            />
             <span v-else>{{ scope.row.dateline }}</span>
           </template>
         </el-table-column>
@@ -159,21 +198,36 @@
         </el-table-column>
         <el-table-column label="比分" width="35">
           <template #default="scope">
-            <span :class="{ 'score-win': scope.row.result1 > scope.row.result2, 'score-lose': scope.row.result1 < scope.row.result2 }">
+            <span
+              :class="{
+                'score-win': scope.row.result1 > scope.row.result2,
+                'score-lose': scope.row.result1 < scope.row.result2,
+              }"
+            >
               {{ scope.row.result1 }}:{{ scope.row.result2 }}
             </span>
           </template>
         </el-table-column>
         <el-table-column label="变化" width="45">
           <template #default="scope">
-            <span :class="{ 'score-win': Number(scope.row.score1) > 0, 'score-lose': Number(scope.row.score1) < 0 }">{{ scope.row.score1 }}</span>
+            <span
+              :class="{
+                'score-win': Number(scope.row.score1) > 0,
+                'score-lose': Number(scope.row.score1) < 0,
+              }"
+              >{{ scope.row.score1 }}</span
+            >
           </template>
         </el-table-column>
       </el-table>
       <div class="pager">
-        <el-button :disabled="page <= 1 || gamesLoading" @click="prevPage" size="small">上一页</el-button>
+        <el-button :disabled="page <= 1 || gamesLoading" @click="prevPage" size="small"
+          >上一页</el-button
+        >
         <span class="page-text">第 {{ page }} 页</span>
-        <el-button :disabled="!hasNext || gamesLoading" @click="nextPage" size="small">下一页</el-button>
+        <el-button :disabled="!hasNext || gamesLoading" @click="nextPage" size="small"
+          >下一页</el-button
+        >
       </div>
     </el-card>
   </div>
@@ -217,7 +271,14 @@
           <template v-if="showTags.length">
             <div class="section-title">收到最多评价</div>
             <div class="tag-list">
-              <el-tag v-for="tag in showTags" :key="`${tag.ename}-${tag.etype}`" :type="tag.selected == 1 ? 'success' : 'info'" effect="plain" class="tag-item">{{ tag.ename }} ({{ tag.count }})</el-tag>
+              <el-tag
+                v-for="tag in showTags"
+                :key="`${tag.ename}-${tag.etype}`"
+                :type="tag.selected == 1 ? 'success' : 'info'"
+                effect="plain"
+                class="tag-item"
+                >{{ tag.ename }} ({{ tag.count }})</el-tag
+              >
             </div>
           </template>
 
@@ -226,11 +287,19 @@
             <el-descriptions-item label="性别年龄">
               {{ profile.sex || '-' }}{{ profile.age ? ` ${profile.age}岁` : '' }}
             </el-descriptions-item>
-            <el-descriptions-item label="所在">{{ profile.resideprovince || '-' }}</el-descriptions-item>
+            <el-descriptions-item label="所在">{{
+              profile.resideprovince || '-'
+            }}</el-descriptions-item>
             <el-descriptions-item label="专业背景">{{ profile.bg || '-' }}</el-descriptions-item>
-            <el-descriptions-item label="底板型号">{{ `${profile.qiupai || ''} ${profile.qiupaitype || ''}`.trim() || '-' }}</el-descriptions-item>
-            <el-descriptions-item label="正手套胶">{{ `${profile.zhengshou || ''} ${profile.zhengshoutype || ''}`.trim() || '-' }}</el-descriptions-item>
-            <el-descriptions-item label="反手套胶">{{ `${profile.fanshou || ''} ${profile.fanshoutype || ''}`.trim() || '-' }}</el-descriptions-item>
+            <el-descriptions-item label="底板型号">{{
+              `${profile.qiupai || ''} ${profile.qiupaitype || ''}`.trim() || '-'
+            }}</el-descriptions-item>
+            <el-descriptions-item label="正手套胶">{{
+              `${profile.zhengshou || ''} ${profile.zhengshoutype || ''}`.trim() || '-'
+            }}</el-descriptions-item>
+            <el-descriptions-item label="反手套胶">{{
+              `${profile.fanshou || ''} ${profile.fanshoutype || ''}`.trim() || '-'
+            }}</el-descriptions-item>
           </el-descriptions>
         </el-card>
       </div>
@@ -246,7 +315,11 @@
         <template v-if="top3BeatList.length">
           <div class="section-title">击败分数最高前三名</div>
           <div class="stat-list">
-            <div class="stat-item" v-for="(item, index) in top3BeatList" :key="`top3-beat-${index}`">
+            <div
+              class="stat-item"
+              v-for="(item, index) in top3BeatList"
+              :key="`top3-beat-${index}`"
+            >
               <UserLink :uid="item.uid" :name="item.name" />
             </div>
           </div>
@@ -255,7 +328,11 @@
         <template v-if="top3PlayerList.length">
           <div class="section-title">交手分数最高前三名</div>
           <div class="stat-list">
-            <div class="stat-item" v-for="(item, index) in top3PlayerList" :key="`top3-player-${index}`">
+            <div
+              class="stat-item"
+              v-for="(item, index) in top3PlayerList"
+              :key="`top3-player-${index}`"
+            >
               <UserLink :uid="item.uid" :name="item.name" />
             </div>
           </div>
@@ -264,7 +341,11 @@
         <template v-if="top3BeatManList.length">
           <div class="section-title">击败男子最高前三名</div>
           <div class="stat-list">
-            <div class="stat-item" v-for="(item, index) in top3BeatManList" :key="`top3-man-${index}`">
+            <div
+              class="stat-item"
+              v-for="(item, index) in top3BeatManList"
+              :key="`top3-man-${index}`"
+            >
               <UserLink :uid="item.uid" :name="item.name" />
             </div>
           </div>
@@ -273,7 +354,11 @@
         <template v-if="top3BeatWomanList.length">
           <div class="section-title">击败女子最高前三名</div>
           <div class="stat-list">
-            <div class="stat-item" v-for="(item, index) in top3BeatWomanList" :key="`top3-woman-${index}`">
+            <div
+              class="stat-item"
+              v-for="(item, index) in top3BeatWomanList"
+              :key="`top3-woman-${index}`"
+            >
               <UserLink :uid="item.uid" :name="item.name" />
             </div>
           </div>
@@ -302,14 +387,25 @@
         <template v-if="oftenPlayerList.length">
           <div class="section-title">经常交手</div>
           <div class="tag-list">
-            <el-tag v-for="(item, index) in oftenPlayerList" :key="`often-${index}`" effect="plain">{{ item }}</el-tag>
+            <el-tag
+              v-for="(item, index) in oftenPlayerList"
+              :key="`often-${index}`"
+              effect="plain"
+              >{{ item }}</el-tag
+            >
           </div>
         </template>
 
         <template v-if="allCitiesList.length">
           <div class="section-title">曾参加比赛城市</div>
           <div class="tag-list">
-            <el-tag v-for="(city, index) in allCitiesList" :key="`city-${index}`" type="info" effect="plain">{{ city }}</el-tag>
+            <el-tag
+              v-for="(city, index) in allCitiesList"
+              :key="`city-${index}`"
+              type="info"
+              effect="plain"
+              >{{ city }}</el-tag
+            >
           </div>
         </template>
 
@@ -328,7 +424,11 @@
           <el-table-column label="#" type="index" width="40" />
           <el-table-column label="日期" width="130">
             <template #default="scope">
-              <EventLink v-if="getEventId(scope.row)" :event-id="getEventId(scope.row)" :name="scope.row.dateline" />
+              <EventLink
+                v-if="getEventId(scope.row)"
+                :event-id="getEventId(scope.row)"
+                :name="scope.row.dateline"
+              />
               <span v-else>{{ scope.row.dateline }}</span>
             </template>
           </el-table-column>
@@ -360,17 +460,37 @@
           </el-table-column>
           <el-table-column label="比分" width="50">
             <template #default="scope">
-              <span v-if="scope.row.gameid && scope.row.flag === '0'" class="score-link" @click="openMatch(scope.row.gameid)" :class="{ 'score-win': scope.row.result1 > scope.row.result2, 'score-lose': scope.row.result1 < scope.row.result2 }">
+              <span
+                v-if="scope.row.gameid && scope.row.flag === '0'"
+                class="score-link"
+                @click="openMatch(scope.row.gameid)"
+                :class="{
+                  'score-win': scope.row.result1 > scope.row.result2,
+                  'score-lose': scope.row.result1 < scope.row.result2,
+                }"
+              >
                 {{ scope.row.result1 }}:{{ scope.row.result2 }}
               </span>
-              <span v-else :class="{ 'score-win': scope.row.result1 > scope.row.result2, 'score-lose': scope.row.result1 < scope.row.result2 }">
+              <span
+                v-else
+                :class="{
+                  'score-win': scope.row.result1 > scope.row.result2,
+                  'score-lose': scope.row.result1 < scope.row.result2,
+                }"
+              >
                 {{ scope.row.result1 }}:{{ scope.row.result2 }}
               </span>
             </template>
           </el-table-column>
           <el-table-column label="变化" min-width="80">
             <template #default="scope">
-              <span :class="{ 'score-win': Number(scope.row.score1) > 0, 'score-lose': Number(scope.row.score1) < 0 }">{{ scope.row.score1 }}</span>
+              <span
+                :class="{
+                  'score-win': Number(scope.row.score1) > 0,
+                  'score-lose': Number(scope.row.score1) < 0,
+                }"
+                >{{ scope.row.score1 }}</span
+              >
             </template>
           </el-table-column>
         </el-table>
@@ -584,11 +704,15 @@ watch(windowWidth, () => {
   resizeCharts();
 });
 
-watch(scoreTrend, () => {
-  nextTick(() => {
-    initCharts();
-  });
-}, { deep: true });
+watch(
+  scoreTrend,
+  () => {
+    nextTick(() => {
+      initCharts();
+    });
+  },
+  { deep: true },
+);
 
 watch(isMobile, () => {
   nextTick(() => {

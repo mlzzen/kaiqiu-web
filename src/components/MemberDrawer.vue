@@ -1,5 +1,9 @@
 <template>
-  <el-drawer :model-value="visible" size="72%" @update:model-value="$emit('update:visible', $event)">
+  <el-drawer
+    :model-value="visible"
+    size="72%"
+    @update:model-value="$emit('update:visible', $event)"
+  >
     <template #header>
       <div class="drawer-header">
         <span>参赛名单</span>
@@ -13,21 +17,41 @@
           <UserLink
             :uid="scope.row.uid"
             :name="scope.row.username"
-            :sub-name="scope.row.realname" />
+            :sub-name="scope.row.realname"
+          />
         </template>
       </el-table-column>
-      <el-table-column prop="score" label="报名积分" width="120" sortable :sort-method="sortMemberScore" />
-      <el-table-column label="确认" width="120" :filters="paidFilters" :filter-method="filterMemberPaid"
-        column-key="paid">
+      <el-table-column
+        prop="score"
+        label="报名积分"
+        width="120"
+        sortable
+        :sort-method="sortMemberScore"
+      />
+      <el-table-column
+        label="确认"
+        width="120"
+        :filters="paidFilters"
+        :filter-method="filterMemberPaid"
+        column-key="paid"
+      >
         <template #default="scope">
-          <span v-if="scope.row.paid === 1" style="color: #67c23a; font-weight: bold">{{ paidMap[scope.row.paid]
-            }}</span>
-          <span v-else-if="scope.row.paid === 2" style="color: #409eff; font-weight: bold">{{ paidMap[scope.row.paid]
-            }}</span>
+          <span v-if="scope.row.paid === 1" style="color: #67c23a; font-weight: bold">{{
+            paidMap[scope.row.paid]
+          }}</span>
+          <span v-else-if="scope.row.paid === 2" style="color: #409eff; font-weight: bold">{{
+            paidMap[scope.row.paid]
+          }}</span>
           <span v-else>{{ paidMap[scope.row.paid] || scope.row.paid }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="性别" width="80" :filters="sexFilters" :filter-method="filterMemberSex" column-key="sex">
+      <el-table-column
+        label="性别"
+        width="80"
+        :filters="sexFilters"
+        :filter-method="filterMemberSex"
+        column-key="sex"
+      >
         <template #default="scope">{{ sexMap[scope.row.sex] || '-' }}</template>
       </el-table-column>
     </el-table>

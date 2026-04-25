@@ -4,10 +4,7 @@
       {{ showTtDetail ? '隐藏' : '显示' }}淘汰赛详细成绩
     </div>
     <template v-if="showTtDetail">
-      <div
-        v-for="info in ttDetailGames"
-        :key="info.tgameid"
-        class="results-detail-round">
+      <div v-for="info in ttDetailGames" :key="info.tgameid" class="results-detail-round">
         <div class="results-detail-round-name">{{ info.roundname }}</div>
         <div class="results-detail-table-wrap">
           <el-table
@@ -17,13 +14,15 @@
             class="results-detail-table"
             :cell-style="setDetailCellStyle"
             :header-cell-style="setResultHeaderStyle"
-            size="small">
+            size="small"
+          >
             <el-table-column type="index" label="序号" width="50" align="center" />
             <el-table-column prop="username1" label="选手1" width="120" align="center">
               <template #default="scope">
                 <div
                   class="results-detail-name"
-                  :class="{ 'is-win': scope.row.result1 > scope.row.result2 }">
+                  :class="{ 'is-win': scope.row.result1 > scope.row.result2 }"
+                >
                   {{ scope.row.username1 }}
                 </div>
               </template>
@@ -32,7 +31,8 @@
               <template #default="scope">
                 <div
                   class="results-detail-name"
-                  :class="{ 'is-win': scope.row.result2 > scope.row.result1 }">
+                  :class="{ 'is-win': scope.row.result2 > scope.row.result1 }"
+                >
                   {{ scope.row.username2 }}
                 </div>
               </template>
@@ -42,7 +42,8 @@
                 <span
                   v-if="scope.row.gameid"
                   class="score-link"
-                  @click="openMatch(scope.row.gameid)">
+                  @click="openMatch(scope.row.gameid)"
+                >
                   {{ `${scope.row.result1}:${scope.row.result2}` }}
                 </span>
                 <span v-else>{{ `${scope.row.result1}:${scope.row.result2}` }}</span>
@@ -53,7 +54,8 @@
                 <el-icon
                   v-if="String(scope.row.flag) === '0' && scope.row.gameid"
                   class="detail-icon"
-                  @click="openMatch(scope.row.gameid)">
+                  @click="openMatch(scope.row.gameid)"
+                >
                   <ArrowRight />
                 </el-icon>
               </template>

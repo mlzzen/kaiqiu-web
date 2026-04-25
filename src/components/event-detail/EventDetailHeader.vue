@@ -1,5 +1,5 @@
 <template>
-  <el-card v-loading="loading" class="event-header" :class="{ 'mobile': isMobile }">
+  <el-card v-loading="loading" class="event-header" :class="{ mobile: isMobile }">
     <template #header>
       <div class="head">
         <div class="title-row">
@@ -11,26 +11,35 @@
               placeholder="选择比赛分项"
               :style="isMobile ? 'width: 140px' : 'width: 300px'"
               size="small"
-              v-if="isMobile">
+              v-if="isMobile"
+            >
               <el-option
                 v-for="item in subEventList"
                 :key="item.id"
                 :label="item.name"
-                :value="item.id" />
+                :value="item.id"
+              />
             </el-select>
             <el-select
               v-if="!isMobile"
               :model-value="activeItemId"
               @update:model-value="$emit('update:activeItemId', $event)"
               placeholder="选择比赛分项"
-              style="width: 300px">
+              style="width: 300px"
+            >
               <el-option
                 v-for="item in subEventList"
                 :key="item.id"
                 :label="item.name"
-                :value="item.id" />
+                :value="item.id"
+              />
             </el-select>
-            <el-button type="success" :disabled="!activeItemId" :size="isMobile ? 'small' : ''" @click="$emit('openMembers')">
+            <el-button
+              type="success"
+              :disabled="!activeItemId"
+              :size="isMobile ? 'small' : ''"
+              @click="$emit('openMembers')"
+            >
               参赛名单
             </el-button>
           </div>
@@ -42,31 +51,33 @@
     <el-descriptions :column="isMobile ? 1 : 2" border :size="isMobile ? 'small' : 'default'">
       <el-descriptions-item label="联系人">{{ detail.contact || '-' }}</el-descriptions-item>
       <el-descriptions-item label="电话">{{ detail.mobile || '-' }}</el-descriptions-item>
-      <el-descriptions-item label="比赛时间">{{ detail.starttime || '-' }} 至 {{ detail.endtime || '-'
-        }}</el-descriptions-item>
+      <el-descriptions-item label="比赛时间"
+        >{{ detail.starttime || '-' }} 至 {{ detail.endtime || '-' }}</el-descriptions-item
+      >
       <el-descriptions-item label="比赛球馆">{{ detail.arena_name || '-' }}</el-descriptions-item>
       <el-descriptions-item label="比赛地点" :span="isMobile ? 1 : 2">{{
         detail.location || '-'
-        }}</el-descriptions-item>
+      }}</el-descriptions-item>
     </el-descriptions>
 
     <div v-if="currentItem" class="item-info">
       <el-descriptions :column="isMobile ? 1 : 3" border :size="isMobile ? 'small' : 'default'">
-        <el-descriptions-item label="项目名称">{{
-          currentItem.name || '-'
-          }}</el-descriptions-item>
-        <el-descriptions-item label="报名人数">{{ currentItem.curr_count || 0 }}/{{ allCount }}</el-descriptions-item>
+        <el-descriptions-item label="项目名称">{{ currentItem.name || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="报名人数"
+          >{{ currentItem.curr_count || 0 }}/{{ allCount }}</el-descriptions-item
+        >
         <el-descriptions-item label="比赛类型">{{
           currentItem.match_type || '-'
-          }}</el-descriptions-item>
+        }}</el-descriptions-item>
         <el-descriptions-item label="报名限制">{{
           currentItem.condition || '-'
-          }}</el-descriptions-item>
-        <el-descriptions-item label="报名费">{{ currentItem.cost || 0 }} 元 {{ currentItem.postfee || ''
-          }}</el-descriptions-item>
+        }}</el-descriptions-item>
+        <el-descriptions-item label="报名费"
+          >{{ currentItem.cost || 0 }} 元 {{ currentItem.postfee || '' }}</el-descriptions-item
+        >
         <el-descriptions-item label="报名状态">{{
           currentItem.is_enter ? '已报名' : '未报名'
-          }}</el-descriptions-item>
+        }}</el-descriptions-item>
       </el-descriptions>
     </div>
   </el-card>
