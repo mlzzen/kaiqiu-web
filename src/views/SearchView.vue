@@ -96,6 +96,20 @@
       </div>
     </template>
 
+    <!-- 积分 tab：搜索历史 -->
+    <div v-if="tab === 'player' && searchHistory.length" class="search-history">
+      <el-tag
+        v-for="kw in searchHistory"
+        :key="kw"
+        closable
+        @click="applyHistory(kw)"
+        @close.stop="removeHistory(kw)"
+      >
+        {{ kw }}
+      </el-tag>
+      <el-button link type="primary" size="small" @click="clearHistory">全部清除</el-button>
+    </div>
+
     <!-- 球馆/积分 tab：表格 -->
     <el-table v-if="tab !== 'match'" :data="rows" stripe v-loading="loading">
       <el-table-column v-if="tab === 'arena'" label="球馆名称" prop="name" min-width="220" />
@@ -151,6 +165,21 @@ import { getUserListPageByKey } from '../api/user';
 import { useUserStore } from '../stores/user';
 import { toList } from '../utils/format';
 
+const HISTORY_KEY = 'search_history_player';
+
+function loadHistory() {
+  try {
+    const raw = localStorage.getItem(HISTORY_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveHistory(list) {
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(list));
+}
+
 const userStore = useUserStore();
 const router = useRouter();
 const route = useRoute();
@@ -163,6 +192,7 @@ const distance = ref('');
 const bootstrapped = ref(false);
 const hasMore = ref(false);
 const PAGE_SIZE = 10;
+const searchHistory = ref(loadHistory());
 const windowWidth = ref(window.innerWidth);
 const isMobile = computed(() => windowWidth.value < 768);
 
@@ -300,6 +330,7 @@ async function search(nextPage = 1, append = false) {
         city: '-1',
         sort: 2,
       });
+      pushHistory(keyword.value);
     }
     const incoming = toList(res.data);
     rows.value = append ? rows.value.concat(incoming) : incoming;
@@ -340,6 +371,30 @@ async function loadCities() {
   if (rows.length) {
     cityOptions.value = rows;
   }
+}
+
+function pushHistory(kw) {
+  if (!kw) return;
+  const list = searchHistory.value.filter((item) => item !== kw);
+  list.unshift(kw);
+  searchHistory.value = list;
+  saveHistory(list);
+}
+
+function removeHistory(kw) {
+  const list = searchHistory.value.filter((item) => item !== kw);
+  searchHistory.value = list;
+  saveHistory(list);
+}
+
+function clearHistory() {
+  searchHistory.value = [];
+  saveHistory([]);
+}
+
+function applyHistory(kw) {
+  keyword.value = kw;
+  search(1);
 }
 
 applyQuery();
@@ -404,6 +459,14 @@ function formatDateRange(row) {
 .date-separator {
   color: #909399;
   font-size: 13px;
+}
+
+.search-history {
+  margin: -6px 0 14px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
 }
 
 /* 手机端比赛卡片列表 */
