@@ -46,7 +46,7 @@
     <EventInfoCard :detail-html="detailHtml" />
 
     <MemberDrawer
-      v-model="memberVisible"
+      v-model:visible="memberVisible"
       :members="memberRows"
       :loading="memberLoading"
       @refresh="loadMemberDetail"
@@ -113,6 +113,7 @@ const scoreRows = ref([]);
 
 const memberVisible = ref(false);
 const memberRows = ref([]);
+const loadedMemberKey = ref('');
 
 const eventId = computed(() => route.params.id);
 const currentItem = computed(
@@ -224,6 +225,10 @@ function openMembers() {
     router.push(`/event-members/${detail.value.eventid}/${activeItemId.value}`);
   } else {
     memberVisible.value = true;
+    const memberKey = `${detail.value.eventid || ''}:${activeItemId.value || ''}`;
+    if (loadedMemberKey.value !== memberKey) {
+      loadMemberDetail();
+    }
   }
 }
 
@@ -235,6 +240,7 @@ async function loadMemberDetail() {
   try {
     const res = await getMemberDetail({ match_id: detail.value.eventid, id: currentItem.value.id });
     memberRows.value = res.data?.list || [];
+    loadedMemberKey.value = `${detail.value.eventid}:${currentItem.value.id}`;
   } finally {
     memberLoading.value = false;
   }
@@ -252,16 +258,19 @@ watch(
     resultTtDetailGames.value = [];
     resultInit.value = false;
     memberRows.value = [];
+    loadedMemberKey.value = '';
     await loadDetail();
-    await loadTabData();
-    await loadMemberDetail();
   },
   { immediate: true },
 );
 
 watch(activeItemId, () => {
   loadTabData();
-  loadMemberDetail();
+  memberRows.value = [];
+  loadedMemberKey.value = '';
+  if (memberVisible.value) {
+    loadMemberDetail();
+  }
 });
 </script>
 
