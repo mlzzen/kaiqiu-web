@@ -36,6 +36,7 @@
         :result-tt-detail-games="resultTtDetailGames"
         :result-init="resultInit"
         :current-item="currentItem"
+        :event-id="eventId"
       />
 
       <HonorsTab v-else-if="activeTab === 'honors'" :loading="tabLoading" :honor-rows="honorRows" />

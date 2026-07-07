@@ -31,3 +31,8 @@ export function updateScore(params) {
 export function updateTtScore(params) {
   return get('/Match/update_tt_score', params);
 }
+
+// 通过 uid 反查 gameid（淘汰赛用）
+export function getGameidByUIDAndMatchItem(params) {
+  return get('/Match/getGameidByUIDAndMatchItem', params);
+}
