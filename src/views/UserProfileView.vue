@@ -587,6 +587,12 @@ function buildChartOption(data) {
   const yMin = Math.max(0, minScore - padding);
   const yMax = maxScore + padding;
 
+  // 找出需要标注标签的数据点索引（最高、最低、最后一个）
+  const labelIdxSet = new Set();
+  labelIdxSet.add(scores.indexOf(maxScore)); // 第一个最高点
+  labelIdxSet.add(scores.indexOf(minScore)); // 第一个最低点
+  labelIdxSet.add(scores.length - 1);        // 最后一个点
+
   return {
     tooltip: {
       trigger: 'item',
@@ -636,7 +642,21 @@ function buildChartOption(data) {
     },
     series: [
       {
-        data: scores,
+        data: scores.map((s, idx) =>
+          labelIdxSet.has(idx)
+            ? {
+                value: s,
+                label: {
+                  show: true,
+                  formatter: String(s),
+                  position: 'top',
+                  fontSize: isMobile.value ? 10 : 12,
+                  color: '#333',
+                  fontWeight: 'bold',
+                },
+              }
+            : s,
+        ),
         type: 'line',
         smooth: false,
         symbol: 'circle',
@@ -883,7 +903,7 @@ function splitValue(raw, delimiter = ',') {
 }
 
 function parseTopList(uids, names) {
-  const uidList = splitValue(uids).reverse();
+  const uidList = splitValue(uids);
   const nameList = splitValue(names);
   return nameList
     .map((name, index) => ({
