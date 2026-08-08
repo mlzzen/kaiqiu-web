@@ -39,22 +39,15 @@
             </el-table-column>
             <el-table-column label="比分" width="80" align="center">
               <template #default="scope">
-                <span
-                  v-if="scope.row.gameid"
-                  class="score-link"
-                  @click="openMatch(scope.row.gameid)"
-                >
-                  {{ `${scope.row.result1}:${scope.row.result2}` }}
-                </span>
-                <span v-else>{{ `${scope.row.result1}:${scope.row.result2}` }}</span>
+                <span>{{ `${scope.row.result1}:${scope.row.result2}` }}</span>
               </template>
             </el-table-column>
             <el-table-column label="详情" width="60" align="center">
               <template #default="scope">
                 <el-icon
-                  v-if="String(scope.row.flag) === '0' && scope.row.gameid"
+                  v-if="String(scope.row.flag) === '0'"
                   class="detail-icon"
-                  @click="openMatch(scope.row.gameid)"
+                  @click="openKnockoutDetail(scope.row)"
                 >
                   <ArrowRight />
                 </el-icon>
@@ -76,22 +69,52 @@
 <script setup>
 import { ref } from 'vue';
 import { ArrowRight } from '@element-plus/icons-vue';
+import { getGameidByUIDAndMatchItem } from '@/api/match';
 import MatchDetailDialog from '../MatchDetailDialog.vue';
 
-defineProps({
+const props = defineProps({
   ttDetailGames: {
     type: Array,
     default: () => [],
+  },
+  eventId: {
+    type: [String, Number],
+    default: '',
+  },
+  itemId: {
+    type: [String, Number],
+    default: '',
   },
 });
 
 const showTtDetail = ref(false);
 const dialogVisible = ref(false);
 const currentGameid = ref('');
+const resolving = ref(false);
 
 const openMatch = (gameid) => {
   currentGameid.value = gameid;
   dialogVisible.value = true;
+};
+
+const openKnockoutDetail = async (game) => {
+  if (!props.eventId || !props.itemId || !game.uid1 || !game.uid2) return;
+  if (resolving.value) return;
+  resolving.value = true;
+  try {
+    const res = await getGameidByUIDAndMatchItem({
+      eventid: props.eventId,
+      itemid: props.itemId,
+      uid1: game.uid1,
+      uid2: game.uid2,
+    });
+    const gameid = res.data?.gameid;
+    if (gameid) {
+      openMatch(gameid);
+    }
+  } finally {
+    resolving.value = false;
+  }
 };
 
 function setResultHeaderStyle() {

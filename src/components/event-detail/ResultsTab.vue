@@ -3,7 +3,11 @@
     <HonorsList :honors="resultHonors" />
     <GroupResults :groups="resultGroups" :current-item="currentItem" />
     <TtBracket :tt-games="resultTtGames" />
-    <TtDetail :tt-detail-games="resultTtDetailGames" />
+    <TtDetail
+      :tt-detail-games="resultTtDetailGames"
+      :event-id="eventId"
+      :item-id="currentItem?.id"
+    />
     <div v-if="!resultGroups.length && resultInit" class="results-empty">暂无成绩信息</div>
   </div>
 </template>
@@ -42,6 +46,10 @@ defineProps({
   currentItem: {
     type: Object,
     default: null,
+  },
+  eventId: {
+    type: [String, Number],
+    default: '',
   },
 });
 </script>

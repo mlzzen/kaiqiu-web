@@ -1,345 +1,487 @@
 <template>
-  <el-card>
-    <el-tabs v-model="tab">
-      <el-tab-pane label="比赛" name="match" />
-      <el-tab-pane label="球馆" name="arena" />
-      <el-tab-pane label="积分" name="player" />
-    </el-tabs>
+    <el-card>
+        <el-tabs v-model="tab">
+            <el-tab-pane label="比赛" name="match" />
+            <el-tab-pane label="球馆" name="arena" />
+            <el-tab-pane label="积分" name="player" />
+        </el-tabs>
 
-    <div class="filters">
-      <el-input
-        v-model="keyword"
-        :placeholder="placeholder"
-        clearable
-        style="max-width: 320px"
-        @keyup.enter="search(1)"
-      />
-      <template v-if="tab === 'match'">
-        <!-- 手机端使用原生日期输入 -->
-        <template v-if="isMobile">
-          <div class="date-inputs">
+        <div class="filters">
             <el-input
-              v-model="dateStart"
-              type="date"
-              value-format="YYYY-MM-DD"
-              placeholder="开始日期"
-              style="width: 140px"
+                v-if="tab !== 'player'"
+                v-model="keyword"
+                :placeholder="placeholder"
+                clearable
+                style="max-width: 320px"
+                @keyup.enter="search(1)"
             />
-            <span class="date-separator">至</span>
-            <el-input
-              v-model="dateEnd"
-              type="date"
-              value-format="YYYY-MM-DD"
-              placeholder="结束日期"
-              style="width: 140px"
+            <el-autocomplete
+                v-else
+                v-model="keyword"
+                :fetch-suggestions="querySearch"
+                placeholder="请输入用户昵称"
+                clearable
+                style="max-width: 320px"
+                @keyup.enter="search(1)"
+                @select="search(1)"
             />
-          </div>
+            <template v-if="tab === 'match'">
+                <!-- 手机端使用原生日期输入 -->
+                <template v-if="isMobile">
+                    <div class="date-inputs">
+                        <el-input
+                            v-model="dateStart"
+                            type="date"
+                            value-format="YYYY-MM-DD"
+                            placeholder="开始日期"
+                            style="width: 140px"
+                        />
+                        <span class="date-separator">至</span>
+                        <el-input
+                            v-model="dateEnd"
+                            type="date"
+                            value-format="YYYY-MM-DD"
+                            placeholder="结束日期"
+                            style="width: 140px"
+                        />
+                    </div>
+                </template>
+                <!-- 桌面端使用日期范围选择器 -->
+                <el-date-picker
+                    v-else
+                    v-model="dateRange"
+                    type="daterange"
+                    range-separator="至"
+                    start-placeholder="开始日期"
+                    end-placeholder="结束日期"
+                    value-format="YYYY-MM-DD"
+                    style="width: 280px"
+                />
+                <el-select
+                    v-model="matchCity"
+                    filterable
+                    clearable
+                    placeholder="举办城市"
+                    style="width: 160px"
+                >
+                    <el-option
+                        v-for="item in cityOptions"
+                        :key="item.id"
+                        :label="item.name"
+                        :value="item.name"
+                    />
+                </el-select>
+                <el-select v-model="distance" style="width: 140px">
+                    <el-option label="全部距离" value="" />
+                    <el-option label="20公里内" value="lt20" />
+                    <el-option label="50公里内" value="lt50" />
+                    <el-option label="100公里内" value="lt100" />
+                </el-select>
+                <el-select
+                    v-model="matchTags"
+                    multiple
+                    collapse-tags
+                    collapse-tags-tooltip
+                    placeholder="赛事标签"
+                    style="width: 220px"
+                >
+                    <el-option
+                        v-for="item in tagOptions"
+                        :key="item"
+                        :label="item"
+                        :value="item"
+                    />
+                </el-select>
+            </template>
+            <el-button type="success" @click="search(1)">搜索</el-button>
+        </div>
+
+        <!-- 比赛 tab -->
+        <template v-if="tab === 'match'">
+            <!-- 手机端：MobileEventCard 卡片列表 -->
+            <div v-if="isMobile" class="match-card-list" v-loading="loading">
+                <MobileEventCard
+                    v-for="(item, index) in rows"
+                    :key="index"
+                    :item="item"
+                />
+            </div>
+            <!-- 桌面端：EventCard 网格 -->
+            <div v-else class="match-grid-wrap" v-loading="loading">
+                <el-row :gutter="16">
+                    <el-col
+                        v-for="(item, index) in rows"
+                        :key="index"
+                        :sm="12"
+                        :md="8"
+                        :lg="6"
+                    >
+                        <EventCard :item="item" />
+                    </el-col>
+                </el-row>
+            </div>
         </template>
-        <!-- 桌面端使用日期范围选择器 -->
-        <el-date-picker
-          v-else
-          v-model="dateRange"
-          type="daterange"
-          range-separator="至"
-          start-placeholder="开始日期"
-          end-placeholder="结束日期"
-          value-format="YYYY-MM-DD"
-          style="width: 280px"
-        />
-        <el-select
-          v-model="matchCity"
-          filterable
-          clearable
-          placeholder="举办城市"
-          style="width: 160px"
+
+        <!-- 积分 tab：搜索历史 -->
+        <div
+            v-if="tab === 'player' && searchHistory.length"
+            class="search-history"
         >
-          <el-option
-            v-for="item in cityOptions"
-            :key="item.id"
-            :label="item.name"
-            :value="item.name"
-          />
-        </el-select>
-        <el-select v-model="distance" style="width: 140px">
-          <el-option label="全部距离" value="" />
-          <el-option label="20公里内" value="lt20" />
-          <el-option label="50公里内" value="lt50" />
-          <el-option label="100公里内" value="lt100" />
-        </el-select>
-        <el-select
-          v-model="matchTags"
-          multiple
-          collapse-tags
-          collapse-tags-tooltip
-          placeholder="赛事标签"
-          style="width: 220px"
+            <el-tag
+                v-for="kw in searchHistory"
+                :key="kw"
+                closable
+                @click="applyHistory(kw)"
+                @close.stop="removeHistory(kw)"
+            >
+                {{ kw }}
+            </el-tag>
+            <el-button link type="primary" size="small" @click="clearHistory"
+                >全部清除</el-button
+            >
+        </div>
+
+        <!-- 球馆/积分 tab：表格 -->
+        <el-table
+            v-if="tab !== 'match'"
+            :data="rows"
+            stripe
+            v-loading="loading"
         >
-          <el-option v-for="item in tagOptions" :key="item" :label="item" :value="item" />
-        </el-select>
-      </template>
-      <el-button type="success" @click="search(1)">搜索</el-button>
-    </div>
+            <el-table-column
+                v-if="tab === 'arena'"
+                label="球馆名称"
+                prop="name"
+                min-width="220"
+            />
+            <el-table-column
+                v-if="tab === 'arena'"
+                label="城市"
+                prop="city"
+                width="120"
+            />
+            <el-table-column
+                v-if="tab === 'arena'"
+                label="地址"
+                prop="location"
+                min-width="320"
+            />
 
-    <!-- 比赛 tab -->
-    <template v-if="tab === 'match'">
-      <!-- 手机端：MobileEventCard 卡片列表 -->
-      <div v-if="isMobile" class="match-card-list" v-loading="loading">
-        <MobileEventCard v-for="(item, index) in rows" :key="index" :item="item" />
-      </div>
-      <!-- 桌面端：EventCard 网格 -->
-      <div v-else class="match-grid-wrap" v-loading="loading">
-        <el-row :gutter="16">
-          <el-col v-for="(item, index) in rows" :key="index" :sm="12" :md="8" :lg="6">
-            <EventCard :item="item" />
-          </el-col>
-        </el-row>
-      </div>
-    </template>
+            <el-table-column v-if="tab === 'player'" label="姓名" width="100">
+                <template #default="scope">
+                    <UserLink
+                        :uid="scope.row.uid || scope.row.id"
+                        :name="scope.row.username2 || '-'"
+                        :subName="scope.row.realname || '-'"
+                    />
+                </template>
+            </el-table-column>
+            <el-table-column
+                v-if="tab === 'player'"
+                label="当前积分"
+                prop="score"
+                width="80"
+            />
+            <el-table-column
+                v-if="tab === 'player' && !isMobile"
+                label="最高积分"
+                prop="maxscore"
+                width="110"
+            />
+            <el-table-column
+                v-if="tab === 'player'"
+                label="性别"
+                prop="sex"
+                width="60"
+                ><template #default="{ row }">
+                    {{ row.sex === "1" ? "男" : "女" }}
+                </template>
+            </el-table-column>
+            <el-table-column
+                v-if="tab === 'player'"
+                label="省份"
+                prop="resideprovince"
+                width="100"
+            />
+            <el-table-column v-if="tab === 'player'" label="生于" width="130">
+                <template #default="scope">
+                    {{ scope.row.birthyear ? `${scope.row.birthyear}年` : "-" }}
+                </template>
+            </el-table-column>
+        </el-table>
 
-    <!-- 球馆/积分 tab：表格 -->
-    <el-table v-if="tab !== 'match'" :data="rows" stripe v-loading="loading">
-      <el-table-column v-if="tab === 'arena'" label="球馆名称" prop="name" min-width="220" />
-      <el-table-column v-if="tab === 'arena'" label="城市" prop="city" width="120" />
-      <el-table-column v-if="tab === 'arena'" label="地址" prop="location" min-width="320" />
-
-      <el-table-column v-if="tab === 'player'" label="姓名" width="100">
-        <template #default="scope">
-          <UserLink
-            :uid="scope.row.uid || scope.row.id"
-            :name="scope.row.username2 || '-'"
-            :subName="scope.row.realname || '-'"
-          />
-        </template>
-      </el-table-column>
-      <el-table-column v-if="tab === 'player'" label="当前积分" prop="score" width="80" />
-      <el-table-column
-        v-if="tab === 'player' && !isMobile"
-        label="最高积分"
-        prop="maxscore"
-        width="110"
-      />
-      <el-table-column v-if="tab === 'player'" label="性别" prop="sex" width="60"
-        ><template #default="{ row }">
-          {{ row.sex === '1' ? '男' : '女' }}
-        </template>
-      </el-table-column>
-      <el-table-column v-if="tab === 'player'" label="省份" prop="resideprovince" width="100" />
-      <el-table-column v-if="tab === 'player'" label="生于" width="130">
-        <template #default="scope">
-          {{ scope.row.birthyear ? `${scope.row.birthyear}年` : '-' }}
-        </template>
-      </el-table-column>
-    </el-table>
-
-    <div class="pager">
-      <el-button v-if="hasMore" :loading="loading" @click="loadMore"> 加载更多 </el-button>
-      <span v-else class="pager-end"> 没有更多数据了 </span>
-    </div>
-  </el-card>
+        <div class="pager">
+            <el-button v-if="hasMore" :loading="loading" @click="loadMore">
+                加载更多
+            </el-button>
+            <span v-else class="pager-end"> 没有更多数据了 </span>
+        </div>
+    </el-card>
 </template>
 
 <script setup>
-import { computed, ref, watch, onMounted, onBeforeUnmount } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import UserLink from '../components/UserLink.vue';
-import EventCard from '../components/EventCard.vue';
-import MobileEventCard from '../components/MobileEventCard.vue';
-import { getArenaListPageByKey } from '../api/arena';
-import { getMatchListPageByKey } from '../api/match';
-import { getCities } from '../api/publicc';
-import { getUserListPageByKey } from '../api/user';
-import { useUserStore } from '../stores/user';
-import { toList } from '../utils/format';
+import { computed, ref, watch, onMounted, onBeforeUnmount } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import UserLink from "../components/UserLink.vue";
+import EventCard from "../components/EventCard.vue";
+import MobileEventCard from "../components/MobileEventCard.vue";
+import { getArenaListPageByKey } from "../api/arena";
+import { getMatchListPageByKey } from "../api/match";
+import { getCities } from "../api/publicc";
+import { getUserListPageByKey } from "../api/user";
+import { useUserStore } from "../stores/user";
+import { toList } from "../utils/format";
+
+const HISTORY_KEY = "search_history_player";
+
+function loadHistory() {
+    try {
+        const raw = localStorage.getItem(HISTORY_KEY);
+        return raw ? JSON.parse(raw) : [];
+    } catch {
+        return [];
+    }
+}
+
+function saveHistory(list) {
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(list));
+}
 
 const userStore = useUserStore();
 const router = useRouter();
 const route = useRoute();
-const tab = ref('match');
+const tab = ref("match");
 const loading = ref(false);
-const keyword = ref('');
+const keyword = ref("");
 const rows = ref([]);
 const page = ref(1);
-const distance = ref('');
+const distance = ref("");
 const bootstrapped = ref(false);
 const hasMore = ref(false);
 const PAGE_SIZE = 10;
+const searchHistory = ref(loadHistory());
 const windowWidth = ref(window.innerWidth);
 const isMobile = computed(() => windowWidth.value < 768);
 
 const updateWindowWidth = () => {
-  windowWidth.value = window.innerWidth;
+    windowWidth.value = window.innerWidth;
 };
 
 onMounted(() => {
-  window.addEventListener('resize', updateWindowWidth);
+    window.addEventListener("resize", updateWindowWidth);
 });
 
 onBeforeUnmount(() => {
-  window.removeEventListener('resize', updateWindowWidth);
+    window.removeEventListener("resize", updateWindowWidth);
 });
 
 function formatYmd(date) {
-  const y = date.getFullYear();
-  const m = `${date.getMonth() + 1}`.padStart(2, '0');
-  const d = `${date.getDate()}`.padStart(2, '0');
-  return `${y}-${m}-${d}`;
+    const y = date.getFullYear();
+    const m = `${date.getMonth() + 1}`.padStart(2, "0");
+    const d = `${date.getDate()}`.padStart(2, "0");
+    return `${y}-${m}-${d}`;
 }
 
 const today = formatYmd(new Date());
 const dateRange = ref([today, today]);
 const dateStart = ref(today);
 const dateEnd = ref(today);
-const matchCity = ref('');
+const matchCity = ref("");
 const matchTags = ref([]);
 const cityOptions = ref([{ id: userStore.city.id, name: userStore.city.name }]);
-const tagOptions = ['网红', '大奖赛', '青少年', '观察员'];
+const tagOptions = ["网红", "大奖赛", "青少年", "观察员"];
 
 const placeholder = computed(() => {
-  if (tab.value === 'arena') return '请输入球馆名称';
-  if (tab.value === 'player') return '请输入用户昵称';
-  return '请输入比赛名称';
+    if (tab.value === "arena") return "请输入球馆名称";
+    if (tab.value === "player") return "请输入用户昵称";
+    return "请输入比赛名称";
 });
 
 // 同步手机端日期和桌面端日期选择器
 const effectiveDateRange = computed(() => {
-  if (isMobile.value) {
-    return [dateStart.value, dateEnd.value];
-  }
-  return dateRange.value;
+    if (isMobile.value) {
+        return [dateStart.value, dateEnd.value];
+    }
+    return dateRange.value;
 });
 
 function buildQuery() {
-  const query = {
-    tab: tab.value || 'match',
-    keyword: keyword.value || undefined,
-  };
-  if (tab.value === 'match') {
-    const [startDate, endDate] = effectiveDateRange.value || [];
-    if (startDate && endDate) {
-      query.start = startDate;
-      query.end = endDate;
+    const query = {
+        tab: tab.value || "match",
+        keyword: keyword.value || undefined,
+    };
+    if (tab.value === "match") {
+        const [startDate, endDate] = effectiveDateRange.value || [];
+        if (startDate && endDate) {
+            query.start = startDate;
+            query.end = endDate;
+        }
+        query.city = matchCity.value || undefined;
+        query.distance = distance.value || undefined;
+        query.tags = matchTags.value.length
+            ? matchTags.value.join(",")
+            : undefined;
     }
-    query.city = matchCity.value || undefined;
-    query.distance = distance.value || undefined;
-    query.tags = matchTags.value.length ? matchTags.value.join(',') : undefined;
-  }
-  return query;
+    return query;
 }
 
 function syncQuery() {
-  router.replace({ query: buildQuery() });
+    router.replace({ query: buildQuery() });
 }
 
 function applyQuery() {
-  const q = route.query || {};
-  tab.value = q.tab === 'arena' || q.tab === 'player' ? q.tab : 'match';
-  keyword.value = typeof q.keyword === 'string' ? q.keyword : '';
-  page.value = 1;
+    const q = route.query || {};
+    tab.value = q.tab === "arena" || q.tab === "player" ? q.tab : "match";
+    keyword.value = typeof q.keyword === "string" ? q.keyword : "";
+    page.value = 1;
 
-  if (tab.value === 'match') {
-    const start = typeof q.start === 'string' ? q.start : today;
-    const end = typeof q.end === 'string' ? q.end : today;
-    dateRange.value = [start, end];
-    dateStart.value = start;
-    dateEnd.value = end;
-    matchCity.value = typeof q.city === 'string' ? q.city : '';
-    distance.value = typeof q.distance === 'string' ? q.distance : '';
-    matchTags.value = typeof q.tags === 'string' && q.tags.length ? q.tags.split(',') : [];
-  } else {
-    dateRange.value = [today, today];
-    dateStart.value = today;
-    dateEnd.value = today;
-    matchCity.value = '';
-    distance.value = '';
-    matchTags.value = [];
-  }
+    if (tab.value === "match") {
+        const start = typeof q.start === "string" ? q.start : today;
+        const end = typeof q.end === "string" ? q.end : today;
+        dateRange.value = [start, end];
+        dateStart.value = start;
+        dateEnd.value = end;
+        matchCity.value = typeof q.city === "string" ? q.city : "";
+        distance.value = typeof q.distance === "string" ? q.distance : "";
+        matchTags.value =
+            typeof q.tags === "string" && q.tags.length
+                ? q.tags.split(",")
+                : [];
+    } else {
+        dateRange.value = [today, today];
+        dateStart.value = today;
+        dateEnd.value = today;
+        matchCity.value = "";
+        distance.value = "";
+        matchTags.value = [];
+    }
 }
 
 async function search(nextPage = 1, append = false) {
-  if (loading.value || (tab.value === 'player' && keyword.value === '')) {
-    return;
-  }
-  page.value = nextPage;
-  syncQuery();
-  loading.value = true;
-  try {
-    const { lng, lat } = userStore.location;
-    let res;
-    if (tab.value === 'match') {
-      const [startDate, endDate] = effectiveDateRange.value || [];
-      const startMatchTimestamp = startDate
-        ? String(Math.floor(new Date(`${startDate} 00:00:00`).getTime() / 1000))
-        : '';
-      const endMatchTimestamp = endDate
-        ? String(Math.floor(new Date(`${endDate} 23:59:59`).getTime() / 1000))
-        : '';
-      res = await getMatchListPageByKey({
-        lng,
-        lat,
-        city: matchCity.value || userStore.city.name,
-        eventTitle: keyword.value,
-        startMatchTimestamp,
-        endMatchTimestamp,
-        quickTags: matchTags.value.join(','),
-        distance: distance.value,
-        search: 1,
-        page: nextPage,
-      });
-    } else if (tab.value === 'arena') {
-      res = await getArenaListPageByKey({
-        lng,
-        lat,
-        key: keyword.value,
-        page: nextPage,
-      });
-    } else {
-      res = await getUserListPageByKey({
-        key: keyword.value,
-        page: nextPage,
-        now: userStore.city.name,
-        city: '-1',
-        sort: 2,
-      });
+    if (loading.value || (tab.value === "player" && keyword.value === "")) {
+        return;
     }
-    const incoming = toList(res.data);
-    rows.value = append ? rows.value.concat(incoming) : incoming;
-    hasMore.value = incoming.length >= PAGE_SIZE;
-  } finally {
-    loading.value = false;
-  }
+    page.value = nextPage;
+    syncQuery();
+    loading.value = true;
+    try {
+        const { lng, lat } = userStore.location;
+        let res;
+        if (tab.value === "match") {
+            const [startDate, endDate] = effectiveDateRange.value || [];
+            const startMatchTimestamp = startDate
+                ? String(
+                      Math.floor(
+                          new Date(`${startDate} 00:00:00`).getTime() / 1000,
+                      ),
+                  )
+                : "";
+            const endMatchTimestamp = endDate
+                ? String(
+                      Math.floor(
+                          new Date(`${endDate} 23:59:59`).getTime() / 1000,
+                      ),
+                  )
+                : "";
+            res = await getMatchListPageByKey({
+                lng,
+                lat,
+                city: matchCity.value || userStore.city.name,
+                eventTitle: keyword.value,
+                startMatchTimestamp,
+                endMatchTimestamp,
+                quickTags: matchTags.value.join(","),
+                distance: distance.value,
+                search: 1,
+                page: nextPage,
+            });
+        } else if (tab.value === "arena") {
+            res = await getArenaListPageByKey({
+                lng,
+                lat,
+                key: keyword.value,
+                page: nextPage,
+            });
+        } else {
+            res = await getUserListPageByKey({
+                key: keyword.value,
+                page: nextPage,
+                now: userStore.city.name,
+                city: "-1",
+                sort: 2,
+            });
+            pushHistory(keyword.value);
+        }
+        const incoming = toList(res.data);
+        rows.value = append ? rows.value.concat(incoming) : incoming;
+        hasMore.value = incoming.length >= PAGE_SIZE;
+    } finally {
+        loading.value = false;
+    }
 }
 
 function loadMore() {
-  if (!hasMore.value || loading.value) {
-    return;
-  }
-  search(page.value + 1, true);
+    if (!hasMore.value || loading.value) {
+        return;
+    }
+    search(page.value + 1, true);
 }
 
 watch(tab, () => {
-  if (!bootstrapped.value) {
-    return;
-  }
-  page.value = 1;
-  rows.value = [];
-  hasMore.value = false;
-  if (
-    tab.value === 'match' &&
-    (!effectiveDateRange.value || effectiveDateRange.value.length !== 2)
-  ) {
-    dateRange.value = [today, today];
-    dateStart.value = today;
-    dateEnd.value = today;
-  }
-  search(1, false);
+    if (!bootstrapped.value) {
+        return;
+    }
+    page.value = 1;
+    rows.value = [];
+    hasMore.value = false;
+    if (
+        tab.value === "match" &&
+        (!effectiveDateRange.value || effectiveDateRange.value.length !== 2)
+    ) {
+        dateRange.value = [today, today];
+        dateStart.value = today;
+        dateEnd.value = today;
+    }
+    search(1, false);
 });
 
 async function loadCities() {
-  const res = await getCities();
-  const rows = res.data?.data || [];
-  if (rows.length) {
-    cityOptions.value = rows;
-  }
+    const res = await getCities();
+    const rows = res.data?.data || [];
+    if (rows.length) {
+        cityOptions.value = rows;
+    }
+}
+
+function pushHistory(kw) {
+    if (!kw) return;
+    const list = searchHistory.value.filter((item) => item !== kw);
+    list.unshift(kw);
+    searchHistory.value = list;
+    saveHistory(list);
+}
+
+function removeHistory(kw) {
+    const list = searchHistory.value.filter((item) => item !== kw);
+    searchHistory.value = list;
+    saveHistory(list);
+}
+
+function clearHistory() {
+    searchHistory.value = [];
+    saveHistory([]);
+}
+
+function querySearch(queryString, cb) {
+    const results = queryString
+        ? searchHistory.value.filter((kw) => kw.includes(queryString))
+        : searchHistory.value;
+    cb(results.map((kw) => ({ value: kw })));
+}
+
+function applyHistory(kw) {
+    keyword.value = kw;
+    search(1);
 }
 
 applyQuery();
@@ -348,78 +490,86 @@ search(page.value || 1, false);
 loadCities();
 
 function getEventId(row) {
-  return row?.eventid || row?.id || row?.match_id || null;
+    return row?.eventid || row?.id || row?.match_id || null;
 }
 
 function formatDistance(juli) {
-  if (juli === undefined || juli === null || juli === '') {
-    return '-';
-  }
-  return `距您${Number(juli).toFixed(1)}公里`;
+    if (juli === undefined || juli === null || juli === "") {
+        return "-";
+    }
+    return `距您${Number(juli).toFixed(1)}公里`;
 }
 
 function formatDateRange(row) {
-  const start = row?.starttime || '-';
-  const end = row?.endtime || '';
-  return end ? `${start} 至 ${end}` : start;
+    const start = row?.starttime || "-";
+    const end = row?.endtime || "";
+    return end ? `${start} 至 ${end}` : start;
 }
 </script>
 
 <style scoped>
 .filters {
-  margin: 6px 0 14px;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 12px;
+    margin: 6px 0 14px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
 }
 
 .pager {
-  margin-top: 14px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+    margin-top: 14px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .pager-end {
-  font-size: 13px;
-  color: #909399;
+    font-size: 13px;
+    color: #909399;
 }
 
 .link-primary {
-  color: #409eff;
-  text-decoration: none;
+    color: #409eff;
+    text-decoration: none;
 }
 
 .link-primary:hover {
-  text-decoration: underline;
+    text-decoration: underline;
 }
 
 .date-inputs {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
 .date-separator {
-  color: #909399;
-  font-size: 13px;
+    color: #909399;
+    font-size: 13px;
+}
+
+.search-history {
+    margin: -6px 0 14px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
 }
 
 /* 手机端比赛卡片列表 */
 .match-card-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 4px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 4px 0;
 }
 
 /* 桌面端比赛卡片网格 */
 .match-grid-wrap {
-  margin-top: 6px;
+    margin-top: 6px;
 }
 
 .match-grid-wrap :deep(.el-row) {
-  row-gap: 16px;
+    row-gap: 16px;
 }
 </style>
