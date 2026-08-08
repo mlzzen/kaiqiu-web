@@ -175,7 +175,7 @@
     <el-card class="mobile-card">
       <div class="section-title">近期战绩</div>
       <el-table :data="games" stripe v-loading="gamesLoading" size="small">
-        <el-table-column label="#" type="index" width="25" />
+        <el-table-column label="#" type="index" width="32" class-name="index-col" />
         <el-table-column label="日期" width="80">
           <template #default="scope">
             <EventLink
@@ -196,7 +196,7 @@
             <UserLink :uid="scope.row.uid2" :name="scope.row.username2" />
           </template>
         </el-table-column>
-        <el-table-column label="比分" width="35">
+        <el-table-column label="比分" width="40" label-class-name="score-col">
           <template #default="scope">
             <span
               :class="{
@@ -420,8 +420,8 @@
         </template>
 
         <div class="section-title">近期战绩</div>
-        <el-table :data="games" stripe v-loading="gamesLoading">
-          <el-table-column label="#" type="index" width="40" />
+        <el-table :data="games" stripe v-loading="gamesLoading" class="games-table">
+          <el-table-column label="#" type="index" width="40" class-name="index-col" />
           <el-table-column label="日期" width="130">
             <template #default="scope">
               <EventLink
@@ -458,7 +458,7 @@
               </template>
             </template>
           </el-table-column>
-          <el-table-column label="比分" width="50">
+          <el-table-column label="比分" width="56" label-class-name="score-col">
             <template #default="scope">
               <span
                 v-if="scope.row.gameid && scope.row.flag === '0'"
@@ -495,9 +495,15 @@
           </el-table-column>
         </el-table>
         <div class="pager">
-          <el-button :disabled="page <= 1 || gamesLoading" @click="prevPage">上一页</el-button>
-          <span class="page-text">第 {{ page }} 页</span>
-          <el-button :disabled="!hasNext || gamesLoading" @click="nextPage">下一页</el-button>
+          <el-pagination
+            background
+            :layout="totalKnown ? 'prev, pager, next, jumper' : 'prev, next, jumper'"
+            :current-page="page"
+            :page-size="effectivePageSize"
+            :total="pagerTotal"
+            :disabled="gamesLoading"
+            @current-change="onPageChange"
+          />
         </div>
       </el-card>
     </el-col>
@@ -537,6 +543,9 @@ const gamesLoading = ref(false);
 const page = ref(1);
 const pageSize = 20;
 const total = ref(0);
+// 后端未返回总数时为 false：分页组件用超大 total 保证 jumper 可跳任意页码，翻到尽头再收口
+const totalKnown = ref(false);
+const pagerTotal = computed(() => (totalKnown.value ? total.value : Number.MAX_SAFE_INTEGER));
 const firstPageGames = ref([]);
 const hasNext = ref(false);
 const effectivePageSize = ref(20);
@@ -773,11 +782,29 @@ async function loadData() {
   total.value = Number(
     res.data?.games?.total || res.data?.games?.count || res.data?.games?.recordsTotal || 0,
   );
+  totalKnown.value = total.value > 0 || firstPageGames.value.length === 0;
   // 原版是无限加载：未知总数时先允许继续翻页，直到某页返回空/不足再收口
   hasNext.value =
     total.value > 0 ? effectivePageSize.value < total.value : firstPageGames.value.length > 0;
   await Promise.all([loadUserTags(), loadUserScores()]);
-  await loadGames(1);
+  await loadGames(getInitialPage());
+}
+
+// 从 URL query 读取初始页码，非法/缺省时回落到第 1 页
+function getInitialPage() {
+  const queryPage = Number(route.query.page);
+  return Number.isInteger(queryPage) && queryPage > 1 ? queryPage : 1;
+}
+
+// 把当前页码同步到 URL（第 1 页时不带参数，保持 URL 干净）
+function syncPageToUrl(nextPage) {
+  const query = { ...route.query };
+  if (nextPage > 1) {
+    query.page = String(nextPage);
+  } else {
+    delete query.page;
+  }
+  router.replace({ query });
 }
 
 async function loadUserTags() {
@@ -801,6 +828,7 @@ async function loadGames(nextPage = 1) {
     return;
   }
   page.value = nextPage;
+  syncPageToUrl(nextPage);
   gamesLoading.value = true;
   try {
     if (nextPage === 1) {
@@ -815,13 +843,18 @@ async function loadGames(nextPage = 1) {
     const remoteTotal = Number(res.data?.total || res.data?.count || 0);
     if (remoteTotal > 0) {
       total.value = remoteTotal;
+      totalKnown.value = true;
       hasNext.value = nextPage * effectivePageSize.value < remoteTotal;
     } else if (rows.length < effectivePageSize.value) {
-      total.value = Math.max(total.value, (nextPage - 1) * effectivePageSize.value + rows.length);
+      // 收口：该页数据不足（或为空），确认到“当前页为止”，保证 pageCount >= currentPage，
+      // 避免分页组件因 pageCount 缩小而连环回退页码
+      total.value = Math.max(total.value, nextPage * effectivePageSize.value);
+      totalKnown.value = true;
       hasNext.value = false;
     } else {
       // 后端未返回总数时，按“可能还有下一页”维持可翻页
       total.value = Math.max(total.value, nextPage * effectivePageSize.value + 1);
+      totalKnown.value = false;
       hasNext.value = true;
     }
   } finally {
@@ -845,6 +878,18 @@ async function toggleFollow() {
 }
 
 watch(uid, () => loadData(), { immediate: true });
+
+// 支持浏览器前进/后退恢复页码；本页翻页触发的同步（page 已一致）直接跳过
+watch(
+  () => route.query.page,
+  (newPage) => {
+    const target = Number(newPage);
+    const valid = Number.isInteger(target) && target > 1 ? target : 1;
+    if (valid !== page.value) {
+      loadGames(valid);
+    }
+  },
+);
 
 function getEventId(row) {
   return row?.eventid || row?.match_id || row?.id || null;
@@ -870,6 +915,13 @@ function nextPage() {
     return;
   }
   loadGames(page.value + 1);
+}
+
+// el-pagination 页码变化（点页码/上一页/下一页/jumper 跳转）统一走 loadGames
+function onPageChange(newPage) {
+  if (newPage !== page.value) {
+    loadGames(newPage);
+  }
 }
 
 function splitValue(raw, delimiter = ',') {
@@ -1040,6 +1092,27 @@ function parseSpecialRival(raw) {
   min-width: 72px;
   text-align: center;
   color: #6b7280;
+}
+
+/* 近期战绩序号列：不换行 */
+:deep(.index-col .cell) {
+  white-space: nowrap;
+}
+
+/* 近期战绩比分列表头：不换行 */
+:deep(.score-col .cell) {
+  white-space: nowrap;
+}
+
+/* 桌面端近期战绩：固定行高 54px，避免单打/双打行高不同导致翻页时表格高度跳动 */
+.games-table :deep(td.el-table__cell) {
+  height: 54px;
+  padding: 0;
+}
+
+.games-table :deep(.el-table__cell .cell) {
+  display: flex;
+  align-items: center;
 }
 
 .stat-list {
