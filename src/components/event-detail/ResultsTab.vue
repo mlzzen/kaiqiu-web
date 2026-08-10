@@ -1,5 +1,8 @@
 <template>
   <div class="results" v-loading="loading">
+    <div class="results-toolbar">
+      <el-button size="small" :icon="Refresh" @click="$emit('refresh')">刷新</el-button>
+    </div>
     <HonorsList :honors="resultHonors" />
     <GroupResults :groups="resultGroups" :current-item="currentItem" />
     <TtBracket :tt-games="resultTtGames" />
@@ -13,10 +16,13 @@
 </template>
 
 <script setup>
+import { Refresh } from '@element-plus/icons-vue';
 import HonorsList from './HonorsList.vue';
 import GroupResults from './GroupResults.vue';
 import TtBracket from './TtBracket.vue';
 import TtDetail from './TtDetail.vue';
+
+defineEmits(['refresh']);
 
 defineProps({
   loading: {
@@ -59,6 +65,11 @@ defineProps({
   display: flex;
   flex-direction: column;
   gap: 18px;
+}
+
+.results-toolbar {
+  display: flex;
+  justify-content: flex-end;
 }
 
 .results-empty {

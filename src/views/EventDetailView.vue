@@ -37,6 +37,7 @@
         :result-init="resultInit"
         :current-item="currentItem"
         :event-id="eventId"
+        @refresh="loadTabData"
       />
 
       <HonorsTab v-else-if="activeTab === 'honors'" :loading="tabLoading" :honor-rows="honorRows" />
